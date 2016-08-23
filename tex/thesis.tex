@@ -39,7 +39,8 @@
 \pagenumbering{arabic}
 
 \lipsum[1]
-Random citation \autocite{DUMMY:1} embeddeed in text.\par
+Random citation \cite{DUMMY:1} embeddeed in text.\par
+%Random citation \autocite{DUMMY:1} embeddeed in text.\par
 \lipsum[2]
 \begin{figure}
 	\caption{The FH Logo}
@@ -73,7 +74,12 @@ Random citation \autocite{DUMMY:1} embeddeed in text.\par
 \chapter{Conclusion}
 
 \clearpage
+\renewcommand{\bibname}{References} % rename Bibliograpy to References
+\printbibliography[heading=bibintoc]
 
-\printbibliography
+\begin{appendices}
+	\chapter{Some name}
+	\lipsum[3]
+\end{appendices}
 
 \end{document}
