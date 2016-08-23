@@ -7,6 +7,73 @@
 	\include{titlepage-content}
 \restoregeometry
 
-test
+\pagenumbering{roman}
+
+\clearpage
+\vspace*{\fill}
+\begin{center}
+	\begin{minipage}{.8\textwidth}
+		\thispagestyle{empty} % no pagenumber on affidavit
+		Diese Arbeit ist von mir selbst\"andig angefertigt und verfasst. Es sind keine anderen als die angegebenen Quellen und Hilfsmittel benutzt worden.\par
+		\vspace{1cm}
+		Frederic Klein ...............................................\par
+		Unterschrift
+	\end{minipage}
+\end{center}
+\vfill % equivalent to \vspace{\fill}
+\clearpage
+
+\spacing{1.5}
+
+\begin{abstract}
+	\thispagestyle{plain}
+	\setcounter{page}{1}
+	Abstract...
+\end{abstract}
+
+\tableofcontents
+\setcounter{page}{2}
+\listoffigures
+
+\chapter{Introduction}
+\pagenumbering{arabic}
+
+\lipsum[1]
+Random citation \autocite{DUMMY:1} embeddeed in text.\par
+\lipsum[2]
+\begin{figure}
+	\caption{The FH Logo}
+	\includegraphics[scale=0.5]{figures/FH-logo.png}
+\end{figure}
+\chapter{Foundation}
+	\section{Gamification and Serious Games}
+	\section{Distributed Systems}
+	\section{Secure Multi-Party Computation (SMPC)}
+	\subsection*{Protocols}
+	\subsection*{Frameworks}
+	\subsection*{Differential Privacy}
+	\section{Wireless network technologies}
+	\subsection*{Wireless Local Area Networks}
+	\subsubsection*{Wi-Fi/802.11}
+	\subsection*{Wireless Personal Area Networks}
+	\subsubsection*{Bluetooth}
+	\subsubsection*{Bluetooth Smart/Bluetooth Low Energy}
+	\subsection*{Wireless Networks in Hospitals}
+	\section{Case Study: "The Hygiene Games" System}
+
+\chapter{Research}
+	\section{Applicability of SMPC Protocols in Decentralised Systems}
+	
+	\subsection*{Analysis of Key Factors: Computing Power, Network Data Rates and Duration of Connection}
+	\section{Effectiveness of SMPC Protocols in Sparse Networks}
+	\subsection*{Maintaining anonymity}
+	\subsection*{Strategies for Aggregation of Participants in Sparse Networks}
+	\section{Applicability and Requirements Analysis for the Hygiene Games}
+
+\chapter{Conclusion}
+
+\clearpage
+
+\printbibliography
 
 \end{document}

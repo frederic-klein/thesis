@@ -1,13 +1,21 @@
-\documentclass[12pt,titlepage]{article}
+\documentclass[12pt,a4paper]{report}
 
-\usepackage[a4paper,lmargin={4cm},rmargin={2cm},tmargin={2.5cm},bmargin={2.5cm}]{geometry}
-
+% packages
+\usepackage[lmargin={3.0cm},rmargin={2.0cm},tmargin={2.5cm},bmargin={2.0cm}]{geometry}
 \usepackage[english]{babel}
-
 \usepackage{amssymb}
-
 \usepackage{graphicx}
-
 \usepackage{tikz} % for positioning the logo
-
 \usepackage[latin1]{inputenc}
+\usepackage[nottoc,notlof,notlot]{tocbibind} % for inclusion of references in toc
+%\usepackage[toc,page]{appendix} % for inclusion of references in toc
+\usepackage{setspace} % for spacing
+\usepackage[backend=bibtex,style=numeric,citestyle=numeric]{biblatex} % for references with footnotes
+
+\bibliography{references}
+\settocbibname{References}
+
+% packages only for demonstration/testing
+\usepackage{lipsum} % for lorem ipsum
+
+
