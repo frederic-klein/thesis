@@ -38,12 +38,31 @@
 \chapter{Introduction}
 \pagenumbering{arabic}
 Research has found that "this is a direct quotation" \autocite[p. 1]{Doe:1}. \textcite[p. 1]{Doe:1} found that "this is a direct quotation". On the other hand, if the direct quotation is paraphrased, we don't need the quotes; also we use pp. for multiple, consecutive pages \autocite[pp. 35-37]{Doe:2}.\par
+
 In the above paragraph we used \textit{authoryear} as citation scheme and add a descriptive footnote.\footnote{authoryear complies with the Harvard Reference Style}\par
+
 The Corporate Design section on the FH Aachen website, is rather disappointing. Using the website logo, we get a higher resolution (see figure \ref{figure:fhLogo}) and use this logo for the title page.\par
+
+Formulas are numbered continuously and referenced with labels except for inline equations, e.g. \(x^2+5x+6=0\). The (compare \ref{eq:multi3})
+
+\begin{equation}
+	\label{eq:simple}
+	x^2+5x+6=0
+\end{equation}
+
+\begin{alignat}{3}
+	& \quad && x^2+5x+6                   \qquad && = 0  \label{eq:multi1} \\
+	& \Leftrightarrow \quad && (2+x)(3+x) \qquad && = 0 \label{eq:multi2} \\
+	& \Rightarrow     \quad && 2+x=0      \qquad && \lor \qquad 3+x=0 \label{eq:multi3} \\
+	& \Rightarrow 	  \quad && x=-2       \qquad && \lor \qquad x =-0 \label{eq:multi4} 
+ 	%w_3 &= w_1 + w_2 &\qquad&\text{(Energieerhaltung)}\\
+ 	%\vec k_3 &= \vec k_1 + \vec k_1 &&\text{(Impulserhaltung)}
+\end{alignat}
+
 \begin{figure}
 	\caption{The FH Logo \autocite[]{Online:FhAachen}}
 	\includegraphics[scale=0.7]{figures/FHLogoFromSVG.png}
-	\label{figure:fhLogo}
+	\label{figure:fhLogo} % to reference it with \ref{figure:fhLogo}
 \end{figure}
 \par
 \lipsum[1]
