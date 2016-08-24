@@ -37,15 +37,19 @@
 
 \chapter{Introduction}
 \pagenumbering{arabic}
-
+Research has found that "this is a direct quotation" \autocite[p. 1]{Doe:1}. \textcite[p. 1]{Doe:1} found that "this is a direct quotation". On the other hand, if the direct quotation is paraphrased, we don't need the quotes; also we use pp. for multiple, consecutive pages \autocite[pp. 35-37]{Doe:2}.\par
+In the above paragraph we used \textit{authoryear} as citation scheme and add a descriptive footnote.\footnote{authoryear complies with the Harvard Reference Style}\par
+The Corporate Design section on the FH Aachen website, is rather disappointing. Using the website logo, we get a higher resolution (see figure \ref{figure:fhLogo}) and use this logo for the title page.\par
+\begin{figure}
+	\caption{The FH Logo \autocite[]{Online:FhAachen}}
+	\includegraphics[scale=0.7]{figures/FHLogoFromSVG.png}
+	\label{figure:fhLogo}
+\end{figure}
+\par
 \lipsum[1]
-Random citation \cite{DUMMY:1} embeddeed in text.\par
 %Random citation \autocite{DUMMY:1} embeddeed in text.\par
 \lipsum[2]
-\begin{figure}
-	\caption{The FH Logo}
-	\includegraphics[scale=0.5]{figures/FH-logo.png}
-\end{figure}
+
 \chapter{Foundation}
 	\section{Gamification and Serious Games}
 	\section{Distributed Systems}
@@ -75,7 +79,7 @@ Random citation \cite{DUMMY:1} embeddeed in text.\par
 
 \clearpage
 \renewcommand{\bibname}{References} % rename Bibliograpy to References
-\printbibliography[heading=bibintoc]
+\printbibliography[heading=bibintoc] % add References chapter and display it in toc
 
 \begin{appendices}
 	\chapter{Some name}
