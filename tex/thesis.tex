@@ -16,7 +16,7 @@
 		\thispagestyle{empty} % no pagenumber on affidavit
 		Diese Arbeit ist von mir selbst\"andig angefertigt und verfasst. Es sind keine anderen als die angegebenen Quellen und Hilfsmittel benutzt worden.\par
 		\vspace{1cm}
-		Frederic Klein ...............................................\par
+		Frederic Klein \dotfill \par
 		Unterschrift
 	\end{minipage}
 \end{center}
@@ -28,12 +28,16 @@
 \begin{abstract}
 	\thispagestyle{plain}
 	\setcounter{page}{1}
-	Abstract...
+	\lipsum[1-3]
 \end{abstract}
 
 \tableofcontents
 \setcounter{page}{2}
 \listoffigures
+
+\printnoidxglossary[type=\acronymtype,title={List of Acronyms}]
+
+{\let\clearpage\relax \printnoidxglossary[type=symbols,sort=letter]}
 
 \chapter{Introduction}
 \pagenumbering{arabic}
@@ -43,31 +47,36 @@ In the above paragraph we used \textit{authoryear} as citation scheme and add a 
 
 The Corporate Design section on the FH Aachen website, is rather disappointing. Using the website logo, we get a higher resolution (see figure \ref{figure:fhLogo}) and use this logo for the title page.\par
 
-Formulas are numbered continuously and referenced with labels except for inline equations, e.g. \(x^2+5x+6=0\). The (compare \ref{eq:multi3})
-
-\begin{equation}
-	\label{eq:simple}
-	x^2+5x+6=0
-\end{equation}
-
-\begin{alignat}{3}
-	& \quad && x^2+5x+6                   \qquad && = 0  \label{eq:multi1} \\
-	& \Leftrightarrow \quad && (2+x)(3+x) \qquad && = 0 \label{eq:multi2} \\
-	& \Rightarrow     \quad && 2+x=0      \qquad && \lor \qquad 3+x=0 \label{eq:multi3} \\
-	& \Rightarrow 	  \quad && x=-2       \qquad && \lor \qquad x =-0 \label{eq:multi4} 
- 	%w_3 &= w_1 + w_2 &\qquad&\text{(Energieerhaltung)}\\
- 	%\vec k_3 &= \vec k_1 + \vec k_1 &&\text{(Impulserhaltung)}
-\end{alignat}
-
-\begin{figure}
+\begin{figure}[htbp] % h for placement here
 	\caption{The FH Logo \autocite[]{Online:FhAachen}}
 	\includegraphics[scale=0.7]{figures/FHLogoFromSVG.png}
 	\label{figure:fhLogo} % to reference it with \ref{figure:fhLogo}
 \end{figure}
+
+Simple formulas can be written in-line, e.g. \(x^2+5x+6=0\).
+\begin{samepage}
+	 Formulas, which need to be referenced in the text, should be numbered with chapter number and a continuous, 1 based counter per chapter. Let us assume our findings could be summarized as:
+	\nopagebreak
+	\begin{equation}
+		\label{eq:simple}
+		x^2+5x+6=0, x \in \gls{doubleR}
+	\end{equation}
+	Seeing that our result formula (compare \ref{eq:simple}) is solvable, we determine the solution (see \ref{eq:multi}), though we avoid the automatic numbering for equations that are not referenced by using \textit{\textbackslash nonumber}:
+	\nopagebreak
+	\begin{alignat}{3}
+		& \quad && x^2+5x+6                   \qquad && = 0  \nonumber \\
+		& \Leftrightarrow \quad && (2+x)(3+x) \qquad && = 0 \nonumber \\
+		& \Rightarrow     \quad && 2+x=0      \qquad && \lor \qquad 3+x=0 \nonumber \\
+		& \Rightarrow 	  \quad && x=-2       \qquad && \lor \qquad x =-0 \label{eq:multi} 
+	\end{alignat}
+\end{samepage}
+
+When writing a scientific paper we might need to introduce abbreviations. When we want to use an abbreviation for a phrase, we insert the abbreviation in parentheses directly after the first usage of the phrase. We might for example describe used tools in a development process such as the \gls{JDK} version. Further references to the \gls{JDK} will be in form of the acronym.\par
+
+
+
 \par
-\lipsum[1]
-%Random citation \autocite{DUMMY:1} embeddeed in text.\par
-\lipsum[2]
+\lipsum[1-3]
 
 \chapter{Foundation}
 	\section{Gamification and Serious Games}

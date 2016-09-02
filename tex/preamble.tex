@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper]{report}
 
 % packages
-\usepackage[lmargin={3.0cm},rmargin={2.0cm},tmargin={2.5cm},bmargin={2.0cm}]{geometry}
+\usepackage[lmargin={2.54cm},rmargin={2.54cm},tmargin={2.54cm},bmargin={2.54cm}]{geometry} % 1" margins
 \usepackage[english]{babel}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -13,10 +13,19 @@
 \usepackage[titletoc]{appendix} % for inclusion of references in toc
 \usepackage{setspace} % for spacing
 \usepackage{mathtools}   % loads »amsmath«
+\usepackage{amssymb} % for mathematical letters like real numbers space
 
 \bibliography{references}
 
 % packages only for demonstration/testing
 \usepackage{lipsum} % for lorem ipsum
 
+\usepackage[nonumberlist,acronyms]{glossaries} % for lsit of abbreviations and list of symbols
+\newglossary{symbols}{sym}{sbl}{List of Symbols}
+
+\makenoidxglossaries
+%=====================ACRONYMS=====================%
+\newacronym{JDK}{JDK}{Java Development Kit}
+%=====================SYMBOLS=====================%
+\newglossaryentry{doubleR}{	type=symbols,sort={real set}, name={\ensuremath{\mathbb{R}}} , description={set of real numbers} }
 
