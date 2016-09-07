@@ -23,7 +23,7 @@
 \vfill % equivalent to \vspace{\fill}
 \clearpage
 
-\spacing{1.5}
+\spacing{1.5} % line spacing
 
 \begin{abstract}
 	\thispagestyle{plain}
@@ -34,6 +34,7 @@
 \tableofcontents
 \setcounter{page}{2}
 \listoffigures
+{\let\clearpage\relax \listoftables}
 
 \printnoidxglossary[type=\acronymtype,title={List of Acronyms}]
 
@@ -41,18 +42,22 @@
 
 \chapter{Introduction}
 \pagenumbering{arabic}
+We will use this introduction chapter to introduce some formatting guidelines for writing your thesis.
+
+\section{Citations and Footnotes}
 Research has found that "this is a direct quotation" \autocite[p. 1]{Doe:1}. \textcite[p. 1]{Doe:1} found that "this is a direct quotation". On the other hand, if the direct quotation is paraphrased, we don't need the quotes; also we use pp. for multiple, consecutive pages \autocite[pp. 35-37]{Doe:2}.\par
 
 In the above paragraph we used \textit{authoryear} as citation scheme and add a descriptive footnote.\footnote{authoryear complies with the Harvard Reference Style}\par
 
-The Corporate Design section on the FH Aachen website, is rather disappointing. Using the website logo, we get a higher resolution (see figure \ref{figure:fhLogo}) and use this logo for the title page.\par
-
+\section{Figures}
+The Corporate Design section on the FH Aachen website, is rather disappointing. Using the website logo, we get a higher resolution (see figure \ref{figure:fhLogo}) and use this logo for the title page.
 \begin{figure}[htbp] % h for placement here
 	\caption{The FH Logo \autocite[]{Online:FhAachen}}
 	\includegraphics[scale=0.7]{figures/FHLogoFromSVG.png}
 	\label{figure:fhLogo} % to reference it with \ref{figure:fhLogo}
 \end{figure}
 
+\section{Formulas}
 Simple formulas can be written in-line, e.g. \(x^2+5x+6=0\).
 \begin{samepage}
 	 Formulas, which need to be referenced in the text, should be numbered with chapter number and a continuous, 1 based counter per chapter. Let us assume our findings could be summarized as:
@@ -71,10 +76,29 @@ Simple formulas can be written in-line, e.g. \(x^2+5x+6=0\).
 	\end{alignat}
 \end{samepage}
 
+
+\section{Acronyms}
 When writing a scientific paper we might need to introduce abbreviations. When we want to use an abbreviation for a phrase, we insert the abbreviation in parentheses directly after the first usage of the phrase. We might for example describe used tools in a development process such as the \gls{JDK} version. Further references to the \gls{JDK} will be in form of the acronym.\par
 
 
+\section{Tables}
 
+\begin{center}
+\begin{table}[h]
+\caption[Format settings]{Some format settings used in this template}
+	\begin{tabular}{| l | c | p{8cm} |}
+		\hline
+		Margin Left & 1" & 2.54cm \\[5pt] \hline
+		Margin Top & 1" & 2.54cm \\ \hline
+		Margin Right & 1" & 2.54cm \\ \hline
+		Margin Bottom & 1" & 2.54cm \\ \hline
+		Fontsize & 12pt & Fontsize must be 10, 11 or 12 points; in this template the fontsize is set to 12pt.  \\ \hline
+	
+	\end{tabular}
+	
+\end{table}
+\end{center}
+		
 \par
 \lipsum[1-3]
 
