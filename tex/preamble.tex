@@ -20,6 +20,9 @@
 \bibliography{references}
 
 % packages only for demonstration/testing
+\usepackage[textsize=tiny]{todonotes} % for todo notes
+\setlength{\marginparwidth}{2cm} % for todo width
+
 \usepackage{lipsum} % for lorem ipsum
 
 \usepackage[nonumberlist,acronyms]{glossaries} % for lsit of abbreviations and list of symbols
@@ -27,7 +30,10 @@
 
 \makenoidxglossaries
 %=====================ACRONYMS=====================%
-\newacronym{JDK}{JDK}{Java Development Kit}
+\newacronym{SMPC}{SMPC}{secure multi-party computation}
+\newacronym{LAN}{LAN}{local area network}
+\newacronym{MANET}{MANET}{mobile ad hoc network}
+\newacronym{SPAN}{SPAN}{smart phone ad hoc network}
 %=====================SYMBOLS=====================%
 \newglossaryentry{doubleR}{	type=symbols,sort={real set}, name={\ensuremath{\mathbb{R}}} , description={set of real numbers} }
 

@@ -28,7 +28,7 @@
 \begin{abstract}
 	\thispagestyle{plain}
 	\setcounter{page}{1}
-	\lipsum[1-3]
+	\todo{~1 page}
 \end{abstract}
 
 \tableofcontents
@@ -42,90 +42,90 @@
 
 \chapter{Introduction}
 \pagenumbering{arabic}
-We will use this introduction chapter to introduce some formatting guidelines for writing your thesis.
+In the last couple of years gamification has found it's way into many areas of our daily life. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. Gamification concerning our work life on the other hand can have much higher privacy demands. Since comparison is a key component for the gamification approach, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography.
 
-\section{Citations and Footnotes}
-Research has found that "this is a direct quotation" \autocite[p. 1]{Doe:1}. \textcite[p. 1]{Doe:1} found that "this is a direct quotation". On the other hand, if the direct quotation is paraphrased, we don't need the quotes; also we use pp. for multiple, consecutive pages \autocite[pp. 35-37]{Doe:2}.\par
+Existing frameworks for \gls{SMPC} utilize the Internet protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Especially many hospitals tend to avoid Wi-Fi to reduce the risk of electromagnetic interference with medical devices.
 
-In the above paragraph we used \textit{authoryear} as citation scheme and add a descriptive footnote.\footnote{authoryear complies with the Harvard Reference Style}\par
+To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of mesh-networks and proposes describes the design of a \gls{SMPC} framework for mesh-networks. 
 
-\section{Figures}
-The Corporate Design section on the FH Aachen website, is rather disappointing. Using the website logo, we get a higher resolution (see figure \ref{figure:fhLogo}) and use this logo for the title page.
-\begin{figure}[htbp] % h for placement here
-	\caption{The FH Logo \autocite[]{Online:FhAachen}}
-	\includegraphics[scale=0.7]{figures/FHLogoFromSVG.png}
-	\label{figure:fhLogo} % to reference it with \ref{figure:fhLogo}
-\end{figure}
+Context
 
-\section{Formulas}
-Simple formulas can be written in-line, e.g. \(x^2+5x+6=0\).
-\begin{samepage}
-	 Formulas, which need to be referenced in the text, should be numbered with chapter number and a continuous, 1 based counter per chapter. Let us assume our findings could be summarized as:
-	\nopagebreak
-	\begin{equation}
-		\label{eq:simple}
-		x^2+5x+6=0, x \in \gls{doubleR}
-	\end{equation}
-	Seeing that our result formula (compare \ref{eq:simple}) is solvable, we determine the solution (see \ref{eq:multi}), though we avoid the automatic numbering for equations that are not referenced by using \textit{\textbackslash nonumber}:
-	\nopagebreak
-	\begin{alignat}{3}
-		& \quad && x^2+5x+6                   \qquad && = 0  \nonumber \\
-		& \Leftrightarrow \quad && (2+x)(3+x) \qquad && = 0 \nonumber \\
-		& \Rightarrow     \quad && 2+x=0      \qquad && \lor \qquad 3+x=0 \nonumber \\
-		& \Rightarrow 	  \quad && x=-2       \qquad && \lor \qquad x =-0 \label{eq:multi} 
-	\end{alignat}
-\end{samepage}
+Restatement of the problem
 
+Restatement of the response
 
-\section{Acronyms}
-When writing a scientific paper we might need to introduce abbreviations. When we want to use an abbreviation for a phrase, we insert the abbreviation in parentheses directly after the first usage of the phrase. We might for example describe used tools in a development process such as the \gls{JDK} version. Further references to the \gls{JDK} will be in form of the acronym.\par
-
-
-\section{Tables}
-
-\begin{center}
-\begin{table}[h]
-\caption[Format settings]{Some format settings used in this template}
-	\begin{tabular}{| l | c | p{8cm} |}
-		\hline
-		Margin Left & 1" & 2.54cm \\[5pt] \hline
-		Margin Top & 1" & 2.54cm \\ \hline
-		Margin Right & 1" & 2.54cm \\ \hline
-		Margin Bottom & 1" & 2.54cm \\ \hline
-		Fontsize & 12pt & Fontsize must be 10, 11 or 12 points; in this template the fontsize is set to 12pt.  \\ \hline
-	
-	\end{tabular}
-	
-\end{table}
-\end{center}
-		
-\par
-\lipsum[1-3]
+Roadmap
 
 \chapter{Foundation}
-	\section{Gamification and Serious Games}
-	\section{Distributed Systems}
-	\section{Secure Multi-Party Computation (SMPC)}
-	\subsection*{Protocols}
-	\subsection*{Frameworks}
-	\subsection*{Differential Privacy}
-	\section{Wireless network technologies}
-	\subsection*{Wireless Local Area Networks}
-	\subsubsection*{Wi-Fi/802.11}
-	\subsection*{Wireless Personal Area Networks}
-	\subsubsection*{Bluetooth}
-	\subsubsection*{Bluetooth Smart/Bluetooth Low Energy}
-	\subsection*{Wireless Networks in Hospitals}
-	\section{Case Study: "The Hygiene Games" System}
 
-\chapter{Research}
-	\section{Applicability of SMPC Protocols in Decentralised Systems}
+	\section{Case Study: "The Hygiene Games"}
+
+		\subsection*{Gamification}
+
+		\subsection*{Wireless Networks in Hospitals}
 	
-	\subsection*{Analysis of Key Factors: Computing Power, Network Data Rates and Duration of Connection}
-	\section{Effectiveness of SMPC Protocols in Sparse Networks}
-	\subsection*{Maintaining anonymity}
-	\subsection*{Strategies for Aggregation of Participants in Sparse Networks}
-	\section{Applicability and Requirements Analysis for the Hygiene Games}
+	\section{Secure Multi-Party Computation}
+
+		\subsection*{Secure Addition Protocol}
+
+		\subsection*{Secure Comparison Protocol}
+
+		\subsection*{Differential Privacy}
+
+		\subsection*{Existing Frameworks}
+	
+	\section{Mobile Ad Hoc Networks}
+	
+	{\color{gray} 
+		\begin{itemize}  
+			\item continuously self-configuring
+			\item self-forming
+			\item self-healing
+			\item infrastructure-less
+			\item peer-to-peer
+			\item Difference to mesh: mobility of nodes
+		\end{itemize}
+	}
+	
+		\subsection*{Smart Phone Ad Hoc Network}
+		\todo{Example: firechat}
+		
+			\subsubsection*{Comparison to Wi-Fi Direct}
+			
+			{\color{gray} 
+				\begin{itemize}  
+					\item SPAN support multi-hop relays
+					\item Wi-Fi Direct since Android 4.0
+					\item Wi-Fi Direct: Soft AP 
+				\end{itemize}
+			}
+		
+			\subsubsection*{Wi-Fi Based \gls{SPAN}}
+	
+			\subsubsection*{Bluetooth Based \gls{SPAN}}
+			
+	\section{Distributed Computing}
+	
+		\subsection*{Coordinator Election}
+	
+
+\chapter{Methodology and Implementation}
+
+%	\section{Applicability of \gls{SMPC} Protocols in Decentralized Systems}
+	
+%	\subsection*{Analysis of Key Factors: Computing Power, Network Data Rates and Duration of Connection}
+	
+%	\section{Effectiveness of \gls{SMPC} Protocols in Sparse Networks}
+	
+%	\subsection*{Maintaining anonymity}
+	
+%	\subsection*{Strategies for Aggregation of Participants in Sparse Networks}
+	
+%	\section{Applicability and Requirements Analysis for the Hygiene Games}
+	
+\chapter{Evaluation}
+
+
 
 \chapter{Conclusion}
 
