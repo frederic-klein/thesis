@@ -28,15 +28,12 @@
 \begin{abstract}
 	\thispagestyle{plain}
 	\setcounter{page}{1}
-	In recent years gamification has become a part of many areas of our daily routine. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. In contrast, gamification concerning our work life has to satisfy much higher privacy demands. Since comparison is a key component for the gamification approach, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography. Existing frameworks for \gls{SMPC} utilize the Internet Protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Facilities with sensible measuring systems, e.g. medical devices in hospitals, often avoid Wi-Fi to reduce the risk of electromagnetic interference.
-	To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of \gls{MANET}s and proposes the design of a \gls{SMPC} framework for \gls{MANET}s, especially based on Bluetooth technology, and the implementation as a C library. 
+	In recent years gamification has become a part in many areas of our daily routine. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. In contrast, gamification concerning our work life has to satisfy much higher privacy demands. Since comparison is a key component for gamification, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography. Existing frameworks for \gls{SMPC} utilize the Internet Protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Facilities with sensible measuring systems, e.g. medical devices in hospitals, often avoid Wi-Fi to reduce the risk of electromagnetic interference.
+	To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of \gls{MANET} and proposes the design of a \gls{SMPC} framework for \gls{MANET}, especially based on Bluetooth technology, and the implementation as a C library. 
 	
-	Since \gls{MANET}s have a high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a distributed database based on the blockchain is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution are provided. Since the framework aims to provide distributed computations of statics for comparison, protocols for secure addition and a secure comparison are implemented, enabling the computation of minimum, maximum and average.
+	Since \gls{MANET}s have a high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a blockchain based distributed database is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution. Since the framework aims to provide distributed computations of comparable values, protocols for secure addition and secure comparison are implemented, enabling the computation of minimum, maximum and average.
 	
-	Devices of diverse computational power will be used to verify the applicability for wearables and \gls{IoT} grade devices. Also field-tests with a \gls{SPAN}(20-50 nodes) will be conducted to evaluated real life use cases. In contrast, the security of the framework and attack scenarios will be discussed. In summary this thesis proposes a framework for \gls{SMPC} for decentralized, distributed systems.
-	
-	
-
+	Devices of diverse computational power will be used to verify the applicability for wearables and \gls{IoT} grade devices. Also field-tests with a \gls{SPAN}(20-50 nodes) will be conducted to evaluated real life use cases. In contrast, the security of the framework and attack scenarios will be discussed. In summary, this thesis proposes a framework for \gls{SMPC} for decentralized, distributed systems.
 \end{abstract}
 
 \tableofcontents
@@ -64,76 +61,114 @@ Restatement of the response
 
 Roadmap
 
-\chapter{Background \todo{10-15\%; thorough review of the state of the art; informed audience}}
-
 	\section{Case Study: "The Hygiene Games"}
 
 		\subsection*{Gamification}
-
+	
 		\subsection*{Wireless Networks in Hospitals}
+
+\chapter{Background \todo{10-15\%; thorough review of the state of the art; informed audience}}
 	
 	\section{Secure Multi-Party Computation}
 
+		\subsection*{General Idea}
+
+		\subsection*{Differential Privacy}
+		
 		\subsection*{Secure Addition Protocol}
 
 		\subsection*{Secure Comparison Protocol}
-
-		\subsection*{Differential Privacy}
 
 		\subsection*{Existing Frameworks}
 	
 	\section{Mobile Ad Hoc Networks}
 	
-	{\color{gray} 
-		\begin{itemize}  
-			\item continuously self-configuring
-			\item self-forming
-			\item self-healing
-			\item infrastructure-less
-			\item peer-to-peer
-			\item Difference to mesh: mobility of nodes
-		\end{itemize}
-	}
+		{\color{gray} 
+			\begin{itemize}  
+				\item continuously self-configuring
+				\item self-forming
+				\item self-healing
+				\item infrastructure-less
+				\item peer-to-peer
+				\item Difference to mesh: mobility of nodes
+			\end{itemize}
+		}
 	
-		\subsection*{Smart Phone Ad Hoc Network}
-		\todo{Example: firechat}
+		\todo{Example: firechat in SPAN}
 		
 			\subsubsection*{Comparison to Wi-Fi Direct}
 			
-			{\color{gray} 
-				\begin{itemize}  
-					\item SPAN support multi-hop relays
-					\item Wi-Fi Direct since Android 4.0
-					\item Wi-Fi Direct: Soft AP 
-				\end{itemize}
-			}
+				{\color{gray} 
+					\begin{itemize}  
+						\item SPAN support multi-hop relays
+						\item Wi-Fi Direct since Android 4.0
+						\item Wi-Fi Direct: Soft AP 
+					\end{itemize}
+				}
 		
-			\subsubsection*{Wi-Fi Based \gls{SPAN}}
-	
-			\subsubsection*{Bluetooth Based \gls{SPAN}}
-			
-	\section{Distributed Computing}
-	
-		\subsection*{Coordinator Election}
-	
+			\subsubsection*{Bluetooth Based \gls{MANET} }
 
+			\subsubsection*{Wi-Fi Based \gls{MANET}}
+	
 \chapter{Design \todo{15-20\%; explains complete processing chain; explains what methods are used; for someone that wants to know what was done in detail}}
 
-%	\section{Applicability of \gls{SMPC} Protocols in Decentralized Systems}
+	\section{Requirements}
 	
-%	\subsection*{Analysis of Key Factors: Computing Power, Network Data Rates and Duration of Connection}
+		\todo{use cases, process description, resulting requirements}
+
+	\section{Distributed Computing}
+
+		\subsection*{Coordinator Election}
+		
+		\subsection*{Clock Synchronization}
+		
+		\subsection*{Distributed Databases}
+		
+	\section{Applicability of \gls{SMPC} Protocols in \gls{MANET}s}
 	
-%	\section{Effectiveness of \gls{SMPC} Protocols in Sparse Networks}
-	
-%	\subsection*{Maintaining anonymity}
-	
-%	\subsection*{Strategies for Aggregation of Participants in Sparse Networks}
-	
-%	\section{Applicability and Requirements Analysis for the Hygiene Games}
-	
+		\subsection*{Analysis of Key Factors: Computing Power, Network Data Rates and Duration of Connection}
+		
+		\subsection*{Effectiveness of \gls{SMPC} Protocols in Sparse Networks}
+		
+			\subsubsection*{Maintaining anonymity}
+		
+			\subsubsection*{Strategies for Aggregation of Participants in Sparse Networks}
+
 \chapter{Implementation \todo{15-20\%; details on the implementation; for someone who wants to continue the work}}	
+
+	%\section{Development Tools}
 	
+	\section{Communication Layer}
+	
+			\subsection*{Pairing-less Connection}
+			
+			\subsection*{Secure Channel}
+			
+	\section{\gls{SMPC} Module}
+	
+	\section{Data Storage and Distribution}
+	
+	\section{Interfacing the Library}
+	
+		\subsection*{Configuration}
+		
+		\subsection*{Usage in C}
+		
+		\subsection*{Usage in Android}
+		
 \chapter{Evaluation \todo{5-15\%; outcome; how was it tested; for supervisor}}
+
+	\section{Testing Tools}
+	
+		\todo{CUnit; JUnit; Simulation?}
+
+	\section{Examination of Computation Time Dependent on Computing Power}
+	
+	\section{Examination of Computation Time Dependent on Number of Participants}
+	
+		\todo{SNET with increasing number of android devices; predefined tests}
+		
+	%\section{Examination of Distribution Time Dependent on Number of Participants}
 
 \chapter{Discussion \todo{5-15\%; outcome for a design-reader} }
 
