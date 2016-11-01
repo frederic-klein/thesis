@@ -71,7 +71,49 @@ Roadmap
 	
 	\section{Secure Multi-Party Computation}
 
-		\subsection*{General Idea}
+		\todo{general idea}
+		
+		\todo{introduce modulo for cryptography}
+		
+		\todo{introduce Zp}
+		
+		\todo{discuss passive and active security}
+		
+		\todo{simple example}
+
+		\subsection*{Secret Sharing}
+		
+		\textcite[p. \todo{compare to book version}]{Cra:1} describe secret sharing schemes as the main tool to build a \gls{SMPC} protocol with passive security. In 1979 Adi Shamir described a $(k, n)$ threshold scheme for sharing secret data $D$: "Our goal is to devide $D$ into $n$ pieces $D_i$, ..., $D_n$ in such a way that:
+		(1) knowledge of any k or more $D_i$ pieces makes $D$ easily computable; (2) knowledge of any $k-1$ or fewer $D_i$ pieces leaves $D$ completely undetermined (in the sense that all its possible values are equally likely). " \autocite{Sha:1}
+		Shamir's secret sharing scheme is based on polynomials of degree $k-1$ with $a_0=D$ (compare \ref{eq:polynomial}). 
+		
+		\begin{equation}
+		\label{eq:polynomial}
+		q(x)=D + a_1*x + ... + a_(k-1)*x^(k-1)
+		\end{equation}
+		
+		To divide $D$ into $n$ pieces the polynomial is evaluated: $D_i=q(i), i=1,...,n$.
+		
+		\textcite{Sha:1} specifies that modular instead of real arithmetic is used. A prime $p$ with $p>D, p>n$ is selected and used to define the set $[0, p)$. "The coefficients $a1, ..., a_(k-1)$ in $q(x)$ are randomly chosen	from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$." \autocite[p. 613]{Sha:1}
+		
+		\todo{describe number off messages, usage of threshold as tradeoff between security and performance}
+		
+		\textcite[p. \todo{compare to book version}]{Cra:1} introduce some notions, that will be used in the following:
+		
+		$\mathbb{Z}_p={0,1,...,p-1}$
+				
+		\todo{why modulo}
+		
+		\todo{example with reconstruction of the secret}
+		
+		\subsection*{Random Numbers}
+		
+		\todo{random numbers important for cryptography: selection of coefficients in secret sharing, public key generation, ...}
+
+		
+		
+		
+		Citation test \autocite[pp. 35-37]{Cra:1}.
 
 		\subsection*{Differential Privacy}
 		
@@ -83,20 +125,20 @@ Roadmap
 	
 	\section{Mobile Ad Hoc Networks}
 	
-		{\color{gray} 
-			\begin{itemize}  
-				\item continuously self-configuring
-				\item self-forming
-				\item self-healing
-				\item infrastructure-less
-				\item peer-to-peer
-				\item Difference to mesh: mobility of nodes
-			\end{itemize}
-		}
+			{\color{gray} 
+				\begin{itemize}  
+					\item continuously self-configuring
+					\item self-forming
+					\item self-healing
+					\item infrastructure-less
+					\item peer-to-peer
+					\item Difference to mesh: mobility of nodes
+				\end{itemize}
+			}
 	
 		\todo{Example: firechat in SPAN}
 		
-			\subsubsection*{Comparison to Wi-Fi Direct}
+			\subsection*{Comparison to Wi-Fi Direct}
 			
 				{\color{gray} 
 					\begin{itemize}  
@@ -106,9 +148,9 @@ Roadmap
 					\end{itemize}
 				}
 		
-			\subsubsection*{Bluetooth Based \gls{MANET} }
+			\subsection*{Bluetooth Based \gls{MANET} }
 
-			\subsubsection*{Wi-Fi Based \gls{MANET}}
+			\subsection*{Wi-Fi Based \gls{MANET}}
 	
 \chapter{Design \todo{15-20\%; explains complete processing chain; explains what methods are used; for someone that wants to know what was done in detail}}
 
@@ -133,6 +175,10 @@ Roadmap
 			\subsubsection*{Maintaining anonymity}
 		
 			\subsubsection*{Strategies for Aggregation of Participants in Sparse Networks}
+			
+	\section{Architecture}
+	
+			\todo{UML; module structure}
 
 \chapter{Implementation \todo{15-20\%; details on the implementation; for someone who wants to continue the work}}	
 
@@ -166,7 +212,7 @@ Roadmap
 	
 	\section{Examination of Computation Time Dependent on Number of Participants}
 	
-		\todo{SNET with increasing number of android devices; predefined tests}
+		%\todo{SNET with increasing number of android devices; predefined tests}
 		
 	%\section{Examination of Distribution Time Dependent on Number of Participants}
 
