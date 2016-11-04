@@ -74,9 +74,7 @@ Roadmap
 		\todo{general idea}
 		
 		\todo{introduce modulo for cryptography}
-		
-		\todo{introduce Zp}
-		
+			
 		\todo{discuss passive and active security}
 		
 		\todo{simple example}
@@ -84,28 +82,70 @@ Roadmap
 		\subsection*{Secret Sharing}
 		
 		\textcite[p. \todo{compare to book version}]{Cra:1} describe secret sharing schemes as the main tool to build a \gls{SMPC} protocol with passive security. In 1979 Adi Shamir described a $(k, n)$ threshold scheme for sharing secret data $D$: "Our goal is to devide $D$ into $n$ pieces $D_i$, ..., $D_n$ in such a way that:
-		(1) knowledge of any k or more $D_i$ pieces makes $D$ easily computable; (2) knowledge of any $k-1$ or fewer $D_i$ pieces leaves $D$ completely undetermined (in the sense that all its possible values are equally likely). " \autocite{Sha:1}
+		(1) knowledge of any k or more $D_i$ pieces makes $D$ easily computable; (2) knowledge of any $k-1$ or fewer $D_i$ pieces leaves $D$ completely undetermined (in the sense that all its possible values are equally likely)." \autocite{Sha:1}
 		Shamir's secret sharing scheme is based on polynomials of degree $k-1$ with $a_0=D$ (compare \ref{eq:polynomial}). 
-		
 		\begin{equation}
 		\label{eq:polynomial}
-		q(x)=D + a_1*x + ... + a_(k-1)*x^(k-1)
+		q(x)=D + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1}
 		\end{equation}
 		
-		To divide $D$ into $n$ pieces the polynomial is evaluated: $D_i=q(i), i=1,...,n$.
+		To divide $D$ into $n$ pieces the polynomial is evaluated: $D_i=q(i),\ i=1,...,n$.
 		
-		\textcite{Sha:1} specifies that modular instead of real arithmetic is used. A prime $p$ with $p>D, p>n$ is selected and used to define the set $[0, p)$. "The coefficients $a1, ..., a_(k-1)$ in $q(x)$ are randomly chosen	from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$." \autocite[p. 613]{Sha:1}
+		\todo{recombination with lagrange}
+		
+		For cryptographic protocols it is not practical to work with real arithmetic, instead a finite field is used. \textcite{Sha:1} specifies that modular instead of real arithmetic is used. A prime $p$ with $p>D, p>n$ is selected and used to define the set $[0, p)$. "The coefficients $a_1, ..., a_{k-1}$ in $q(x)$ are randomly chosen	from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$." \autocite[p. 613]{Sha:1} (compare \ref{eq:polynomial modular})
+		\begin{equation}
+		\label{eq:polynomial modular}
+		q(x) = D + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1} \mod p \qquad D,\ a_i \in [0,p)\ , \quad p \in \mathbb{P}
+		\end{equation}
+		\textcite[p. \todo{compare to book version 1.3.1}]{Cra:1} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
 		
 		\todo{describe number off messages, usage of threshold as tradeoff between security and performance}
-		
-		\textcite[p. \todo{compare to book version}]{Cra:1} introduce some notions, that will be used in the following:
-		
-		$\mathbb{Z}_p={0,1,...,p-1}$
 				
-		\todo{why modulo}
+		The reconstruction of a secret $S$ can be done using Lagrange interpolation (compare \ref{eq:SSS lagrange interpolation}).
+		\begin{equation}
+		\label{eq:SSS lagrange interpolation}
+		S = \sum_i s_i \prod_{i \neq j} \frac{-x_j}{x_i-x_j} \mod p
+		\end{equation}
+		 $k$ shares $s_i$ are needed to reconstruct $S$, so only the associated values for $i$ are used in the Lagrange interpolation.
+						
+		\subsubsection{Example Computation}
 		
-		\todo{example with reconstruction of the secret}
+		Consider the following task: a secret $S=8$ is supposed to be shared among $n=4$ parties $P_i$. The threshold for the number of needed shares for the reconstruction of the secret shall be $k=3$ (public).
 		
+		First a prime $p$ has to be chosen, which has to be larger than the secret ($p>S$) and the number of parties ($p>n$): $p=17$ (public)
+		
+		Since $k=3$, the polynomial has a degree of $k-1=2$ (compare \ref{eq:SSS example polynomial}).
+		\begin{equation}
+		\label{eq:SSS example polynomial}
+		f(x) = S + a_1 \cdot x + a_2 \cdot x^2 \mod p
+		\end{equation}
+		 
+		 The coefficients are selected randomly uniformly out of $\mathbb{Z}_p=\{0,1,...,p-1\}=\{0,1,...,16\}$: $a_1=13$ and $a_2=4$ and the shares $s_i$ are computed (compare \ref{eq:SSS example polynomial specific}).
+		 \begin{alignat}{1}
+		 & f(x) = 8 + 13 \cdot x + 4 \cdot x^2 \mod 17 \label{eq:SSS example polynomial specific} \\
+		 &\qquad \qquad \qquad \quad \Downarrow \nonumber \\ 
+		 & f(x_1)=f(1)=25\mod17=8=s_1 \nonumber \\
+		 & f(x_2)=f(2)=50\mod17=16=s_2 \nonumber \\
+		 & f(x_3)=f(3)=83\mod17=15=s_3 \nonumber \\
+		 & f(x_4)=f(4)=124\mod17=5=s_4 \nonumber 
+		 \end{alignat}
+		 
+		 If parties $P_2$, $P_3$ and $P_4$ pool their shares, they can reconstruct the secret S using Lagrange interpolation (using also the public information: $p=17$):
+		 \begin{alignat}{2}
+		 & S = && \sum_i s_i \prod_{i \neq j} \frac{-x_j}{x_i - x_j } \mod 17 \qquad \qquad  with \ i,j \in \{2,3,4\} \\
+		 & \quad && =s_2 \cdot \frac{-x_3}{x_2-x_3} \cdot \frac{-x_4}{x_2-x_4} + s_3 \cdot \frac{-x_2}{x_3-x_2} \cdot \frac{-x_4}{x_3-x_4} + s_4 \cdot \frac{-x_2}{x_4-x_2} \cdot \frac{-x_3}{x_4-x_3} \mod 17 \nonumber \\
+		 & \quad && =16 \cdot \frac{-3}{2-3} \cdot \frac{-4}{2-4} + 15 \cdot \frac{-2}{3-2} \cdot \frac{-4}{3-4} + 5 \cdot \frac{-2}{4-2} \cdot \frac{-3}{4-3} \mod 17  \nonumber \\
+		 & \quad && = 96-120+15 \mod 17 \nonumber \\
+		 & \quad && = -9 \mod 17 \label{eq:SSS example negative modulo} \\
+		 & \quad && = 8 \nonumber 
+		 \end{alignat}
+		 \textit{Note:} in cryptography $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$, so that $m*n+a>0$: e.g. $-9 \mod 17 = (17-9) \mod 17$ (compare \ref{eq:SSS example negative modulo}).
+		 
+		 
+		 
+		 
+		 		
 		\subsection*{Random Numbers}
 		
 		\todo{random numbers important for cryptography: selection of coefficients in secret sharing, public key generation, ...}
