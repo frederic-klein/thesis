@@ -31,7 +31,7 @@
 	In recent years gamification has become a part in many areas of our daily routine. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. In contrast, gamification concerning our work life has to satisfy much higher privacy demands. Since comparison is a key component for gamification, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography. Existing frameworks for \gls{SMPC} utilize the Internet Protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Facilities with sensible measuring systems, e.g. medical devices in hospitals, often avoid Wi-Fi to reduce the risk of electromagnetic interference.
 	To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of \gls{MANET} and proposes the design of a \gls{SMPC} framework for \gls{MANET}, especially based on Bluetooth technology, and the implementation as a C library. 
 	
-	Since \gls{MANET}s have a high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a blockchain based distributed database is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution. Since the framework aims to provide distributed computations of comparable values, protocols for secure addition and secure comparison are implemented, enabling the computation of minimum, maximum and average.
+	Since \gls{MANET}s have a \todo{bad word high acceptable here?} high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a blockchain based distributed database is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution. Since the framework aims to provide distributed computations of comparable values, protocols for secure addition and secure comparison are implemented, enabling the computation of minimum, maximum and average.
 	
 	Devices of diverse computational power will be used to verify the applicability for wearables and \gls{IoT} grade devices. Also field-tests with a \gls{SPAN}(20-50 nodes) will be conducted to evaluated real life use cases. In contrast, the security of the framework and attack scenarios will be discussed. In summary, this thesis proposes a framework for \gls{SMPC} for decentralized, distributed systems.
 \end{abstract}
@@ -51,7 +51,7 @@ In the last couple of years gamification has found it's way into many areas of o
 
 Existing frameworks for \gls{SMPC} utilize the Internet protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Especially many hospitals tend to avoid Wi-Fi to reduce the risk of electromagnetic interference with medical devices.
 
-To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of mesh-networks and proposes describes the design of a \gls{SMPC} framework for mesh-networks. 
+To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of mesh-networks and proposes describes the design of a \gls{SMPC} framework for mesh-networks.
 
 Context
 
@@ -69,20 +69,30 @@ Roadmap
 
 \chapter{Background \todo{10-15\%; thorough review of the state of the art; informed audience}}
 	
+	In this chapter a general understanding of \gls{SMPC} and the key features of \gls{MANET}s is established.  
+	
+	First the general idea for \gls{SMPC} is introduced. Since secret sharing is used for the development of \gls{SMPC} protocols, Shamir's secret sharing scheme is presented, as well as random numbers.
+	Before protocols for secure addition and secure comparison with passive security are introduced, the term security is defined and existing framework for \gls{SMPC} are discussed.
+	
+	To be able to define requirements for the new framework, the key features of \gls{MANET}s are identified, with a focus on the wireless technology standards Bluetooth and Wi-Fi.
+		
 	\section{Secure Multi-Party Computation}
 
 		\todo{general idea}
+		\gls{SMPC} is a subfield of cryptography. 
 		
-		\todo{introduce modulo for cryptography}
-			
 		\todo{discuss passive and active security}
+		For \gls{SMPC} two types of adversaries have to be considered: semi-honest adversaries and malicious adversaries. 
+		Semi-honest adversaries "follow the protocol specification, yet may attempt to learn additional information by analyzing the transcript of messages received during the execution" \autocite{Aumann2007}. Malicious adversaries "are not bound in any way to following the instructions of the specified protocol" \autocite{Aumann2007}.
+		\gls{SMPC} protocols that can tolerate semi-honest parties (up to a specific threshold) provide semi-honest or passive security. \gls{SMPC} protocols that are secure against malicious adversaries achieve malicious or active security.
+		\textcite[p. \todo{4.3.4}]{Cramer2015} also differentiate between unconditional or perfect security and computational security: if security can be proven for an adversary with unlimited computation power a protocol has unconditional security. In contrast, computational security can only be proven for a polytime adversary.
 		
 		\todo{simple example}
 
 		\subsection*{Secret Sharing}
 		
-		\textcite[p. \todo{compare to book version}]{Cra:1} describe secret sharing schemes as the main tool to build a \gls{SMPC} protocol with passive security. In 1979 Adi Shamir described a $(k, n)$ threshold scheme for sharing secret data $D$: "Our goal is to devide $D$ into $n$ pieces $D_i$, ..., $D_n$ in such a way that:
-		(1) knowledge of any k or more $D_i$ pieces makes $D$ easily computable; (2) knowledge of any $k-1$ or fewer $D_i$ pieces leaves $D$ completely undetermined (in the sense that all its possible values are equally likely)." \autocite{Sha:1}
+		\textcite[p. \todo{compare to book version}]{Cramer2015} describe secret sharing schemes as the main tool to build a \gls{SMPC} protocol with passive security. In 1979 Adi Shamir described a $(k, n)$ threshold scheme for sharing secret data $D$: "Our goal is to divide $D$ into $n$ pieces $D_i$, ..., $D_n$ in such a way that:
+		(1) knowledge of any k or more $D_i$ pieces makes $D$ easily computable; (2) knowledge of any $k-1$ or fewer $D_i$ pieces leaves $D$ completely undetermined (in the sense that all its possible values are equally likely)." \autocite{Shamir1979}
 		Shamir's secret sharing scheme is based on polynomials of degree $k-1$ with $a_0=D$ (compare \ref{eq:polynomial}). 
 		\begin{equation}
 		\label{eq:polynomial}
@@ -91,16 +101,16 @@ Roadmap
 		
 		To divide $D$ into $n$ pieces the polynomial is evaluated: $D_i=q(i),\ i=1,...,n$.
 		
-		\todo{recombination with lagrange}
+		\todo{recombination with Lagrange}
 		
-		For cryptographic protocols it is not practical to work with real arithmetic, instead a finite field is used. \textcite{Sha:1} specifies that modular instead of real arithmetic is used. A prime $p$ with $p>D, p>n$ is selected and used to define the set $[0, p)$. "The coefficients $a_1, ..., a_{k-1}$ in $q(x)$ are randomly chosen	from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$." \autocite[p. 613]{Sha:1} (compare \ref{eq:polynomial modular})
+		For cryptographic protocols it is not practical to work with real arithmetic, instead a finite field is used. \textcite{Shamir1979} specifies that modular instead of real arithmetic is used. A prime $p$ with $p>D, p>n$ is selected and used to define the set $[0, p)$. "The coefficients $a_1, ..., a_{k-1}$ in $q(x)$ are randomly chosen	from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$." \autocite[p. 613]{Shamir1979} (compare \ref{eq:polynomial modular})
 		\begin{equation}
 		\label{eq:polynomial modular}
 		q(x) = D + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1} \mod p \qquad D,\ a_i \in [0,p)\ , \quad p \in \mathbb{P}
 		\end{equation}
-		\textcite[p. \todo{compare to book version 1.3.1}]{Cra:1} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
+		\textcite[p. \todo{compare to book version 1.3.1}]{Cramer2015} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
 		
-		\todo{describe number off messages, usage of threshold as tradeoff between security and performance}
+		\todo{describe number off messages, usage of threshold as trade-off between security and performance}
 				
 		The reconstruction of a secret $S$ can be done using Lagrange interpolation (compare \ref{eq:SSS lagrange interpolation}).
 		\begin{equation}
@@ -142,22 +152,27 @@ Roadmap
 		 \end{alignat}
 		 \textit{Note:} in cryptography $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$, so that $m*n+a>0$: e.g. $-9 \mod 17 = (17-9) \mod 17$ (compare \ref{eq:SSS example negative modulo}).
 		 
-		 
-		 
-		 
-		 		
-		\subsection*{Random Numbers}
+		 \subsection*{Random Numbers}
 		
-		\todo{random numbers important for cryptography: selection of coefficients in secret sharing, public key generation, ...}
-
+		\todo{random numbers important for cryptography: selection of coefficients in secret sharing, public key generation, ...; RNG in different environments; entropy}
 		
+		%https://en.wikipedia.org/wiki/Cryptographically_secure_pseudo-random_number_generator
 		
+		\todo{lib will require a callback for random number generator -> maybe mention with outlook for requirements}
 		
-		Citation test \autocite[pp. 35-37]{Cra:1}.
-
 		\subsection*{Differential Privacy}
 		
+		\todo{keep this? definition of security}
+		
 		\subsection*{Secure Addition Protocol}
+		
+		\todo{extended ring \autocite{Sheikh2009}; number of messages}
+		
+		\todo{secure addition \autocite{Cramer2015}; number of messages}
+		
+		\todo{secure addition with verification \autocite{Cramer2015}; number of messages}
+		
+		
 
 		\subsection*{Secure Comparison Protocol}
 
@@ -197,6 +212,8 @@ Roadmap
 	\section{Requirements}
 	
 		\todo{use cases, process description, resulting requirements}
+		
+		
 
 	\section{Distributed Computing}
 
@@ -230,6 +247,8 @@ Roadmap
 			
 			\subsection*{Secure Channel}
 			
+			\todo{https://developer.android.com/reference/java/security/SecureRandom.html}
+			
 	\section{\gls{SMPC} Module}
 	
 	\section{Data Storage and Distribution}
@@ -247,6 +266,8 @@ Roadmap
 	\section{Testing Tools}
 	
 		\todo{CUnit; JUnit; Simulation?}
+		
+		\todo{centralized client-server test app for android: trigger test runs, report results (measured execution time, correctness)}
 
 	\section{Examination of Computation Time Dependent on Computing Power}
 	
