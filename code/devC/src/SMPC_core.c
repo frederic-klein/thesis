@@ -4,13 +4,13 @@
 
 //TEMP use make all
 
-struct smpcConfig {
-	byte partiesMin;
-	byte partiesMax;
-	byte threshold;
-	uint32_t minValue;
-	uint32_t maxValue;
-}
+//struct smpcConfig {
+//	byte partiesMin;
+//	byte partiesMax;
+//	byte threshold;
+//	uint32_t minValue;
+//	uint32_t maxValue;
+//}
 
 //TODO configuration for SMPC
 	// min. max number of players in a computation
@@ -20,9 +20,9 @@ struct smpcConfig {
 	// connection timeout?
 	// how often refresh private key cryptosystem?
 
-struct pkcs{
-	uint32_t keyLength;
-}
+//struct pkcs{
+//	uint32_t keyLength;
+//}
 //TODO configuration of public key cryptosystem
 	// key length?
 	
