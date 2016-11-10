@@ -1,3 +1,3 @@
-[submodule "code/devC/lib"]
-	path = code/devC/lib
-	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "code/devC/lib/Unity"]
+	path = code/devC/lib/Unity
+	url = git@github.com:ThrowTheSwitch/Unity.git
