@@ -1,4 +1,12 @@
- structure
+Clone
+=====
+
+Use `--recursive` switch to clone with submodules:
+
+`git clone --recursive git@github.com:frederic-klein/thesis.git`
+
+Repo Structure
+==============
 
  code
 ------------------------------------------------------------------------------------------
