@@ -5,6 +5,10 @@ Use `--recursive` switch to clone with submodules:
 
 `git clone --recursive git@github.com:frederic-klein/thesis.git`
 
+To add the submodules after cloning without `--recursive` use:
+
+`git submodule update --recursive --init --remote`
+
 Repo Structure
 ==============
 
