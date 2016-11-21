@@ -55,6 +55,8 @@ To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this t
 
 Context
 
+\todo{mention \gls{IoT} problems ( \gls{DDoS} and botnets), to emphasis usefulness of connected but not online}
+
 Restatement of the problem
 
 Restatement of the response
@@ -71,27 +73,39 @@ Roadmap
 	
 	In this chapter a general understanding of \gls{SMPC} and the key features of \gls{MANET}s is established.  
 	
-	First the general idea for \gls{SMPC} is introduced. Since secret sharing is used for the development of \gls{SMPC} protocols, Shamir's secret sharing scheme is presented, as well as random numbers.
-	Before protocols for secure addition and secure comparison with passive security are introduced, the term security is defined and existing framework for \gls{SMPC} are discussed.
+	First the general idea for \gls{SMPC} is introduced in \ref{sec:Secure Multi-Party Computation} \nameref{sec:Secure Multi-Party Computation}. Since secret sharing is used for the development of \gls{SMPC} protocols, Shamir's secret sharing scheme is presented in \ref{subsec:Secret Sharing} \nameref{subsec:Secret Sharing}.
+	Protocols for secure addition and secure comparison with passive security are introduced in \ref{subsec:Secure Addition Protocol} and \ref{subsec:Secure Comparison Protocol} and existing frameworks for \gls{SMPC} are discussed in \ref{subsec:Existing Frameworks}.
 	
-	To be able to define requirements for the new framework, the key features of \gls{MANET}s are identified, with a focus on the wireless technology standards Bluetooth and Wi-Fi.
+	To be able to define requirements for the new framework, the key features of \gls{MANET}s are identified in \ref{sec:Mobile Ad Hoc Networks} \nameref{sec:Mobile Ad Hoc Networks}, with a focus on the wireless technology standards Bluetooth and Wi-Fi and the differences to similar network types like mesh networks.
+	
+	Since the \gls{SMPC} protocols expect a secure communication channel, while a pairing-less connection doesn't provide security by default, public key cryptography is needed. The key generation, as well as Shamir's secret sharing scheme, requires random numbers. Computer systems can generate pseudo-random numbers and the randomness of such an \gls{PRNG} is discussed in\ref{sec:Pseudo-Random Numbers} \nameref{sec:Pseudo-Random Numbers}.
 		
 	\section{Secure Multi-Party Computation}
-
+	\label{sec:Secure Multi-Party Computation}
+	
 		\todo{general idea}
-		\gls{SMPC} is a subfield of cryptography. 
+		\gls{SMPC} is a subfield of cryptography. The target of \gls{SMPC} is to run computations over inputs from multiple parties while keeping these inputs secret. In 1982 Yao described the problem of two millionaires trying to find out, which one is wealthier, without giving each other information about their actual capital \autocite{Yao1982}. Yao's solution for this \gls{2PC} is considered to be the basis for general \gls{SMPC} protocols. Since the target group for the protocols used in this thesis \todo{resume}
+		
+		\todo{use-cases to describe it better}
+		
+		\todo{cite \textcite{Clifton2002}: data mining; }
+		
+		\todo{only for honest parties, what is for other settings?} 
 		
 		\todo{discuss passive and active security}
 		For \gls{SMPC} two types of adversaries have to be considered: semi-honest adversaries and malicious adversaries. 
 		Semi-honest adversaries "follow the protocol specification, yet may attempt to learn additional information by analyzing the transcript of messages received during the execution" \autocite{Aumann2007}. Malicious adversaries "are not bound in any way to following the instructions of the specified protocol" \autocite{Aumann2007}.
 		\gls{SMPC} protocols that can tolerate semi-honest parties (up to a specific threshold) provide semi-honest or passive security. \gls{SMPC} protocols that are secure against malicious adversaries achieve malicious or active security.
-		\textcite[p. \todo{4.3.4}]{Cramer2015} also differentiate between unconditional or perfect security and computational security: if security can be proven for an adversary with unlimited computation power a protocol has unconditional security. In contrast, computational security can only be proven for a polytime adversary.
+		\textcite[p. 82]{Cramer2015} also differentiate between unconditional or perfect security and computational security: if security can be proven for an adversary with unlimited computation power a protocol has unconditional security. In contrast, computational security can only be proven for a polytime adversary.
+		
+		\todo{discuss the situation for gamification: what can be gained? -> this thesis focuses on honest but curious "players" -> basic sanity checks (see ...)}
 		
 		\todo{simple example}
 
-		\subsection*{Secret Sharing}
+		\subsection{Secret Sharing}
+		\label{subsec:Secret Sharing}
 		
-		\textcite[p. \todo{compare to book version}]{Cramer2015} describe secret sharing schemes as the main tool to build a \gls{SMPC} protocol with passive security. In 1979 Adi Shamir described a $(k, n)$ threshold scheme for sharing secret data $D$: "Our goal is to divide $D$ into $n$ pieces $D_i$, ..., $D_n$ in such a way that:
+		\textcite[p. 32]{Cramer2015} describe secret sharing schemes as the main tool to build a \gls{SMPC} protocol with passive security. In 1979 Adi Shamir described a $(k, n)$ threshold scheme for sharing secret data $D$: "Our goal is to divide $D$ into $n$ pieces $D_i$, ..., $D_n$ in such a way that:
 		(1) knowledge of any k or more $D_i$ pieces makes $D$ easily computable; (2) knowledge of any $k-1$ or fewer $D_i$ pieces leaves $D$ completely undetermined (in the sense that all its possible values are equally likely)." \autocite{Shamir1979}
 		Shamir's secret sharing scheme is based on polynomials of degree $k-1$ with $a_0=D$ (compare \ref{eq:polynomial}). 
 		\begin{equation}
@@ -101,16 +115,19 @@ Roadmap
 		
 		To divide $D$ into $n$ pieces the polynomial is evaluated: $D_i=q(i),\ i=1,...,n$.
 		
-		\todo{recombination with Lagrange}
-		
 		For cryptographic protocols it is not practical to work with real arithmetic, instead a finite field is used. \textcite{Shamir1979} specifies that modular instead of real arithmetic is used. A prime $p$ with $p>D, p>n$ is selected and used to define the set $[0, p)$. "The coefficients $a_1, ..., a_{k-1}$ in $q(x)$ are randomly chosen	from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$." \autocite[p. 613]{Shamir1979} (compare \ref{eq:polynomial modular})
 		\begin{equation}
 		\label{eq:polynomial modular}
 		q(x) = D + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1} \mod p \qquad D,\ a_i \in [0,p)\ , \quad p \in \mathbb{P}
 		\end{equation}
-		\textcite[p. \todo{compare to book version 1.3.1}]{Cramer2015} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
+		\textcite[p. 7]{Cramer2015} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
 		
-		\todo{describe number off messages, usage of threshold as trade-off between security and performance}
+		\todo{describe number off messages, usage of threshold as trade-off between security and performance -> START}
+		
+		
+		
+		\todo{describe number off messages, usage of threshold as trade-off between security and performance -> END}
+		
 				
 		The reconstruction of a secret $S$ can be done using Lagrange interpolation (compare \ref{eq:SSS lagrange interpolation}).
 		\begin{equation}
@@ -121,7 +138,7 @@ Roadmap
 						
 		\subsubsection{Example Computation}
 		
-		Consider the following task: a secret $S=8$ is supposed to be shared among $n=4$ parties $P_i$. The threshold for the number of needed shares for the reconstruction of the secret shall be $k=3$ (public).
+		Consider the following task: a secret $S=8$ is supposed to be shared among $n=4$ parties $P_i,\quad i=0,...,3$. The threshold for the number of needed shares for the reconstruction of the secret shall be $k=3$ (public).
 		
 		First a prime $p$ has to be chosen, which has to be larger than the secret ($p>S$) and the number of parties ($p>n$): $p=17$ (public)
 		
@@ -150,35 +167,159 @@ Roadmap
 		 & \quad && = -9 \mod 17 \label{eq:SSS example negative modulo} \\
 		 & \quad && = 8 \nonumber 
 		 \end{alignat}
-		 \textit{Note:} in cryptography $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$, so that $m*n+a>0$: e.g. $-9 \mod 17 = (17-9) \mod 17$ (compare \ref{eq:SSS example negative modulo}).
+		 \textit{Note:} in cryptography $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$, so that $m \cdot n+a>0$: e.g. $-9 \mod 17 = (\underbrace{1 \cdot 17-9}_{>0}) \mod 17$ (compare \ref{eq:SSS example negative modulo}).
 		 
-		 \subsection*{Random Numbers}
+		%\subsection*{Differential Privacy}
 		
-		\todo{random numbers important for cryptography: selection of coefficients in secret sharing, public key generation, ...; RNG in different environments; entropy}
+		\todo{Write about differential privacy?}
 		
-		%https://en.wikipedia.org/wiki/Cryptographically_secure_pseudo-random_number_generator
+		\subsection{Secure Addition Protocol}
+		\label{subsec:Secure Addition Protocol}
 		
-		\todo{lib will require a callback for random number generator -> maybe mention with outlook for requirements}
+		For an environment with honest parties there are simple \gls{SMPC} protocols to compute the sum over shares. \textcite{Clifton2002} describe a ring based method, where the initializing party adds a random number $R$ to the secret input $s_1$ before passing it to the next node. Each node then adds its secret until the first party receives the result. By removing $R$ the party can than reconstruct the sum over all secret inputs:
 		
-		\subsection*{Differential Privacy}
+		\todo{visualize as svg figure}
 		
-		\todo{keep this? definition of security}
+		This method is efficient ($2n$ messages for computation and announcing the sum in a $n$-node ring) but if parties collude, party $P_i$ only needs the output of $P_{i+1}$ as received by party $P_{i+2}$ to reconstruct the secret input of $P_{i+1}$. \textcite{Clifton2002} propose using shares in combination with permutation of the ring order, so neighbors change in each iteration and the number of parties in need to pool their data increases. This approach was extended by \textcite{Sheikh2009} for their "k-Secure Sum Protocol".
+		Using Shamir's secret sharing a 		
+		In \ref{subsec:Secret Sharing} it was demonstrated how a secret can be reconstructed from the shares using Lagrange interpolation. It is also possible to reconstruct the sum of secrets by using the sums of shares for a Lagrange interpolation.
 		
-		\subsection*{Secure Addition Protocol}
+		Proof:
 		
-		\todo{extended ring \autocite{Sheikh2009}; number of messages}
+		$n$ shares for $m$ secrets $s_l$:
+		\begin{alignat}{1}
+			&s_{l,i} = f_l(x_i) = s_l + \sum_{i=1}^{k-1} \alpha_{l,i} x_i^i \mod p \\
+			& \Leftrightarrow \begin{cases}
+				s_{1,i} = f_1(x_i) = & s_1 + \alpha_{1,1} x_i + \alpha_{1,2} x_i^2 + ... + \alpha_{1,k-1}x_i^{k-1} \mod p \\
+				&\vdots \\
+				s_{m,i} = f_n(x_i) = & s_n + \beta_{n,1} x_i + \beta_{n,2} x_i^2 + ... + \beta_{n,k-1}x_i^{k-1} \mod p
+			  \end{cases} \nonumber \\
+			& \text{with} \ \{l \in \mathbb{N} \ | \ 1 \leq l \leq m \},
+			\ \{i \in \mathbb{N} \ | \ 1 \leq i \leq n \},
+			\ \{ p \in \mathbb{P} \ | \ p > \sum_l s_l \}, \nonumber \\
+			&\{ \alpha \in \mathbb{N} \ | \ 0 \leq \alpha \leq p \},
+			\ \{k \in \mathbb{N} \ | \ 2 < k \leq n \} \nonumber
+		\end{alignat}
 		
-		\todo{secure addition \autocite{Cramer2015}; number of messages}
+		Lagrange-interpolation for secret $s_l$:
+		\begin{alignat}{1}
+			&s_l = \sum_{i=1}^{n}s_{l,i}\prod_{i\neq j}\frac{-x_j}{x_i - x_j} \mod p \label{eq:Lagrange for s_l}
+		\end{alignat}
+		Sum $s$ over secrets $s_l$:
+		\begin{alignat}{1}
+			&s = \sum_{l=1}^{m} s_l \overset{\text{with} \ \ref{eq:Lagrange for s_l}}{=} \sum_{l=1}^{m} \sum_{i=1}^{n} s_{l,i}\prod_{i\neq j} \frac{-x_j}{x_i-x_j} \mod p \label{eq:sum over secrets}
+		\end{alignat}
+		\begin{alignat}{1}
+		&\text{with} \sum_{i=1}^{n}\sum_{j=1}^{m}a_{ij} = \sum_{j=1}^{m}\sum_{i=1}^{n}a_{ij} \text{follows for \ref{eq:sum over secrets}} \nonumber\\
+		&s= \underbrace{ \sum_{i=1}^n \underbrace{\sum_{l=1}^{m} s_{l,i}}_{\text{sum over shares}} \prod_{i\neq j} \frac{-x_j}{x_i-x_j} \mod p }_{\text{Lagrange-interpolation for sum over shares}}
+		\end{alignat}	
+		Example:
 		
+		public information: $n=3$, $p=67$, $k=3$
+		
+		secrets: $s_1=13$, $s_2=27$, $s_3=17$, $s_4=1$
+		
+		target computation: sum $s$ over secrets $s= \sum_{i=1}^4 s_i=58$ without revealing ones secret to another party.
+		
+		\begin{alignat}{1}
+			s_{1,i}&=f_1(x_i)=13 + 35x + 22x^2 + 7x^3 \mod 67 \label{eq:example shares 1,i} \\
+			s_{2,i}&=f_2(x_i)=27 + 3x + 19x^2 \mod 67 \label{eq:example shares 2,i} \\
+			s_{3,i}&=f_3(x_i)=17 + 9x^2 + 27x^3 \mod 67 \label{eq:example shares 3,i} \\
+			s_{4,i}&=f_4(x_i)=1 + 13x + 31x^2 + 40x^3 \mod 67 \label{eq:example shares 4,i}
+		\end{alignat}
+		with $x_1=1$, $x_2=2$, $x_3=3$, $x_4=4$ follows
+		\begin{alignat}{7}
+		 \overset{\ref{eq:example shares 1,i}}{\Rightarrow} s_{1,1}&=10 \quad &&s_{1,2}&&=26 \quad &&s_{1,3}&&=36 \quad  &&s_{1,4}&&=15  \nonumber \\
+		\overset{\ref{eq:example shares 2,i}}{\Rightarrow} s_{2,1}&=49 \quad &&s_{2,2}&&=42 \quad &&s_{2,3}&&=6 \quad &&s_{2,4}&&=8  \nonumber \\
+		\overset{\ref{eq:example shares 3,i}}{\Rightarrow} s_{3,1}&=53 \quad &&s_{3,2}&&=1 \quad &&s_{3,3}&&=23 \quad &&s_{3,4}&&=13  \nonumber \\
+		\overset{\ref{eq:example shares 4,i}}{\Rightarrow} s_{4,1}&=18 \quad &&s_{4,2}&&=2 \quad &&s_{4,3}&&=59 \quad &&s_{4,4}&&=27 \nonumber \\
+		\Rightarrow \sum_l s_{l,1}&=130 \quad \sum_l && s_{l,2}&&=71 \quad \sum_l && s_{l,3}&&=124 \quad \sum_l && s_{l,4}&&=63 \nonumber		
+		\end{alignat}
+		Lagrange-interpolation:
+		\begin{alignat}{2}
+		s&= &&\sum_{i=1}^{4}\sum_{l=1}^{4}s_{l,i}\prod_{i \neq j} \frac{-x_j}{x_i-x_j}\mod 67 \nonumber \\
+		 &= &&130\frac{-2}{1-2}\frac{-3}{1-3}\frac{-4}{1-4}+71\frac{-1}{2-1}\frac{-3}{2-3}\frac{-4}{2-4} \nonumber \\
+		 & &&+124\frac{-1}{3-1}\frac{-2}{3-2}\frac{-4}{3-4}+63\frac{-1}{4-1}\frac{-2}{4-2}\frac{-3}{4-3}\mod 67 \nonumber \\
+		 &=&& 527 \mod 67 = 58 = \sum_{i=1}^4 s_i \label{eq:example result lagrange}
+		\end{alignat}
+		As expected, the result of the Lagrange-interpolation for the sum over shares is equal to the sum over the initial secrets (compare \ref{eq:example result lagrange}).
+		
+		\subsubsection*{Protocol Description}
+		Assumptions:
+		\vspace{-\topsep}
+		\begin{itemize}
+			\itemsep-0.5em
+			\item number of parties $n>2$
+			\item secure communication channel
+			\item no malicious adversaries
+			\item upper bound of sum $s \leq b$ can be estimated, so a prime $p > b$ can be chosen 
+		\end{itemize}
+		The secure addition protocol, as used in this thesis, consists of six phases:
+		\begin{enumerate}
+		\itemsep-0.5em
+		\item The coordinator announces the number of parties for the computation and the indexation of each party.
+		\item Each party $j$ sends shares $s_{j,i}$ of the secret input $s_j$ to the other parties.
+		\item Each party $i$ computes the sum over the received shares $s_{j,i}$.
+		\item Each party sends the computed sum to the coordinator.
+		\item The coordinator reconstructs the sum over the inputs using Lagrange-interpolation.
+		\item The coordinator broadcasts the reconstructed sum.
+		\end{enumerate}
+	
+	In total $(n+3)\cdot (n-1)=n^2+2n-3$ messages are exchanged, so the traffic increases with the number of parties squared. Selecting a lower threshold for the secret reconstruction $\frac{n}{2} \leq k<n$ lowers the total messages by $\Delta_{\text{messages}}=n^2-n(k-1)$.
+	
+	For a secure channel this protocol is information-theoretically secure: independent from computation power an adversary with $m_\text{leaked}<k$ shares will gain no information regarding the inputs. 
+	
 		\todo{secure addition with verification \autocite{Cramer2015}; number of messages}
 		
+		\subsection{Secure Comparison Protocol}
+		\label{subsec:Secure Comparison Protocol}
+		The secure comparison protocol compares the secret inputs and provides the minimum and the maximum in a set without revealing the the inputs or the parties holding the minimum or the maximum.
+		
+		The general idea: the secure comparison protocol utilizes the secure addition protocol: in iterations the secure sum for the bits ($0 \lor 1$) of the secrets multiplied with a random value are computed, starting with the most significant bit from an predefined upper bound. The announced sum gives each party the information if at least one party has this bit set, if the sum is unequal zero. If a party has this bit not set itself it has a lower value and commits only zeros to the following iterations. Storing the result of each iteration, the parties can reconstruct the maximum.
+		For finding the minimum the inputs are negated (using the binary operation NOT), making the minimum in the set the largest value. Afterwards the maximum is determined as described above. Finally the found maximum is negated again to reconstruct the minimum in the set.
+		
+		\subsubsection*{Protocol Description}
+		Assumptions:
+		\vspace{-\topsep}
+		\begin{itemize}
+			\itemsep-0.5em
+			\item number of parties $n>2$
+			\item secure communication channel
+			\item no malicious adversaries
+			\item upper bound of sum $s \leq b$ can be estimated, so a prime $p > b$ can be chosen 
+		\end{itemize}
+		The secure comparison protocol, as used in this thesis, consists of the phases for secure addition within iterations for the bitwise length of a predefined upper bound for the inputs: 
+		\begin{enumerate}
+			\itemsep-0.5em
+			\item The coordinator announces the number of parties for the computation and the indexation of each party.
+			\item For minimum-search: each party negates the secret input.
+			\item For each bit in the secret input starting from \gls{MSB} to \gls{LSB} each party runs through iterations:
+			\vspace{-\topsep}
+			\begin{enumerate}
+				\itemsep-0.5em
+				\item If input is flagged as lower than maximum, then use $s_j=0$ as the input. Otherwise multiply actual bit $b$ with a random value $R$: $s_j=b \cdot R$.
+				\item Each party $j$ sends shares $s_{j,i}$ of the input $s_j$ to the other parties.
+				\item Each party $i$ computes the sum over the received shares $s_{j,i}$.
+				\item Each party sends the computed sum to the coordinator.
+				\item The coordinator reconstructs the sum over the inputs using Lagrange-interpolation.
+				\item The coordinator broadcasts the reconstructed sum.
+				\item Each party stores if the sum for the bit was equal 0 (set bit 0) or unequal 0 (set bit 1).
+				\item Each party compares if bit from the computed sum is greater than own bit. If so input is flagged as lower than maximum.
+			\end{enumerate}
+			\item For minimum-search: each party negates the stored sum-result.
+		\end{enumerate}
+	
+		\todo{example computation}
+		
+		\subsection{Existing Frameworks}
+		\label{subsec:Existing Frameworks}
 		
 
-		\subsection*{Secure Comparison Protocol}
-
-		\subsection*{Existing Frameworks}
 	
 	\section{Mobile Ad Hoc Networks}
+	\label{sec:Mobile Ad Hoc Networks}
+	
+	\todo{differences between mesh and MANET}
 	
 			{\color{gray} 
 				\begin{itemize}  
@@ -193,7 +334,7 @@ Roadmap
 	
 		\todo{Example: firechat in SPAN}
 		
-			\subsection*{Comparison to Wi-Fi Direct}
+			\subsection{Comparison to Wi-Fi Direct}
 			
 				{\color{gray} 
 					\begin{itemize}  
@@ -203,9 +344,20 @@ Roadmap
 					\end{itemize}
 				}
 		
-			\subsection*{Bluetooth Based \gls{MANET} }
+			\subsection{Bluetooth Based \gls{MANET} }
 
-			\subsection*{Wi-Fi Based \gls{MANET}}
+			\subsection{Wi-Fi Based \gls{MANET}}
+			
+			\todo{mention https://github.com/ProjectSPAN/android-manet-manager kernel changes needed for manet}
+			
+		\section{Pseudo-Random Numbers}
+		\label{sec:Pseudo-Random Numbers}
+			
+		\todo{random numbers important for cryptography: selection of coefficients in secret sharing, public key generation, ...; RNG in different environments; entropy}
+			
+		%https://en.wikipedia.org/wiki/Cryptographically_secure_pseudo-random_number_generator
+			
+		\todo{lib will require a callback for random number generator -> maybe mention with outlook for requirements}
 	
 \chapter{Design \todo{15-20\%; explains complete processing chain; explains what methods are used; for someone that wants to know what was done in detail}}
 
@@ -219,7 +371,11 @@ Roadmap
 
 		\subsection*{Coordinator Election}
 		
+		\todo{exponential back-off + heartbeat}
+		
 		\subsection*{Clock Synchronization}
+		
+		\todo{berkeley algorithm}
 		
 		\subsection*{Distributed Databases}
 		
@@ -265,9 +421,9 @@ Roadmap
 
 	\section{Testing Tools}
 	
-		\todo{CUnit; JUnit; Simulation?}
+		\todo{Unity (Unit test for C); JUnit; Simulation?}
 		
-		\todo{centralized client-server test app for android: trigger test runs, report results (measured execution time, correctness)}
+		\todo{centralized client-server test application for android: trigger test runs, report results (measured execution time, correctness)}
 
 	\section{Examination of Computation Time Dependent on Computing Power}
 	
@@ -279,7 +435,13 @@ Roadmap
 
 \chapter{Discussion \todo{5-15\%; outcome for a design-reader} }
 
+\todo{extend protocol: implement merging of results, to reduce probability of not finding computation partner; implement alternative protocols}
+
+\todo{implement optional verification for addition, if performance is good enough for real life application}
+
 \chapter{Conclusion \todo{5-10\%; outcome for a introduction-reader}}
+
+\todo{outlook: bt 5.0, mesh network}
 
 \clearpage
 \renewcommand{\bibname}{References} % rename Bibliograpy to References
