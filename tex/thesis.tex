@@ -213,14 +213,13 @@ Roadmap
 		&\text{with} \sum_{i=1}^{n}\sum_{j=1}^{m}a_{ij} = \sum_{j=1}^{m}\sum_{i=1}^{n}a_{ij} \text{follows for \ref{eq:sum over secrets}} \nonumber\\
 		&s= \underbrace{ \sum_{i=1}^n \underbrace{\sum_{l=1}^{m} s_{l,i}}_{\text{sum over shares}} \prod_{i\neq j} \frac{-x_j}{x_i-x_j} \mod p }_{\text{Lagrange-interpolation for sum over shares}}
 		\end{alignat}	
-		Example:
 		
-		public information: $n=3$, $p=67$, $k=3$
+		\subsubsection*{Example Computation}
+		Public information: $n=3$, $p=67$, $k=3$\par
 		
-		secrets: $s_1=13$, $s_2=27$, $s_3=17$, $s_4=1$
+		\noindent Secrets: $s_1=13$, $s_2=27$, $s_3=17$, $s_4=1$\par
 		
-		target computation: sum $s$ over secrets $s= \sum_{i=1}^4 s_i=58$ without revealing ones secret to another party.
-		
+		\noindent Target computation: sum $s$ over secrets $s= \sum_{i=1}^4 s_i=58$ without revealing ones secret to another party.		
 		\begin{alignat}{1}
 			s_{1,i}&=f_1(x_i)=13 + 35x + 22x^2 + 7x^3 \mod 67 \label{eq:example shares 1,i} \\
 			s_{2,i}&=f_2(x_i)=27 + 3x + 19x^2 \mod 67 \label{eq:example shares 2,i} \\
@@ -275,8 +274,102 @@ Roadmap
 		\label{subsec:Secure Comparison Protocol}
 		The secure comparison protocol compares the secret inputs and provides the minimum and the maximum in a set without revealing the the inputs or the parties holding the minimum or the maximum.
 		
-		The general idea: the secure comparison protocol utilizes the secure addition protocol: in iterations the secure sum for the bits ($0 \lor 1$) of the secrets multiplied with a random value are computed, starting with the most significant bit from an predefined upper bound. The announced sum gives each party the information if at least one party has this bit set, if the sum is unequal zero. If a party has this bit not set itself it has a lower value and commits only zeros to the following iterations. Storing the result of each iteration, the parties can reconstruct the maximum.
+		The general idea: the secure comparison protocol utilizes the secure addition protocol: in iterations the secure-sum for the bits ($0 \lor 1$) of the secrets multiplied with a random value are computed, starting with the \gls{MSB} lower than a predefined upper bound till the \gls{LSB}. The announced sum gives each party the information if at least one party has this bit set, if the sum is unequal zero. If a party has this bit not set itself it has a lower value and commits only zeros to the following iterations. Storing the result of each iteration, the parties can reconstruct the maximum.
 		For finding the minimum the inputs are negated (using the binary operation NOT), making the minimum in the set the largest value. Afterwards the maximum is determined as described above. Finally the found maximum is negated again to reconstruct the minimum in the set.
+		
+		\subsubsection*{Example Computation}
+		
+		Public information: $n=3$, $p=67$, $\mathbb{Z}_p=\{1,...,p-1\}$, $k=3$, $s_i<b=64$ (upper bound for secret value range) \par
+		\noindent Secrets: $s_1=13$, $s_2=27$, $s_3=17$ \par
+		
+		\noindent Target computation: $\min(s_i)=13$, $\max(s_i)=27$
+		
+		Since $64_{10}=1000000_2$ is defined as upper bound for the secret values the \gls{MSB} is the sixth bit (second column in table \ref{table:secure maximum binary representation of secrets}).
+		 
+		\begin{table}[!htb]
+			\centering
+			\caption{Binary representation of secrets $s_i$}
+			\label{table:secure maximum binary representation of secrets}
+			\begin{tabular}{|l|l|l|l|l|l|l|}
+				\hline
+				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Binary $s_{i,2}$} \\ \hline
+				13                 & 0    & 0    & 1    & 1    & 0   & 1   \\ \hline
+				27                 & 0    & 1    & 1    & 0    & 1   & 1   \\ \hline
+				17                 & 0    & 1    & 0    & 0    & 0   & 1   \\ \hline
+			\end{tabular}
+		\end{table}
+
+		Each party multiplies each bit with a random within $\mathbb{Z_p}$:
+		
+		\begin{table}[!htb]
+			\centering
+			\caption{Randomized binary representation of secrets}
+			\label{table:secure maximum randomized binary representation}
+			\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+				\hline
+				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Binary $s_{i,2}$}  & \multicolumn{6}{l|}{Randomized} \\ \hline
+				13                 & 0    & 0    & 1    & 1    & 0   & 1 & 0    & 0    & 45    & 61    & 0   & 57   \\ \hline
+				27                 & 0    & 1    & 1    & 0    & 1   & 1 & 0    & 12    & 31    & 0    & 5   & 15   \\ \hline
+				17                 & 0    & 1    & 0    & 0    & 0   & 1 & 0    & 24    & 0    & 0    & 0   & 9   \\ \hline
+			\end{tabular}
+		\end{table}
+				
+		\begin{alignat}{3}
+			\intertext{There are six bits, therefore six rounds of secure addition ($\sum_{secure}$) are computed:}
+			1^{st} \ \text{round:} \quad & \sum_{secure}=0 && \Rightarrow \quad 6^{th} \ \text{bit of the maximum is} && 0 \nonumber \\
+			2^{nd} \ \text{round:} \quad &\sum_{secure}=36 > 0 \quad && \Rightarrow \quad 5^{th} \ \text{bit of the maximum is} \quad && 1 \nonumber \\
+			\intertext{Party $p_1$ disqualifies itself as the maximum (see table \ref{table:secure maximum p1 not maximum})}
+			3^{rd} \ \text{round:} \quad &\sum_{secure}=31 > 0 && \Rightarrow \quad 4^{th} \ \text{bit of the maximum is} && 1 \nonumber \\
+			\intertext{Party $p_3$ disqualifies itself as the maximum (see table \ref{table:secure maximum p3 not maximum})}
+			4^{th} \ \text{round:} \quad &\sum_{secure}=0 && \Rightarrow \quad 3^{rd} \ \text{bit of the maximum is} && 0 \nonumber \\
+			5^{th} \ \text{round:} \quad &\sum_{secure}=5>0 && \Rightarrow \quad 2^{nd} \ \text{bit of the maximum is} && 1 \nonumber \\
+			6^{th} \ \text{round:} \quad &\sum_{secure}=15>0 && \Rightarrow \quad 1^{st} \ \text{bit of the maximum is} && 1 \nonumber
+		\end{alignat}
+
+		\begin{table}[!htb]
+			\centering
+			\caption{Party $p_1$ disqualifies itself as maximum in $2^{nd}$ round}
+			\label{table:secure maximum p1 not maximum}
+			\begin{tabular}{|l|l|l|l|l|l|l|}
+				\hline
+				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Randomized} \\ \hline
+				13                 & 0    & \underline{0}    & $\cancelto{0}{45}$    & $\cancelto{0}{61}$    & 0   & $\cancelto{0}{57}$   \\ \hline
+				27                 & 0    & 12    & 31    & 0    & 5   & 15   \\ \hline
+				17                 & 0    & 24    & 0    & 0    & 0   & 9   \\ \hline
+			\end{tabular}
+		\end{table}
+
+		\begin{table}[!htb]
+			\centering
+			\caption{Party $p_3$ disqualifies itself as maximum in $2^{nd}$ round}
+			\label{table:secure maximum p3 not maximum}
+			\begin{tabular}{|l|l|l|l|l|l|l|}
+				\hline
+				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Randomized} \\ \hline
+				13                 & 0    & 0    & 0    & 0    & 0   & 0   \\ \hline
+				27                 & 0    & 12    & 31    & 0    & 5   & 15   \\ \hline
+				17                 & 0    & 24    & \underline{0}    & 0    & 0   & $\cancelto{0}{9}$   \\ \hline
+			\end{tabular}
+		\end{table}
+
+		In total, each party has the bits $0|1|1|0|1|1$ stored and can reconstruct the correct maximum $\max(s_i)=27$.
+		
+		Using the negation of the binary representation, the order of the corresponding values in decimal numeral system is inverted (compare table \ref{table:secure minimum negation}). The computation is then the same as for the maximum search. The reconstructed maximum is finally negated to result in $\min(s_i)$.
+		
+		\begin{table}[!htb]
+			\centering
+			\caption{Negation of binary representation for minimum determination}
+			\label{table:secure minimum negation}
+			\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+				\hline
+				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Binary $s_{i,2}$}  & \multicolumn{6}{l|}{Negated} \\ \hline
+				13                 & 0    & 0    & 1    & 1    & 0   & 1 & 1    & 1    & 0    & 0    & 1   & 0   \\ \hline
+				27                 & 0    & 1    & 1    & 0    & 1   & 1 & 1    & 0    & 0    & 1    & 0   & 0   \\ \hline
+				17                 & 0    & 1    & 0    & 0    & 0   & 1 & 1    & 0    & 1    & 1    & 1   & 0   \\ \hline
+			\end{tabular}
+		\end{table}
+
+		\todo{example computation}
 		
 		\subsubsection*{Protocol Description}
 		Assumptions:
@@ -309,11 +402,30 @@ Roadmap
 			\item For minimum-search: each party negates the stored sum-result.
 		\end{enumerate}
 	
-		\todo{example computation}
+		Note: the assumption $n>2$ for the secure addition and secure comparison protocols is not strict enough, if sum, $\min$ and $\max$ are computed for the same parties, since for $n=3$ the secret between minimum and maximum can be restored (the mapping of values to parties is still secure though).
 		
 		\subsection{Existing Frameworks}
 		\label{subsec:Existing Frameworks}
 		
+		 \href{http://www.brics.dk/SMCL/}{SMCL} discontinued -> \href{http://viff.dk/}{VIFF} discontinued -> SPDZ
+		
+		\todo{maybe: mention \href{http://www.cs.huji.ac.il/project/Fairplay/FairplayMP.html}{FairplayMP}, but also abandoned, issue from 2015 unanswered}
+		
+		\subsubsection*{SPDZ Software}
+		\todo{SPDZ Software}
+		\href{https://www.cs.bris.ac.uk/Research/CryptographySecurity/SPDZ/\#software}{link}
+		
+		\subsubsection*{SEPIA}
+		\todo{SEPIA Java lib}
+		\href{http://www.sepia.ee.ethz.ch/}{link}
+		
+		\subsubsection*{MpcLib}
+		\todo{MpcLib: no documentation}
+		\href{https://github.com/mahdiz/mpclib}{link}	
+		
+		\subsubsection*{Sharemind}
+		\todo{sharemind}
+		\href{https://sharemind.cyber.ee//}{link}	
 
 	
 	\section{Mobile Ad Hoc Networks}
