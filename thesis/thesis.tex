@@ -511,7 +511,7 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		
 		As discussed in \fullref{Implementability} fully featured \gls{MANET}s are currently not provided and mapping it completely in the application layer is beyond the scope of this thesis. Overcoming the technical limitation, the system can be build with sequential communications instead of parallel. As stated in \fullref{Network Topologies} communication in context of \gls{SMPC} computations is only done in a fully meshed subgroup of the network, which simplifies the coordinator election.
 		
-		\noindent A node will try to become the coordinator, when
+		\noindent A node will try to become the coordinator, when \todo{no linebreak}
 		\vspace{-\topsep}
 		\begin{enumerate}
 			\itemsep-0.5em
@@ -527,7 +527,7 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		\label{figure:coordinator exponential backoff}
 		\end{figure}
 		
-		\todo{exponential back-off + heartbeat}
+		\todo{heartbeat: timeout timer run out, try to send heartbeat, otherwise abort and reset initial state}
 		
 		\todo{Reduction of active connections; compare number of additional rounds needed; discuss timeouts}
 		
