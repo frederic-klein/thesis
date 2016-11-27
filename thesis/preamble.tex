@@ -11,21 +11,33 @@
 \usepackage{tikz} % for positioning the logo
 \floatsetup[table]{capposition=top} % for captions above tables
 \usepackage[bottom]{footmisc} % fix for figures under footnotes
-\usepackage[backend=bibtex,style=authoryear,citestyle=authoryear]{biblatex} % for references with footnotes
+\usepackage[backend=bibtex,style=authoryear,citestyle=authoryear,doi=false,url=true]{biblatex} % for references with footnotes
 \usepackage[titletoc]{appendix} % for inclusion of references in toc
 \usepackage{setspace} % for spacing
 \usepackage{mathtools}   % loads amsmath
 \usepackage{amssymb} % for mathematical letters like real numbers space
-\usepackage{hyperref}
+\usepackage{hyperref} % for nameref
 \usepackage[makeroom]{cancel} % crossed out numbers
 
 
 \setcounter{tocdepth}{1} % include only section in toc
 \setcounter{secnumdepth}{2} % number also subsections
 
-
-%\bibliography{references}
+% \bibliography{references}
 \addbibresource{references.bib}
+
+% allow additional url in bibliography
+	\let\URL\url
+	\makeatletter
+	\def\url#1{\@URL#1;;\@nil}
+	\def\@URL#1;#2;#3\@nil{%
+		\URL{#1}\ifx\relax#2\relax\else (archived at: \URL{#2})\fi}
+	\makeatother
+	%
+
+% combine ref and nameref for referencing titles
+	\newcommand*{\fullref}[1]{\ref{#1}~\nameref{#1}} 
+%
 
 % packages only for demonstration/testing
 \usepackage[textsize=tiny]{todonotes} % for todo notes
@@ -35,7 +47,7 @@
 \usepackage[nonumberlist,acronyms]{glossaries} % for lsit of abbreviations and list of symbols
 \newglossary{symbols}{sym}{sbl}{List of Symbols}
 
-\makenoidxglossaries
+\makenoidxglossaries % create glossaries
 
 %=====================ACRONYMS=====================%
 \newacronym{SMPC}{SMPC}{secure multi-party computation}
@@ -49,6 +61,16 @@
 \newacronym{DDoS}{DDoS}{Distributed Denial of Service}
 \newacronym{MSB}{MSB}{most significant bit}
 \newacronym{LSB}{LSB}{least significant bit}
+\newacronym{TLS}{TLS}{Transport Layer Security}
+\newacronym{HTTPS}{HTTPS}{HTTP over \gls{TLS}}
+\newacronym{GSM}{GSM}{Global System for Mobile Communications}
+\newacronym{API}{API}{application programming interface}
+\newacronym{SDK}{SDK}{software development kit}
+\newacronym{RFCOMM}{RFCOMM}{Radio frequency communication}
+\newacronym{L2CAP}{L2CAP}{Logical Link Control and Adaptation Protocol}
+\newacronym{UML}{UML}{Unified Modeling Language}
+\newacronym{UTC}{UTC}{Coordinated Universal Time}
+\newacronym{RTT}{RTT}{Round Trip Time}
 %=====================SYMBOLS=====================%
 \newglossaryentry{doubleR}{	type=symbols,sort={real set}, name={\ensuremath{\mathbb{R}}} , description={set of real numbers} }
 
