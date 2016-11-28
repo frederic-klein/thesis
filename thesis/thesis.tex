@@ -80,31 +80,26 @@ Roadmap
 	First the general idea for \gls{SMPC} is introduced in \ref{Secure Multi-Party Computation} \nameref{Secure Multi-Party Computation}. Since secret sharing is used for the development of \gls{SMPC} protocols, Shamir's secret sharing scheme is presented in \ref{Secret Sharing} \nameref{Secret Sharing}.
 	Protocols for secure addition and secure comparison with passive security are introduced in \ref{Secure Addition Protocol} and \ref{Secure Comparison Protocol} and existing frameworks for \gls{SMPC} are discussed in \ref{Existing Frameworks}.
 	
-	To be able to define requirements for the new framework, the key features of \gls{MANET}s are identified in \ref{sec:Mobile Ad Hoc Networks} \nameref{sec:Mobile Ad Hoc Networks}, with a focus on the wireless technology standards Bluetooth and Wi-Fi and the differences to similar network types like mesh networks.
+	To be able to define requirements for the new framework, the key features of \gls{MANET}s are identified in \fullref{Mobile Ad Hoc Networks}, with a focus on the wireless technology standards Bluetooth and Wi-Fi and the differences to similar network types like mesh networks.
 	
-	Since the \gls{SMPC} protocols expect a secure communication channel, while a pairing-less connection doesn't provide security by default, public key cryptography is needed. The key generation, as well as Shamir's secret sharing scheme, requires random numbers. Computer systems can generate pseudo-random numbers and the randomness of such an \gls{PRNG} is discussed in\ref{sec:Pseudo-Random Numbers} \nameref{sec:Pseudo-Random Numbers}.
+	Since the \gls{SMPC} protocols expect a secure communication channel, while a pairing-less connection doesn't provide security by default, public key cryptography is needed. The key generation, as well as Shamir's secret sharing scheme, requires random numbers. Computer systems can generate pseudo-random numbers and the randomness of such an \gls{PRNG} is discussed in\fullref{Communication Layer}.
 		
 	\section{Secure Multi-Party Computation}
 	\label{Secure Multi-Party Computation}
 	
 		\todo{general idea}
-		\gls{SMPC} is a subfield of cryptography. The target of \gls{SMPC} is to run computations over inputs from multiple parties while keeping these inputs secret. In 1982 Yao described the problem of two millionaires trying to find out, which one is wealthier, without giving each other information about their actual capital \autocite{Yao1982}. Yao's solution for this \gls{2PC} is considered to be the basis for general \gls{SMPC} protocols. Since the target group for the protocols used in this thesis \todo{resume}
+		\gls{SMPC} is a subfield of cryptography. The target of \gls{SMPC} is to run computations over inputs from multiple parties while keeping these inputs secret. In 1982 Yao described the problem of two millionaires trying to find out, which one is wealthier, without giving each other information about their actual capital \autocite{Yao1982}. Yaos solution for this \gls{2PC} is considered to be the basis for general \gls{SMPC} protocols.
+		\textcite{Cramer2015} describe for example benchmark analysis as a use-cases for \gls{SMPC}: companies want to know how well they are doing in their business area compared to other companies, while they do not want to share their current business numbers with competitors. Using a protocol for secure comparison (as described in \fullref{Secure Comparison Protocol}) the companies can calculate the best performer without leaking business information. 
+		\textcite{Clifton2002} describe privacy preserving data mining as another use-case: while data mining on patient data could for example indicate disease outbreaks but there is of course a privacy concern. Using \gls{SMPC} algorithms statistics can be computed while keeping the personal patient data private.
 		
-		\todo{use-cases to describe it better}
-		
-		\todo{cite \textcite{Clifton2002}: data mining; }
-		
-		\todo{only for honest parties, what is for other settings?} 
-		
-		\todo{discuss passive and active security}
 		For \gls{SMPC} two types of adversaries have to be considered: semi-honest and malicious adversaries.
 		Semi-honest adversaries "follow the protocol specification, yet may attempt to learn additional information by analyzing the transcript of messages received during the execution" \autocite{Aumann2007}. Malicious adversaries "are not bound in any way to following the instructions of the specified protocol" \autocite{Aumann2007}.
 		\gls{SMPC} protocols that can tolerate semi-honest parties (up to a specific threshold) provide semi-honest or passive security. \gls{SMPC} protocols that are secure against malicious adversaries achieve malicious or active security.
 		\textcite[p. 82]{Cramer2015} also differentiate between unconditional or perfect security and computational security: if security can be proven for an adversary with unlimited computation power a protocol has unconditional security. In contrast, computational security can only be proven for a polytime adversary.
 		
-		\todo{discuss the situation for gamification: what can be gained? -> this thesis focuses on honest but curious "players" -> basic sanity checks (see ...)}
+		Since the target group for the protocols used in this thesis are gamification systems potential adversaries are likely of the semi-honest type. Gamification system are usually based on intrinsic motivation. Especially in the context of workplace related gamification without public recognition, there is nothing to be gained from trying to corrupt the system, only the significance of the computation results is reduced.
 		
-		\todo{simple example}
+		Honest, but curious parties are more likely, but providing the majority of semi-honest parties, requires considerable efforts and even gaining a single score is of little interest. This thesis focuses on practical \gls{SMPC} protocols for passive security based on secret sharing.
 
 		\subsection{Secret Sharing}
 		\label{Secret Sharing}
@@ -127,9 +122,7 @@ Roadmap
 		\textcite[p. 7]{Cramer2015} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
 		
 		\todo{describe number off messages, usage of threshold as trade-off between security and performance -> START}
-		
-		
-		
+			
 		\todo{describe number off messages, usage of threshold as trade-off between security and performance -> END}
 		
 		The reconstruction of a secret $S$ can be done using Lagrange interpolation (compare \ref{eq:SSS lagrange interpolation}).
@@ -179,9 +172,13 @@ Roadmap
 		\subsection{Secure Addition Protocol}
 		\label{Secure Addition Protocol}
 		
-		For an environment with honest parties there are simple \gls{SMPC} protocols to compute the sum over shares. \textcite{Clifton2002} describe a ring based method, where the initializing party adds a random number $R$ to the secret input $s_1$ before passing it to the next node. Each node then adds its secret until the first party receives the result. By removing $R$ the party can than reconstruct the sum over all secret inputs:
+		For an environment with honest parties there are simple \gls{SMPC} protocols to compute the sum over shares. \textcite{Clifton2002} describe a ring based method, where the initializing party adds a random number $R$ to the secret input $s_1$ before passing it to the next node. Each node then adds its secret until the first party receives the result. By removing $R$ the party can than reconstruct the sum over all secret inputs (see figure \ref{figure:smpc sum ring}).
 		
-		\todo{visualize as svg figure}
+		\begin{figure}[!htb] % h for placement here
+		\caption{Simple secure sum protocol for ring}
+		\includegraphics[scale=1.0]{figures/smpc-sum-simple-ring.png}
+		\label{figure:smpc sum ring}
+		\end{figure}
 		
 		This method is efficient ($2n$ messages for computation and announcing the sum in a $n$-node ring) but if parties collude, party $P_i$ only needs the output of $P_{i+1}$ as received by party $P_{i+2}$ to reconstruct the secret input of $P_{i+1}$. \textcite{Clifton2002} propose using shares in combination with permutation of the ring order, so neighbors change in each iteration and the number of parties in need to pool their data increases. This approach was extended in the "k-Secure Sum Protocol" \autocite{Sheikh2009}.
 		
@@ -296,7 +293,7 @@ Roadmap
 			\centering
 			\caption{Binary representation of secrets $s_i$}
 			\label{table:secure maximum binary representation of secrets}
-			\begin{tabular}{|l|l|l|l|l|l|l|}
+			\begin{tabular}{|c|l|l|l|l|l|l|}
 				\hline
 				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Binary $s_{i,2}$} \\ \hline
 				13                 & 0    & 0    & 1    & 1    & 0   & 1   \\ \hline
@@ -311,7 +308,7 @@ Roadmap
 			\centering
 			\caption{Randomized binary representation of secrets}
 			\label{table:secure maximum randomized binary representation}
-			\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+			\begin{tabular}{|c|l|l|l|l|l|l|l|l|l|l|l|l|}
 				\hline
 				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Binary $s_{i,2}$}  & \multicolumn{6}{l|}{Randomized} \\ \hline
 				13                 & 0    & 0    & 1    & 1    & 0   & 1 & 0    & 0    & 45    & 61    & 0   & 57   \\ \hline
@@ -377,9 +374,9 @@ Roadmap
 
 		\subsubsection*{Protocol Description}
 		Assumptions:
-		\vspace{-\topsep}
+		% \vspace{-\topsep}
 		\begin{itemize}
-			\itemsep-0.5em
+			% \itemsep-0.5em
 			\item number of parties $n>2$
 			\item secure communication channel
 			\item no malicious adversaries
@@ -387,13 +384,13 @@ Roadmap
 		\end{itemize}
 		The secure comparison protocol, as used in this thesis, consists of the phases for secure addition within iterations for the bitwise length of a predefined upper bound for the inputs: 
 		\begin{enumerate}
-			\itemsep-0.5em
+			% \itemsep-0.5em
 			\item The coordinator announces the number of parties for the computation and the indexation of each party.
 			\item For minimum-search: each party negates the secret input.
 			\item For each bit in the secret input starting from \gls{MSB} to \gls{LSB} each party runs through iterations:
-			\vspace{-\topsep}
+			%\vspace{-\topsep}
 			\begin{enumerate}
-				\itemsep-0.5em
+				% \itemsep-0.5em
 				\item If input is flagged as lower than maximum, then use $s_j=0$ as the input. Otherwise multiply actual bit $b$ with a random value $R$: $s_j=b \cdot R$.
 				\item Each party $j$ sends shares $s_{j,i}$ of the input $s_j$ to the other parties.
 				\item Each party $i$ computes the sum over the received shares $s_{j,i}$.
@@ -409,7 +406,7 @@ Roadmap
 		Note: the assumption $n>2$ for the secure addition and secure comparison protocols is not strict enough, if sum, $\min$ and $\max$ are computed for the same parties, since for $n=3$ the secret between minimum and maximum can be restored (the mapping of values to parties is still secure though).
 		
 		\subsection{Existing Frameworks}
-		\label{subsec:Existing Frameworks}
+		\label{Existing Frameworks}
 		\todo{brief, why not fitting, focus on web, badly documented, complex}
 		 \href{http://www.brics.dk/SMCL/}{SMCL} discontinued; points to: \href{http://viff.dk/}{VIFF} discontinued; points to: SPDZ
 		
@@ -443,9 +440,11 @@ Roadmap
 	\label{Network Topologies}
 	
 	\textcite{Dorri2015} describe a \gls{MANET}s as an "infrastructure-independent network with wireless mobile nodes" \autocite[p. 15]{Dorri2015}. \gls{MANET}s are similar to mesh networks, but the distinctive feature is the nodes' spatial degree of freedom. In comparison to a star network, there is no central switch dedicated to routing messages. Instead each node provides message passing abilities and acts as a multi-hop relay.
-	The advantage of \gls{MANET}s is the open network boundary: nodes can freely join and leaving nodes do not affect the functionality of the \gls{MANET}.
+	The advantage of \gls{MANET}s is the open network boundary: nodes can freely join and leaving nodes do not affect the functionality of the \gls{MANET}:
 	
+	%\vspace{-\topsep}
 	\begin{itemize}  
+		%\itemsep-0.5em
 		\item continuously self-configuring
 		\item self-forming
 		\item self-healing
@@ -473,9 +472,9 @@ Roadmap
 
 	\subsubsection{Wi-Fi Based \gls{MANET}}
 			
-		Situations in which we can use Wi-Fi (or \gls{GSM}) usually provide Internet access, so Wi-Fi is not the primary target technology for this thesis. The callback-based architecture of the developed framework (compare \ref{Architecture} \nameref{Architecture}) enables the usage of different wireless technologies.
-		With Android 4.0 (\gls{API} level 14) the Wi-Fi Peer-to-Peer framework was introduced, which complies with the Wi-Fi Alliance's Wi-Fi Direct certificate program. Wi-Fi Direct states that one-to-one or group (many-to-one) connections are possible. One device acts as a group owner (soft access point), so it forms a star topology. To imitate a \gls{SPAN} with Wi-Fi Direct multi-group communication has to be provided. In \textcite{Funai2015} limitations of Android in regard of multi-group networking as well as solutions are discussed.
-		Other solutions (compare \textcite{Online:SPANProject}) include usage of custom kernels on rooted smart phones. Even though  demonstrations on selected devices have shown the feasibility, such system modifications neglect the target group and the intentions of this framework.
+	Situations in which we can use Wi-Fi (or \gls{GSM}) usually provide Internet access, so Wi-Fi is not the primary target technology for this thesis. The callback-based architecture of the developed framework (compare \ref{Architecture} \nameref{Architecture}) enables the usage of different wireless technologies.
+	With Android 4.0 (\gls{API} level 14) the Wi-Fi Peer-to-Peer framework was introduced, which complies with the Wi-Fi Alliance's Wi-Fi Direct certificate program. Wi-Fi Direct states that one-to-one or group (many-to-one) connections are possible. One device acts as a group owner (soft access point), so it forms a star topology. To imitate a \gls{SPAN} with Wi-Fi Direct multi-group communication has to be provided. In \textcite{Funai2015} limitations of Android in regard of multi-group networking as well as solutions are discussed.
+	Other solutions (compare \textcite{Online:SPANProject}) include usage of custom kernels on rooted smart phones. Even though  demonstrations on selected devices have shown the feasibility, such system modifications neglect the target group and the intentions of this framework.
 								
 		%\section{Pseudo-Random Numbers} %maybe move to implementation/secureing channel
 		%\label{sec:Pseudo-Random Numbers}
@@ -494,15 +493,84 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 	\section{Requirements}
 	\label{Requirements}
 	
-		\todo{use cases, process description, resulting requirements}
-		
-		uses case:
-		find nearby nodes
-		query node states
-		pass score for SMPC
-		join network without user-interaction
-		
+	\subsection{Functional Requirements}
+	\label{Functional Requirements}
+	
+	Functional requirements define the functions the framework has to offer to meet the acceptance criteria. Based on \fullref{Background} we can divide the requirements into two main fields: features regarding the accurate computation of the \gls{SMPC} protocols and functions required to compensate the lack of an \gls{MANET} \gls{API} and technical limitations. 
+	Figure \ref{figure:requirements use case node} presents the general functionality a node or a party expects from the system: especially the need for a secure channel and the limitation for nearby computation partners is caused by the missing multi-hop capabilities.
+	
+	\begin{figure}[!htb] % h for placement here
+	\caption{\gls{UML} use case diagram for the general functional requirements of a node}
+	\includegraphics[scale=0.85]{figures/use-case-node.png}
+	\label{figure:requirements use case node}
+	\end{figure}
 
+	Since most functions (like the time synchronization and the multi-party computation) require the interaction between nodes, these processes need to be coordinated. In a distributed system there is no central authority, so a node has to become the temporal leader or coordinator for the duration of a process. In figure \ref{figure:requirements use case coordinator} the processes requiring coordination are described as use cases for a temporal coordinator.
+	
+	\begin{figure}[!htb] % h for placement here
+	\caption{\gls{UML} use case diagram for the functional requirements for the coordinator}
+	\includegraphics[scale=0.75]{figures/use-case-coordinator.png}
+	\label{figure:requirements use case coordinator}
+	\end{figure}
+
+	Functional requirements:
+
+\begin{table}[!htb] % h for placement here
+	\centering
+	\caption{Functional requirements}
+	\label{table:requirements}
+\begin{tabular}{|l|p{\textwidth*4/5}|}
+	\toprule
+	Name & \textbf{Pairing-less Connection} \\ \midrule
+	Requirement & As a node I want to join the system without having to pair with other devices. \\
+	Assumptions & Device has Bluetooth capabilities with \gls{RFCOMM} protocol. \\ \midrule
+	Name & \textbf{Heartbeat} \\ \midrule
+	Requirement & As a node I need to inform my coordinator if my computation is running longer than expected. As a coordinator I need to inform all group nodes if a computation is running longer than expected. \\
+	Assumptions & Hosting system provides system time. \\ \midrule
+	Name & \textbf{Non-termination Detection} \\ \midrule
+	Requirement & As a node I must be able to detect a communication problem so I can reset my status. \\
+	Assumptions & Hosting system provides system time. \\ \midrule
+	Name & \textbf{Coordinator Election} \\ \midrule
+	Requirement & As a node I want to become coordinator for nearby nodes. While I am coordinator I want to be able to assign a group-member to coordinate a subprocess. \\ \midrule
+	Name & \textbf{Token-Passing} \\ \midrule
+	Requirement & As coordinator I want to be able to assign a group-member to coordinate a subprocess. \\ \midrule
+	Name & \textbf{\gls{SMPC} Module} \\ \midrule
+	Requirement & As a coordinator I want to form a group of fully meshed nodes and coordinate the execution of the secure addition and secure comparison protocols using a secure communication channel. \\
+	Assumptions & group \textgreater 2All group-members have a score within the same time-frame limits. \\
+	Testability & Unit tests to proof correctness of implementation. Performance-tests with different number of computation partners and validation of result. \\ \midrule
+	Name & \textbf{Clock Synchronization} \\ \midrule
+	Requirement & As coordinator I want to synchronize the clocks of nearby nodes. \\
+	Testability & Unit tests to proof correctness of implementation. \\ \midrule
+	Name & \textbf{Database Synchronization} \\ \midrule
+	Requirement & As coordinator I want to compare my database status with nearby nodes without having to compare entry-wise and exchange entries. \\
+	Assumptions & Participating nodes are idle and not waiting for a computation.\\
+	\bottomrule
+\end{tabular}
+\end{table}
+
+	\subsection{Non-Functional Requirements}
+	\label{Non-Functional Requirements}
+
+	\begin{figure}[!htb] % h for placement here
+	\caption{\gls{UML} use case diagram for developer}
+	\includegraphics[scale=0.85]{figures/use-case-developer.png}
+	\label{figure:requirements use case developer}
+	\end{figure}
+
+	\begin{table}[!htb] % h for placement here
+		\centering
+		\caption{My caption}
+		\label{my-label}
+		\begin{tabular}{|l|p{\textwidth*4/5}|}
+			\toprule
+		Name & \textbf{Configurability} \\ \midrule
+		Requirement & As a developer using the framework I want to configure the settings for the \gls{SMPC}. \\ \midrule
+		Name & \textbf{Usability} \\ \midrule
+		Requirement & As a developer it must be clear what callbacks have to be implemented and how the framework can be used in an Android device. \\ \bottomrule
+		\end{tabular}
+	\end{table}
+		
+	\FloatBarrier
 	\section{Decentralized, Distributed Computing}
 	\label{Decentralized, Distributed Computing}
 
@@ -522,16 +590,26 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		To avoid situations of competing nodes trying to become coordinator and thereby booth repeatedly failing, because not enough computation partners can be acquired, the timer based approach is supported by the exponential backoff algorithm. \textcite[p.67]{IEEE2010} describes the exponential backoff algorithm for collision detection and retransmission: if a coordinator appointment failed (equivalent to collision detection in original description) a factor for the waiting time till the next attempt is selected uniformly random from an increasing range, reducing the probability for competing coordinator candidates (compare figure \ref{figure:coordinator exponential backoff}).
 		
 		\begin{figure}[htbp] % h for placement here
-		\caption{\gls{UML} Activity diagram for exponential backoff algorithm}
+		\caption{\gls{UML} activity diagram for exponential backoff algorithm}
 		\includegraphics[scale=0.8]{figures/exponential-backoff.png}
 		\label{figure:coordinator exponential backoff}
 		\end{figure}
 		
-		\todo{heartbeat: timeout timer run out, try to send heartbeat, otherwise abort and reset initial state}
-		
 		\todo{Reduction of active connections; compare number of additional rounds needed; discuss timeouts}
+		Since parallel message exchange for the computation group cannot be guaranteed (see \ref{Implementability}), the coordinator controls sequential message exchanges with token passing. For example when $n$ nodes want to exchange $n$ secrets divided into $n$ shares each, the coordinator first requests successively the shares for himself ($s_i,1$) from the other $n-1$ nodes, while transmitting his own shares ($s_1,j$) with the request. Then the communication token gets passed to the next node, which in turn requests the shares from himself from the other $n-2$ nodes while transmitting his own shares and so on. An exemplary share-exchange for $n=3$ with token-passing is illustrated in figure \ref{figure:coordinator token passing}.
+		
+		\begin{figure}[!htb] % h for placement here
+		\caption{\gls{UML} sequence diagram for passing of communication token}
+		\includegraphics[scale=1.0]{figures/token-passing.png}
+		\label{figure:coordinator token passing}
+		\end{figure}
+	
+		\todo{detecting of non-termination; coordinator perspective and node perspective heartbeat: timeout timer run out, try to send heartbeat, otherwise abort and reset initial state}
+	
 		
 		\todo{when is clock synchronization triggered? Use as transition to next action}
+		
+		The combination of processes with the same communication partners, single-digit (bytes) payloads of a and  When a node tries to become coordinator (see figure \ref{figure:coordinator exponential backoff}) the initial state requests from nearby nodes are a good opportunity to run the clock synchronization
 		
 		\subsection{Clock Synchronization}
 		\label{Clock synchronization}
@@ -547,25 +625,29 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 			\item reports back the adjustments $\Delta_{i}=t_{average}-t_i$
 		\end{enumerate}
 	
-		Since the communication between the coordinator and a node takes time, the received response is already outdated. This is compensated by observing the \gls{RTT} and using half as a correction value (compare \ref{eq:berkeley RTT}). The \gls{RTT} is herein the timespan between sending a request to a node and receiving its response (see figure \ref{figure:berkeley RTT}). By sending the adjustments $\Delta_i$ instead of the adjusted time, the receiving nodes do not need to compensate the received value with the \gls{RTT}.
+		Since the communication between the coordinator and a node takes time, the received response is already outdated. This is compensated by observing the \gls{RTT} and using half of the duration as a correction value (compare \ref{eq:berkeley RTT}). The \gls{RTT} is herein the timespan between sending a request to a node and receiving its response (see figure \ref{figure:berkeley RTT}).
 		\begin{alignat}{1}
 		t'_i &=t_i+\frac{RTT}{2}=t_i+\frac{t_e-t_s}{2} \label{eq:berkeley RTT}
 		\end{alignat}
 		
-		\begin{figure}[htbp] % h for placement here
+		\begin{figure}[!htbp] % h for placement here
 			\caption{Round Trip Time}
 			\includegraphics[scale=1.0]{figures/berkeley.png}
 			\label{figure:berkeley RTT}
 		\end{figure}
+		
+		 By sending the adjustments $\Delta_i$ instead of the adjusted time, the receiving nodes do not need to compensate the received value with the \gls{RTT}. Figure \ref{figure:berkeley example} depicts the computation of the adjustments using Berkeley with \gls{RTT} correction for three nodes. 
+		
+		\begin{figure}[!htbp] % h for placement here
+			\caption{Example computation of adjustments with Berkeley}
+			\includegraphics[scale=1.0]{figures/berkeley-example.png}
+			\label{figure:berkeley example}
+		\end{figure}
 	
-		 For further improvement of the accuracy the processing duration between receiving a request and sending the response $t_{process}$ can be measured and send to the coordinator. In this thesis the simple approximation for $t_{response}$ is used, since the additional payload extends the transmission duration (see example computation in figure \ref{figure:berkeley example}). The \gls{RTT} has to be below an upper bound though, otherwise there is to much uncertainty regarding the influence of $t_{request}$, $t_{process}$ and $t_{response}$.
+		 For further improvement of the accuracy the processing duration between receiving a request and sending the response $t_{process}$ can be measured and send to the coordinator. In this thesis the simple approximation for $t_{response}$ is used, since the additional payload extends the transmission duration. The \gls{RTT} has to be below an upper bound though, otherwise there is to much uncertainty regarding the influence of $t_{request}$, $t_{process}$ and $t_{response}$.
 		 Also bounds for the deviation of the time can be defined to reduce the influence of outliers.
 		 
-		 \begin{figure}[htbp] % h for placement here
-		 \caption{Example computation of adjustments with Berkeley}
-		 \includegraphics[scale=1.0]{figures/berkeley-example.png}
-		 \label{figure:berkeley example}
-		 \end{figure}
+		\FloatBarrier
 		
 		\subsection{Distributed Databases}
 		\label{Distributed Database}

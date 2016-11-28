@@ -8,6 +8,7 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{floatrow} % for centering all figures automatically
+\usepackage{placeins} % for usage of FloatBarrier: stops floats to be pushed beyond barrier
 \usepackage{tikz} % for positioning the logo
 \floatsetup[table]{capposition=top} % for captions above tables
 \usepackage[bottom]{footmisc} % fix for figures under footnotes
@@ -18,6 +19,7 @@
 \usepackage{amssymb} % for mathematical letters like real numbers space
 \usepackage{hyperref} % for nameref
 \usepackage[makeroom]{cancel} % crossed out numbers
+\usepackage{booktabs} % thick rules for tables
 
 
 \setcounter{tocdepth}{1} % include only section in toc
@@ -35,7 +37,8 @@
 	\makeatother
 	%
 
-% combine ref and nameref for referencing titles
+% combine ref and nameref for referencing titles;
+% use \fullref{label}#r in cwl file for autocompletion and error checking in texstudio
 	\newcommand*{\fullref}[1]{\ref{#1}~\nameref{#1}} 
 %
 
