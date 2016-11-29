@@ -31,7 +31,7 @@
 	In recent years gamification has become a part in many areas of our daily routine. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. In contrast, gamification concerning our work life has to satisfy much higher privacy demands. Since comparison is a key component for gamification, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography. Existing frameworks for \gls{SMPC} utilize the Internet Protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Facilities with sensible measuring systems, e.g. medical devices in hospitals, often avoid Wi-Fi to reduce the risk of electromagnetic interference.
 	To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of \gls{MANET} and proposes the design of a \gls{SMPC} framework for \gls{MANET}, especially based on Bluetooth technology, and the implementation as a C library. 
 	
-	Since \gls{MANET}s have a \todo{bad word high acceptable here?} high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a blockchain based distributed database is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution. Since the framework aims to provide distributed computations of comparable values, protocols for secure addition and secure comparison are implemented, enabling the computation of minimum, maximum and average.
+	Since \gls{MANET}s have a \todo*{bad word high acceptable here?} high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a blockchain based distributed database is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution. Since the framework aims to provide distributed computations of comparable values, protocols for secure addition and secure comparison are implemented, enabling the computation of minimum, maximum and average.
 	
 	Devices of diverse computational power will be used to verify the applicability for wearables and \gls{IoT} grade devices. Also field-tests with a \gls{SPAN}(20-50 nodes) will be conducted to evaluated real life use cases. In contrast, the security of the framework and attack scenarios will be discussed. In summary, this thesis proposes a framework for \gls{SMPC} for decentralized, distributed systems.
 \end{abstract}
@@ -45,8 +45,9 @@
 
 {\let\clearpage\relax \printnoidxglossary[type=symbols,sort=letter]}
 
-\chapter{Introduction\todo{5-10\%, including motivation, general audience}}
+\chapter{Introduction}\todo*{5-10\%, including motivation, general audience}
 \label{Introduction}
+
 
 \pagenumbering{arabic}
 In the last couple of years gamification has found it's way into many areas of our daily life. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. In contrast, gamification concerning our work life can have much higher privacy demands. Since comparison is a key component for the gamification approach, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography.
@@ -57,7 +58,7 @@ To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this t
 
 Context
 
-\todo{mention \gls{IoT} problems ( \gls{DDoS} and botnets), to emphasis usefulness of connected but not online}
+\todo*{mention \gls{IoT} problems ( \gls{DDoS} and botnets), to emphasis usefulness of connected but not online}
 
 Restatement of the problem
 
@@ -72,7 +73,7 @@ Roadmap
 	
 		\paragraph{Wireless Networks in Hospitals}
 
-\chapter{Background \todo{10-15\%; thorough review of the state of the art; informed audience}}
+\chapter{Background} \todo*{10-15\%; thorough review of the state of the art; informed audience}
 \label{Background}
 	
 	In this chapter a general understanding of \gls{SMPC} and the key features of \gls{MANET}s is established.  
@@ -87,7 +88,7 @@ Roadmap
 	\section{Secure Multi-Party Computation}
 	\label{Secure Multi-Party Computation}
 	
-		\todo{general idea}
+		\todo*{general idea}
 		\gls{SMPC} is a subfield of cryptography. The target of \gls{SMPC} is to run computations over inputs from multiple parties while keeping these inputs secret. In 1982 Yao described the problem of two millionaires trying to find out, which one is wealthier, without giving each other information about their actual capital \autocite{Yao1982}. Yaos solution for this \gls{2PC} is considered to be the basis for general \gls{SMPC} protocols.
 		\textcite{Cramer2015} describe for example benchmark analysis as a use-cases for \gls{SMPC}: companies want to know how well they are doing in their business area compared to other companies, while they do not want to share their current business numbers with competitors. Using a protocol for secure comparison (as described in \fullref{Secure Comparison Protocol}) the companies can calculate the best performer without leaking business information. 
 		\textcite{Clifton2002} describe privacy preserving data mining as another use-case: while data mining on patient data could for example indicate disease outbreaks but there is of course a privacy concern. Using \gls{SMPC} algorithms statistics can be computed while keeping the personal patient data private.
@@ -121,9 +122,9 @@ Roadmap
 		\end{equation}
 		\textcite[p. 7]{Cramer2015} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
 		
-		\todo{describe number off messages, usage of threshold as trade-off between security and performance -> START}
+		\todo*{describe number off messages, usage of threshold as trade-off between security and performance -> START}
 			
-		\todo{describe number off messages, usage of threshold as trade-off between security and performance -> END}
+		\todo*{describe number off messages, usage of threshold as trade-off between security and performance -> END}
 		
 		The reconstruction of a secret $S$ can be done using Lagrange interpolation (compare \ref{eq:SSS lagrange interpolation}).
 		\begin{equation}
@@ -167,7 +168,7 @@ Roadmap
 		 \textit{Note:} in cryptography $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$, so that $m \cdot n+a>0$: e.g. $-9 \mod 17 = (\underbrace{1 \cdot 17-9}_{>0}) \mod 17$ (compare \ref{eq:SSS example negative modulo}).
 		 
 		%\subsection*{Differential Privacy}
-		\todo{Write about differential privacy?}
+		\todo*{Write about differential privacy?}
 		
 		\subsection{Secure Addition Protocol}
 		\label{Secure Addition Protocol}
@@ -182,7 +183,7 @@ Roadmap
 		
 		This method is efficient ($2n$ messages for computation and announcing the sum in a $n$-node ring) but if parties collude, party $P_i$ only needs the output of $P_{i+1}$ as received by party $P_{i+2}$ to reconstruct the secret input of $P_{i+1}$. \textcite{Clifton2002} propose using shares in combination with permutation of the ring order, so neighbors change in each iteration and the number of parties in need to pool their data increases. This approach was extended in the "k-Secure Sum Protocol" \autocite{Sheikh2009}.
 		
-		\todo{why Shamir instead?}
+		\todo*{why Shamir instead?}
 		Using Shamir's secret sharing a 		
 		In \ref{Secret Sharing} it was demonstrated how a secret can be reconstructed from the shares using Lagrange interpolation. It is also possible to reconstruct the sum of secrets by using the sums of shares for a Lagrange interpolation.
 		
@@ -270,7 +271,7 @@ Roadmap
 	
 	For a secure channel this protocol is information-theoretically secure: independent from computation power an adversary with $m_\text{leaked}<k$ shares will gain no information regarding the inputs. 
 	
-		\todo{secure addition with verification \autocite{Cramer2015}; number of messages}
+		\todo*{secure addition with verification \autocite{Cramer2015}; number of messages}
 		
 		\subsection{Secure Comparison Protocol}
 		\label{Secure Comparison Protocol}
@@ -407,29 +408,29 @@ Roadmap
 		
 		\subsection{Existing Frameworks}
 		\label{Existing Frameworks}
-		\todo{brief, why not fitting, focus on web, badly documented, complex}
+		\todo*{brief, why not fitting, focus on web, badly documented, complex}
 		 \href{http://www.brics.dk/SMCL/}{SMCL} discontinued; points to: \href{http://viff.dk/}{VIFF} discontinued; points to: SPDZ
 		
-		\todo{maybe: mention \href{http://www.cs.huji.ac.il/project/Fairplay/FairplayMP.html}{FairplayMP}, but also abandoned, issue from 2015 unanswered}
+		\todo*{maybe: mention \href{http://www.cs.huji.ac.il/project/Fairplay/FairplayMP.html}{FairplayMP}, but also abandoned, issue from 2015 unanswered}
 		
 		\paragraph{SPDZ Software}
-		\todo{SPDZ Software}
+		\todo*{SPDZ Software}
 		\href{https://www.cs.bris.ac.uk/Research/CryptographySecurity/SPDZ/\#software}{link}
 		
 		\paragraph{SEPIA}
-		\todo{SEPIA Java lib}
+		\todo*{SEPIA Java lib}
 		\href{http://www.sepia.ee.ethz.ch/}{link}
 		
 		\paragraph{MpcLib}
-		\todo{MpcLib: no documentation}
+		\todo*{MpcLib: no documentation}
 		\href{https://github.com/mahdiz/mpclib}{link}	
 		
 		\paragraph{Sharemind}
-		\todo{sharemind}
+		\todo*{sharemind}
 		\href{https://sharemind.cyber.ee//}{link}	
 		
 		\paragraph{Enigma}
-		\todo{Enigma for \gls{SMPC} based cloud services; MIT}
+		\todo*{Enigma for \gls{SMPC} based cloud services; MIT}
 		\href{http://www.enigma.co/}{link}	
 	
 	\section{Mobile Ad Hoc Networks}
@@ -455,7 +456,7 @@ Roadmap
 			
 	The message passing can either be done by routing or flooding. Since the nodes can move freely, the neighbors will change often, so maintaining routing tables is expensive. The passing of messages without the availability of authentication protocols like \gls{HTTPS} makes the communication vulnerable against man-in-the-middle attacks. Of course flooding means broadcasting and is not cheap either. For simplicity all communications related to this thesis are flooding broadcasts, if they have non-critical privacy demands and direct, encrypted message exchanges between neighbors for all \gls{SMPC}.
 	
-	\todo{figure mesh vs \gls{MANET}}
+	\todo*{figure mesh vs \gls{MANET}}
 		
 	\subsection{Implementability on Android Devices}
 	\label{Implementability}
@@ -467,7 +468,7 @@ Roadmap
 	Using the Bluetooth protocol \gls{RFCOMM} an insecure connection can be established, without the need for pairing and user interaction. \textcite{RFCOMM2012} describe \gls{RFCOMM} as the emulation of serial ports over \gls{L2CAP}, supporting the emulation of multiple ports between two devices and ports between multiple devices (device dependent).
 	Since multiple simultaneous connection have to share the available bandwidth per node, it takes $\frac{n}{2}$ times longer to share the same amount of data using only one-to-one connections. For the targeted number of computation partners in this thesis, this is a tolerable overhead.
 	The Bluetooth Special Interest Group has announced mesh networking protocols for upcoming specifications \autocite{Online:BluetoothMesh}. 
-	\todo{mention Bluetooth 5}
+	\todo*{mention Bluetooth 5}
 	
 
 	\subsubsection{Wi-Fi Based \gls{MANET}}
@@ -479,14 +480,14 @@ Roadmap
 		%\section{Pseudo-Random Numbers} %maybe move to implementation/secureing channel
 		%\label{sec:Pseudo-Random Numbers}
 			
-		%\todo{random numbers important for cryptography: selection of coefficients in secret sharing, public key generation, ...; RNG in different environments; entropy}
+		%\todo*{random numbers important for cryptography: selection of coefficients in secret sharing, public key generation, ...; RNG in different environments; entropy}
 			
 		%https://en.wikipedia.org/wiki/Cryptographically_secure_pseudo-random_number_generator
 			
-		%\todo{lib will require a callback for random number generator -> maybe mention with outlook for requirements}
+		%\todo*{lib will require a callback for random number generator -> maybe mention with outlook for requirements}
 
 
-\chapter{Design \todo{15-20\%; explains complete processing chain; explains what methods are used; for someone that wants to know what was done in detail}}
+\chapter{Design} \todo*{15-20\%; explains complete processing chain; explains what methods are used; for someone that wants to know what was done in detail}
 
 Based on the findings in chapter \fullref{Background} extended with \gls{UML} use case diagrams the requirements for the framework are specified in \fullref{Requirements}. In \fullref{Decentralized, Distributed Computing} specific requirements in context of complex processes are substantiated with algorithms for decentralized, distributed computing. Finally, a draft design is presented \fullref{Architecture}.
 
@@ -515,38 +516,41 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 
 	Functional requirements:
 
-\begin{table}[!htb] % h for placement here
-	\centering
-	\caption{Functional requirements}
-	\label{table:requirements}
-\begin{tabular}{|l|p{\textwidth*4/5}|}
-	\toprule
-	Name & \textbf{Pairing-less Connection} \\ \midrule
-	Requirement & As a node I want to join the system without having to pair with other devices. \\
-	Assumptions & Device has Bluetooth capabilities with \gls{RFCOMM} protocol. \\ \midrule
-	Name & \textbf{Heartbeat} \\ \midrule
-	Requirement & As a node I need to inform my coordinator if my computation is running longer than expected. As a coordinator I need to inform all group nodes if a computation is running longer than expected. \\
-	Assumptions & Hosting system provides system time. \\ \midrule
-	Name & \textbf{Non-termination Detection} \\ \midrule
-	Requirement & As a node I must be able to detect a communication problem so I can reset my status. \\
-	Assumptions & Hosting system provides system time. \\ \midrule
-	Name & \textbf{Coordinator Election} \\ \midrule
-	Requirement & As a node I want to become coordinator for nearby nodes. While I am coordinator I want to be able to assign a group-member to coordinate a subprocess. \\ \midrule
-	Name & \textbf{Token-Passing} \\ \midrule
-	Requirement & As coordinator I want to be able to assign a group-member to coordinate a subprocess. \\ \midrule
-	Name & \textbf{\gls{SMPC} Module} \\ \midrule
-	Requirement & As a coordinator I want to form a group of fully meshed nodes and coordinate the execution of the secure addition and secure comparison protocols using a secure communication channel. \\
-	Assumptions & group \textgreater 2All group-members have a score within the same time-frame limits. \\
-	Testability & Unit tests to proof correctness of implementation. Performance-tests with different number of computation partners and validation of result. \\ \midrule
-	Name & \textbf{Clock Synchronization} \\ \midrule
-	Requirement & As coordinator I want to synchronize the clocks of nearby nodes. \\
-	Testability & Unit tests to proof correctness of implementation. \\ \midrule
-	Name & \textbf{Database Synchronization} \\ \midrule
-	Requirement & As coordinator I want to compare my database status with nearby nodes without having to compare entry-wise and exchange entries. \\
-	Assumptions & Participating nodes are idle and not waiting for a computation.\\
-	\bottomrule
-\end{tabular}
-\end{table}
+
+	\begin{table}[!htb] % h for placement here
+		\centering
+		\caption{Functional requirements}
+		\label{table:requirements}
+		\begin{tabular}{|l|p{\textwidth*4/5}|}
+			\toprule
+			Name & \funcreq{Pairing-less Connection}\label{req:Pairing-less Connection} \\ \midrule
+			Requirement & As a node I want to join the system without having to pair with other devices. \\
+			Assumptions & Device has Bluetooth capabilities with \gls{RFCOMM} protocol. \\ \midrule
+			Name & \funcreq{Heartbeat}\label{req:Heartbeat} \\ \midrule
+			Requirement & As a node I need to inform my coordinator if my computation is running longer than expected. As a coordinator I need to inform all group nodes if a computation is running longer than expected. \\
+			Assumptions & Hosting system provides system time. \\ \midrule
+			Name & \funcreq{Non-termination Detection}\label{req:Non-termination Detection} \\ \midrule
+			Requirement & As a node I must be able to detect a communication problem so I can reset my status. \\
+			Assumptions & Hosting system provides system time. \\ \midrule
+			Name & \funcreq{Coordinator Election}\label{req:Coordinator Election} \\ \midrule
+			Requirement & As a node I want to become coordinator for nearby nodes. While I am coordinator I want to be able to assign a group-member to coordinate a subprocess. \\ \midrule
+			Name & \funcreq{Token-Passing}\label{req:Token-Passing} \\ \midrule
+			Requirement & As coordinator I want to be able to assign a group-member to coordinate a subprocess. \\ \midrule
+			Name & \funcreq{Secure Multi-Party Computation Module}\label{req:SMPC Module} \\ \midrule
+			Requirement & As a coordinator I want to form a group of fully meshed nodes and coordinate the execution of the secure addition and secure comparison protocols using a secure communication channel. \\
+			Assumptions & group \textgreater 2All group-members have a score within the same time-frame limits. \\
+			Testability & Unit tests to proof correctness of implementation. Performance-tests with different number of computation partners and validation of result. \\ \midrule
+			Name & \funcreq{Clock Synchronization}\label{req:Clock Synchronization} \\ \midrule
+			Requirement & As coordinator I want to synchronize the clocks of nearby nodes. \\
+			Testability & Unit tests to proof correctness of implementation. \\ \midrule
+			Name & \funcreq{Database Synchronization}\label{req:Database Synchronization} \\ \midrule
+			Requirement & As coordinator I want to compare my database status with nearby nodes without having to compare entry-wise and exchange entries. \\
+			Assumptions & Participating nodes are idle and not waiting for a computation.\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+
+	\FloatBarrier
 
 	\subsection{Non-Functional Requirements}
 	\label{Non-Functional Requirements}
@@ -563,9 +567,9 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		\label{my-label}
 		\begin{tabular}{|l|p{\textwidth*4/5}|}
 			\toprule
-		Name & \textbf{Configurability} \\ \midrule
+		Name & \nonfuncreq{Configurability}\label{req:Configurability} \\ \midrule
 		Requirement & As a developer using the framework I want to configure the settings for the \gls{SMPC}. \\ \midrule
-		Name & \textbf{Usability} \\ \midrule
+		Name & \nonfuncreq{Usability}\label{req:Usability} \\ \midrule
 		Requirement & As a developer it must be clear what callbacks have to be implemented and how the framework can be used in an Android device. \\ \bottomrule
 		\end{tabular}
 	\end{table}
@@ -573,17 +577,20 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 	\FloatBarrier
 	\section{Decentralized, Distributed Computing}
 	\label{Decentralized, Distributed Computing}
+	
+		Some of the specified requirements 
 
 		\subsection{Coordinator Election and Coordinator Role}
 		\label{Coordinator Election}
 		
 		As discussed in \fullref{Implementability} fully featured \gls{MANET}s are currently not provided and mapping it completely in the application layer is beyond the scope of this thesis. Overcoming the technical limitation, the system can be build with sequential communications instead of parallel. As stated in \fullref{Network Topologies} communication in context of \gls{SMPC} computations is only done in a fully meshed subgroup of the network, which simplifies the coordinator election.
 		
-		\noindent A node will try to become the coordinator, when \todo{no linebreak}
-		\vspace{-\topsep}
+		\noindent A node will try to become the coordinator, when \nolinebreak
+		%\vspace{-\topsep}
 		\begin{enumerate}
-			\itemsep-0.5em
-			\item a new score is ready for \gls{SMPC}: event driven.
+			%\itemsep-0.5em
+			\item a new personal score is ready for \gls{SMPC}: event driven.
+			\item all \gls{SMPC}
 			\item an event driven attempt failed an a certain amount of time passed: timer based.
 		\end{enumerate}
 		
@@ -595,7 +602,7 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		\label{figure:coordinator exponential backoff}
 		\end{figure}
 		
-		\todo{Reduction of active connections; compare number of additional rounds needed; discuss timeouts}
+		\todo*{Reduction of active connections; compare number of additional rounds needed; discuss timeouts}
 		Since parallel message exchange for the computation group cannot be guaranteed (see \ref{Implementability}), the coordinator controls sequential message exchanges with token passing. For example when $n$ nodes want to exchange $n$ secrets divided into $n$ shares each, the coordinator first requests successively the shares for himself ($s_i,1$) from the other $n-1$ nodes, while transmitting his own shares ($s_1,j$) with the request. Then the communication token gets passed to the next node, which in turn requests the shares from himself from the other $n-2$ nodes while transmitting his own shares and so on. An exemplary share-exchange for $n=3$ with token-passing is illustrated in figure \ref{figure:coordinator token passing}.
 		
 		\begin{figure}[!htb] % h for placement here
@@ -604,12 +611,11 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		\label{figure:coordinator token passing}
 		\end{figure}
 	
-		\todo{detecting of non-termination; coordinator perspective and node perspective heartbeat: timeout timer run out, try to send heartbeat, otherwise abort and reset initial state}
+		
 	
-		
-		\todo{when is clock synchronization triggered? Use as transition to next action}
-		
-		The combination of processes with the same communication partners, single-digit (bytes) payloads of a and  When a node tries to become coordinator (see figure \ref{figure:coordinator exponential backoff}) the initial state requests from nearby nodes are a good opportunity to run the clock synchronization
+		\todo*{detecting of non-termination; coordinator perspective and node perspective heartbeat: timeout timer run out, try to send heartbeat, otherwise abort and reset initial state}
+	
+		The combination of processes with the same communication partners, single-digit bytes of payloads and short process termination is a good option to reduces the total message-occurrence in the network: for example when a coordinator requests the states of nearby nodes, it can be combined with the clock synchronization.
 		
 		\subsection{Clock Synchronization}
 		\label{Clock synchronization}
@@ -647,16 +653,18 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		 For further improvement of the accuracy the processing duration between receiving a request and sending the response $t_{process}$ can be measured and send to the coordinator. In this thesis the simple approximation for $t_{response}$ is used, since the additional payload extends the transmission duration. The \gls{RTT} has to be below an upper bound though, otherwise there is to much uncertainty regarding the influence of $t_{request}$, $t_{process}$ and $t_{response}$.
 		 Also bounds for the deviation of the time can be defined to reduce the influence of outliers.
 		 
+		 The framework does not change the actual clock setting on the hosting system, but stores the computed time difference $\Delta_t$ and applies the value to all time-related actions. To make sure that a node is time-synchronized before scores and computations are acquired, it is reasonable to trigger a synchronization when the node joins the network. 
+		 
 		\FloatBarrier
 		
 		\subsection{Distributed Databases}
 		\label{Distributed Database}
 		
-		\todo{simplified version; let system handle storage; system needs to provide callback to run query over hashes; hash for each entry and db hash over all hashes; calculation done in lib; if db hash different from neighbor: compare entries anti chronologically}
+		\todo*{simplified version; let system handle storage; system needs to provide callback to run query over hashes; hash for each entry and db hash over all hashes; calculation done in lib; if db hash different from neighbor: compare entries anti chronologically}
 		
-		\todo{information: hash | time-stamp | number of participants | min v max v sum | value }
+		\todo*{information: hash | time-stamp | number of participants | min v max v sum | value }
 		
-%	\section{Applicability of \gls{SMPC} Protocols in \gls{MANET}s} \todo{Remove Applicability chapter? More or less answered in previous/following chapters...}
+%	\section{Applicability of \gls{SMPC} Protocols in \gls{MANET}s} \todo*{Remove Applicability chapter? More or less answered in previous/following chapters...}
 	
 %		\subsection*{Analysis of Key Factors: Computing Power, Network Data Rates and Duration of Connection}
 		
@@ -665,56 +673,68 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 %			\subsubsection*{Maintaining anonymity}
 		
 %			\subsubsection*{Strategies for Aggregation of Participants in Sparse Networks}
+
+	\subsection{Securing the Communication Channel}
+	\label{Securing the Communication Channel}
+	
+	The requirement 
+	
+	\todo*{Extend}
+	Description of asymmetric cryptography/public-key cryptosystem RSA
 			
 	\section{Architecture}
 	\label{Architecture}
 	
 			% Grobdesign, Komponentenbeschreibung, globale Eigenschaft des Gesamtsystems
 	
-			\todo{FURPS: Functionality, Usability, Reliability, Performance, Supportability; how followed to be system independent}
+			\todo*{FURPS: Functionality, Usability, Reliability, Performance, Supportability; how followed to be system independent}
 	
-			\todo{UML; module structure}
+			\todo*{UML; module structure}
 			
-			\todo{state machine; state pattern; client server architecture; \gls{UML} state diagrams for 1. joining network (get time; set clock delta), 2. finding computation partners, 3. running computation, 4. compare database}
+			\todo*{state machine; state pattern; client server architecture; \gls{UML} state diagrams for 1. joining network (get time; set clock delta), 2. finding computation partners, 3. running computation, 4. compare database}
 			
-			\todo{describe how it will change for a real \gls{MANET}: simplification, reduction of states}
+			\todo*{describe how it will change for a real \gls{MANET}: simplification, reduction of states}
 			
-			\todo{describe what is handled internally and what is handled externally by the hosting system and why (external: providing time, providing secure seed, providing timeout timer, providing communication channel: send (id based), receive (id based), query neighbors; )}
+			\todo*{describe what is handled internally and what is handled externally by the hosting system and why (external: providing time, providing secure seed, providing timeout timer, providing communication channel: send (id based), receive (id based), query neighbors; )}
 
-\chapter{Implementation \todo{15-20\%; details on the implementation; for someone who wants to continue the work}}	
+\chapter{Implementation} \todo*{15-20\%; details on the implementation; for someone who wants to continue the work}
 \label{Implementation}
 
 	%\section{Development Tools}
-	\todo{UML class or component diagram}
+	\todo*{UML class or component diagram}
 	
 	\section{Communication Layer}
 	\label{Communication Layer}
 	
-			\todo{UML communication diagram}
+			\todo*{UML communication diagram}
 	
 			\subsection{Pairing-less Connection}
 			\label{Pairing-less Connection}
 			
-			\todo{external system: extend on \gls{RFCOMM}; widespread}
+			\todo*{external system: extend on \gls{RFCOMM}; widespread}
 			
 			\subsection{Securing Channel}
 			\label{Secure Channel}
 			
-			\todo{describe how external system can provide better seeds for the public key system}
+			\todo*{describe how external system can provide better seeds for the public key system}
 			
-			\todo{describe how the library encrypts the messages; flag for message to signal encryption (first Byte of payload 0/1)}
+			\todo*{describe how the library encrypts the messages; flag for message to signal encryption (first Byte of payload 0/1)}
 			
-			\todo{https://developer.android.com/reference/java/security/SecureRandom.html}
+			RSA with wolfCrypt: Embedded Crypto Engine \textcite{Online:WolfCrypt}
+			
+			\todo*{https://developer.android.com/reference/java/security/SecureRandom.html}
 			
 	\section{Secure Multi-Party Computation Module}
 	\label{Secure Multi-Part Computation Module}
 	
-	\todo{describe the module for creating shares; describe generation of communication partner matrix; describe secure addition module; describe secure maximum module; describe secure minimum module}
+	\todo*{describe the module for creating shares; describe generation of communication partner matrix; describe secure addition module; describe secure maximum module; describe secure minimum module}
 	
 	\section{Data Storage and Distribution}
 	\label{Data Storage and Distribution}
 	
-	\todo{describe hash module; }
+	\textcite{Online:WolfCrypt}
+	
+	Hashing with wolfCrypt: Embedded Crypto Engine
 	
 	\section{Interfacing the Library}
 	\label{Interfacing the Library}
@@ -722,55 +742,55 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		\subsection{Configuration}
 		\label{Configuration}
 		
-		\todo{describe configuration.h: what can be configured, override of illegal configurations/sanity checks}
+		\todo*{describe configuration.h: what can be configured, override of illegal configurations/sanity checks}
 		
 		\subsection{Usage in C}
 		\label{Usage in C}
 		
-		\todo{describe library is used in raspberry and in xadow}
+		\todo*{describe library is used in raspberry and in xadow}
 		
 		\subsection{Usage in Android}
 		\label{Usage in Android}
 		
-		\todo{describe how library is used with android \gls{NDK}; describe Java wrapper}
+		\todo*{describe how library is used with android \gls{NDK}; describe Java wrapper}
 		
-\chapter{Evaluation \todo{5-15\%; outcome; how was it tested; for supervisor}}
+\chapter{Evaluation} \todo*{5-15\%; outcome; how was it tested; for supervisor}
 \label{Evaluation}
 
 	\section{Testing Tools}
 	\label{Testing Tools}
 	
-		\todo{Unity (Unit test for C); JUnit; Android based multi-device tests}
+		\todo*{Unity (Unit test for C); JUnit; Android based multi-device tests}
 		
-		\todo{centralized client-server test application for android: trigger test runs, report results (measured execution time, correctness)}
+		\todo*{centralized client-server test application for android: trigger test runs, report results (measured execution time, correctness)}
 
 	\section{Examination of Computation Time Dependent on Computing Power}
 	\label{Examination of Computation Time Dependent on Computing Power}
 	
-	\todo{test on: xadow (IoT); RaspberryPi 3 (SBC); Android 4 (single core, low RAM), Android 5 (multi-core, 2 GB RAM)}
+	\todo*{test on: xadow (IoT); RaspberryPi 3 (SBC); Android 4 (single core, low RAM), Android 5 (multi-core, 2 GB RAM)}
 	
 	\section{Examination of Computation Time Dependent on Number of Participants}
 	\label{Examination of Computation Time Dependent on Number of Participants}
 		
-		\todo{n devices, n shares (highest security)}
+		\todo*{n devices, n shares (highest security)}
 		
-		\todo{n devices, k (>n/2) shares (adjustable security)}
+		\todo*{n devices, k (>n/2) shares (adjustable security)}
 			
-		%\todo{SNET with increasing number of android devices; predefined tests}
+		%\todo*{SNET with increasing number of android devices; predefined tests}
 		
 		%\section{Examination of Distribution Time Dependent on Number of Participants}
 
-\chapter{Discussion \todo{5-15\%; outcome for a design-reader} }
+\chapter{Discussion} \todo*{5-15\%; outcome for a design-reader}
 \label{Discussion}
 
-\todo{extend protocol: implement merging of results, to reduce probability of not finding computation partner; implement alternative protocols}
+\todo*{extend protocol: implement merging of results, to reduce probability of not finding computation partner; implement alternative protocols}
 
-\todo{implement optional verification for addition, if performance is good enough for real life application}
+\todo*{implement optional verification for addition, if performance is good enough for real life application}
 
-\chapter{Conclusion \todo{5-10\%; outcome for an introduction-reader}}
+\chapter{Conclusion} \todo*{5-10\%; outcome for an introduction-reader}
 \label{Conclusion}
 
-\todo{outlook: bt 5.0, mesh network}
+\todo*{outlook: bt 5.0, mesh network}
 
 \clearpage
 \renewcommand{\bibname}{References} % rename Bibliograpy to References
@@ -780,5 +800,7 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 	\chapter{Some name}
 	\lipsum[3]
 \end{appendices}
+
+\todos
 
 \end{document}

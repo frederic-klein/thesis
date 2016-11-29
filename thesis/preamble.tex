@@ -5,7 +5,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{csquotes} % recommended for quoted text
-\usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{floatrow} % for centering all figures automatically
 \usepackage{placeins} % for usage of FloatBarrier: stops floats to be pushed beyond barrier
@@ -35,15 +34,38 @@
 	\def\@URL#1;#2;#3\@nil{%
 		\URL{#1}\ifx\relax#2\relax\else (archived at: \URL{#2})\fi}
 	\makeatother
-	%
+%
 
 % combine ref and nameref for referencing titles;
 % use \fullref{label}#r in cwl file for autocompletion and error checking in texstudio
 	\newcommand*{\fullref}[1]{\ref{#1}~\nameref{#1}} 
 %
 
+\newcommand{\pad}[1]{\ifnum\value{#1}<10 0\fi\arabic{#1}}
+
+
+
+% define funcreq command
+% creates an auto-incremented (FR00), bold output of the functional requirement argument, that can be labeled and prints the output when referenced
+\newcounter{funcreqcounter}
+\setcounter{funcreqcounter}{0}
+\makeatletter
+\newcommand{\funcreq}[1]{\stepcounter{funcreqcounter}\textbf{FR\pad{funcreqcounter} #1}\renewcommand{\@currentlabel}{FR\pad{funcreqcounter}~#1}}
+\makeatother
+%
+
+% define nonfuncreq command
+% creates an auto-incremented (NFR00), bold output of the non-functional requirement argument, that can be labeled and prints the output when referenced
+\newcounter{nonfuncreqcounter}
+\setcounter{nonfuncreqcounter}{0}
+\makeatletter
+\newcommand{\nonfuncreq}[1]{\stepcounter{nonfuncreqcounter}\textbf{NFR\pad{nonfuncreqcounter} #1}\renewcommand{\@currentlabel}{NFR\pad{nonfuncreqcounter}~#1}}
+\makeatother
+%
+
 % packages only for demonstration/testing
-\usepackage[textsize=tiny]{todonotes} % for todo notes
+% \usepackage[textsize=tiny]{todonotes} % for todo notes
+\usepackage{todo}
 \setlength{\marginparwidth}{2.2cm} % for todo width
 \usepackage{lipsum} % for lorem ipsum
 
