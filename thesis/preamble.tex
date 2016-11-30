@@ -6,6 +6,7 @@
 \usepackage[english]{babel}
 \usepackage{csquotes} % recommended for quoted text
 \usepackage{graphicx}
+\usepackage{subfig} % for composing multiple sub-figures into one figures
 \usepackage{floatrow} % for centering all figures automatically
 \usepackage{placeins} % for usage of FloatBarrier: stops floats to be pushed beyond barrier
 \usepackage{tikz} % for positioning the logo
@@ -66,7 +67,7 @@
 % packages only for demonstration/testing
 % \usepackage[textsize=tiny]{todonotes} % for todo notes
 \usepackage{todo}
-\setlength{\marginparwidth}{2.2cm} % for todo width
+%\setlength{\marginparwidth}{2.2cm} % for todo width
 \usepackage{lipsum} % for lorem ipsum
 
 \usepackage[nonumberlist,acronyms]{glossaries} % for lsit of abbreviations and list of symbols
@@ -96,6 +97,7 @@
 \newacronym{UML}{UML}{Unified Modeling Language}
 \newacronym{UTC}{UTC}{Coordinated Universal Time}
 \newacronym{RTT}{RTT}{Round Trip Time}
+\newacronym{MAC}{MAC}{media access control}
 %=====================SYMBOLS=====================%
 \newglossaryentry{doubleR}{	type=symbols,sort={real set}, name={\ensuremath{\mathbb{R}}} , description={set of real numbers} }
 
