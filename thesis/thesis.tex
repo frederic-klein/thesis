@@ -91,7 +91,7 @@ Roadmap
 		\todo*{general idea}
 		\gls{SMPC} is a subfield of cryptography. The target of \gls{SMPC} is to run computations over inputs from multiple parties while keeping these inputs secret. In 1982 Yao described the problem of two millionaires trying to find out, which one is wealthier, without giving each other information about their actual capital \autocite{Yao1982}. Yaos solution for this \gls{2PC} is considered to be the basis for general \gls{SMPC} protocols.
 		\textcite{Cramer2015} describe for example benchmark analysis as a use-cases for \gls{SMPC}: companies want to know how well they are doing in their business area compared to other companies, while they do not want to share their current business numbers with competitors. Using a protocol for secure comparison (as described in \fullref{Secure Comparison Protocol}) the companies can calculate the best performer without leaking business information. 
-		\textcite{Clifton2002} describe privacy preserving data mining as another use-case: while data mining on patient data could for example indicate disease outbreaks but there is of course a privacy concern. Using \gls{SMPC} algorithms statistics can be computed while keeping the personal patient data private.
+		\textcite{Clifton2002} describe privacy preserving data mining as another use-case: data mining on patient data can for example be used to indicate disease outbreaks but there is of course a privacy concern. Using \gls{SMPC} algorithms statistics can be computed while keeping the personal patient data private.
 		
 		For \gls{SMPC} two types of adversaries have to be considered: semi-honest and malicious adversaries.
 		Semi-honest adversaries "follow the protocol specification, yet may attempt to learn additional information by analyzing the transcript of messages received during the execution" \autocite{Aumann2007}. Malicious adversaries "are not bound in any way to following the instructions of the specified protocol" \autocite{Aumann2007}.
@@ -165,7 +165,7 @@ Roadmap
 		 & \quad && = -9 \mod 17 \label{eq:SSS example negative modulo} \\
 		 & \quad && = 8 \nonumber 
 		 \end{alignat}
-		 \textit{Note:} in cryptography $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$, so that $m \cdot n+a>0$: e.g. $-9 \mod 17 = (\underbrace{1 \cdot 17-9}_{>0}) \mod 17$ (compare \ref{eq:SSS example negative modulo}).
+		 \textit{Note:} in cryptography $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$ ($mn\mod n=0$), so that $m \cdot n+a>0$: e.g. $-9 \mod 17 = (\underbrace{1 \cdot 17-9}_{>0}) \mod 17$ (compare \ref{eq:SSS example negative modulo}), which resolves to: $a\mod n = n-(|a|\mod n), a<0$.
 		 
 		%\subsection*{Differential Privacy}
 		\todo*{Write about differential privacy?}
@@ -741,9 +741,9 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		\subsection{Distributed Databases}
 		\label{Distributed Database}
 		
-		A distributed system without central servers, that guarantee availability throughout the network, has to provide a distributed database model. This means that nodes need to compare their database states and synchronize differences. Since the nodes can enter and leave the network freely, preservation of the data in the system as well as consistency have to be considered.
+		A distributed system without central servers, that guarantee availability throughout the network, has to provide a distributed database model. This means, that nodes need to compare their database states with each other and synchronize differences. Since the nodes can enter and leave the network freely, preservation of the data in the system as well as consistency has to be considered.
 		
-		The framework deals only with entry-sets of the database and lets the hosting system handle the actual storage.
+		The framework deals only with entry-sets of the database and lets the hosting system handle the actual storage. Since each node hosts its own database, transactions for concurrent access is not an issue.
 		
 		\noindent An entry consists of:
 		%\vspace{-\topsep}
@@ -768,16 +768,15 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 			\end{rcases*} \overline{v}_i=\frac{v_1+v_2}{n_1+n_2}
 		\end{align*}
 		 
-		Since the framework offers three types of \gls{SMPC}s the entry must reflect the source of the value.
-
-		By comparison and updating, each node will have eventually all entries, so a distributed database has eventually consistency. 
-		For the gamification setting it can be argued, that a small number of missing entries will distort the results only marginally. So values that have not been committed to the system for a certain duration (e.g. a week), can be considered outdated. That enables the aggregation of entries:
+		Since the framework offers three types of \gls{SMPC}s the entry must reflect the source of the value. By comparison and updating, each node will have eventually all entries, so a distributed database has eventual consistency.
+		To meet with the requirement \ref{req:Database Synchronization} each node holds the sum of the entries' hashes within a specified time-window. This value is used to compare the database-states between nodes: if the values are equal, the databases are likely consistent (collisions are possible though), otherwise entries are compared and exchanged. First the coordinator request the hash-sum. If they match an acknowledgment is send, otherwise up to n (predefined upper bound) hashes of the entries in anti-chronological order are send in an array to the node. The node response with an array of booleans, representing if the hashes are known. If the response-array contains zeros, then the unknown entries are transmitted. After an entry-exchange the hash-sums are compared, to determine if consistency is reached (coordinator request hash-sum if needed, compare figure \ref{figure:Database synchronization scheme}). If the hash-sums do not match, the node sends up to n entry-hashes to the coordinator, skipping already evaluated entries. This is repeated until consistency is reached or a request times out and the process is aborted.
+		Figure \ref{figure:Database synchronization scheme} displays the basic process for $n=2$, with ASCII-values as hashes:
 		
-		\todo*{go on, describe how n values can be combined for timeslots or even days, weeks, etc. to save space and speed up synchronization}
-		
-		\todo*{simplified version; let system handle storage; system needs to provide callback to run query over hashes; hash for each entry and db hash over all hashes; calculation done in lib; if db hash different from neighbor: compare entries anti chronologically}
-		
-		\todo*{information: hash | time-stamp | number of participants | min v max v sum | value }
+		\begin{figure}[!htbp] % h for placement here
+			\caption{Database synchronization scheme}
+			\includegraphics[scale=1.0]{figures/db-synchronization.png}
+			\label{figure:Database synchronization scheme}
+		\end{figure}
 		
 %	\section{Applicability of \gls{SMPC} Protocols in \gls{MANET}s} \todo*{Remove Applicability chapter? More or less answered in previous/following chapters...}
 	
@@ -789,16 +788,33 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		
 %			\subsubsection*{Strategies for Aggregation of Participants in Sparse Networks}
 
+	\FloatBarrier
+
 	\subsection{Securing the Communication Channel}
 	\label{Securing the Communication Channel}
 	
-	The requirement 
+	As requested in requirement \ref{req:SMPC Module} and noted in \ref{Secure Addition Protocol} the \gls{SMPC} protocols need secure communication channels. Listen in on wireless communication means receiving the radio signals, so for common wireless technologies this is easily accomplished. Since the physical layer is more or less public, the communication needs encryption. 
+	For this framework two kinds of encryption are used: first asymmetric cryptography is used to exchange a session-key, which is then used to secure messages with symmetric encryption, as displayed in figure \ref{figure:RSA/AES scheme}. This principle is well known from \gls{TLS} encryption used in \gls{HTTPS}. For the symmetric encryption the \gls{AES} as described by \textcite[pp. 19-25]{Delfs2015} is used.
+	For the asymmetric encryption the public-key cryptosystem \acs{RSA} as described by \textcite[pp. 49-76]{Delfs2015} is used.
+	\gls{AES} encrypts and decrypts faster than \gls{RSA}, because \gls{RSA} requires long keys (2048 bit and longer recommended) for proper security. But \gls{AES} needs sender and receiver to know the cipher, and the exchange of this key over an insecure channel only with \gls{AES} is not possible.
 	
-	\todo*{Extend}
-	Description of asymmetric cryptography/public-key cryptosystem RSA
+	\todo*{figure for \gls{AES} and \gls{RSA} combination}
+	\begin{figure}[!htbp] % h for placement here
+		\caption{Securing communication with \gls{RSA} and \gls{AES}}
+		\includegraphics[scale=1.0]{figures/encryption.png}
+		\label{figure:RSA/AES scheme}
+	\end{figure}
+		
+	The basis for the cryptosystem by \gls{RSA} is the prime-factorization, which requires super-polynomial time. \gls{RSA} is asymmetric, since there is one key for encryption and one key for decryption. In this setting, the public key is used for encryption, so only the receiver with the private key can decrypt the secret.
+	For the key generation two large prime numbers are selected: $p,q,p\neq q \in \mathbb{P}$. The product $n=p\cdot q$ is computed. Euler's Phi function $\phi (n)=(p-1)(q-1)$ is computed and a coprime integer $e$ is selected $1<e<\phi(n)$. A common value for $e$ is $65537$. $n$ and $e$ form the public key.
+	The private key is formed from $n$ and $d$, where d meets $e\cdot d\equiv 1\mod \phi(n)$.
+	For the symmetric encryption, booth partners use the same key. \gls{AES} is an iterated block cipher with a block length of 128 bits and key length of 128, 192 or 256 bits. The iterations (called rounds) follow the Rijndael algorithm. A detailed description of the algorithm can be found in \textcite[pp. 20-25]{Delfs2015}.
+	
+	\FloatBarrier
 			
 	\section{Architecture}
 	\label{Architecture}
+	
 	
 			% Grobdesign, Komponentenbeschreibung, globale Eigenschaft des Gesamtsystems
 	
@@ -811,6 +827,8 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 			\todo*{describe how it will change for a real \gls{MANET}: simplification, reduction of states}
 			
 			\todo*{describe what is handled internally and what is handled externally by the hosting system and why (external: providing time, providing secure seed, providing timeout timer, providing communication channel: send (id based), receive (id based), query neighbors; )}
+			
+	\FloatBarrier
 
 \chapter{Implementation} \todo*{15-20\%; details on the implementation; for someone who wants to continue the work}
 \label{Implementation}
@@ -884,6 +902,8 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 	
 	\todo*{test on: xadow (IoT); RaspberryPi 3 (SBC); Android 4 (single core, low RAM), Android 5 (multi-core, 2 GB RAM)}
 	
+	\todo*{test on pc: define CPU limited processes, use pipes as communication channel, run scalability tests}
+	
 	\section{Examination of Computation Time Dependent on Number of Participants}
 	\label{Examination of Computation Time Dependent on Number of Participants}
 		
@@ -898,14 +918,25 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 \chapter{Discussion} \todo*{5-15\%; outcome for a design-reader}
 \label{Discussion}
 
+\todo*{combine requirements with evaluation}
+
 \todo*{extend protocol: implement merging of results, to reduce probability of not finding computation partner; implement alternative protocols}
 
 \todo*{implement optional verification for addition, if performance is good enough for real life application}
 
+\todo*{computation group, implement fairness: after rejection as member of computation group either reduce backoff time or raise a priority indicator a do a weighted group}
+
+\todo*{outlook: bt 5.0, mesh network}
+
+\todo*{extend: combine dated data to reduce storage needs; incremental hash instead of sum}
+Based on the gamification related target group, assumptions regarding the significance of dated data can be made: for example it is of interest to compare the general average for the previous year with the personal scores, maybe also on month or week level. In contrast a more fine-grained resolution of dated data will be rarely used while requiring extensive storage, compared to summarized data.
+
+\todo*{QoS control needed}
+
 \chapter{Conclusion} \todo*{5-10\%; outcome for an introduction-reader}
 \label{Conclusion}
 
-\todo*{outlook: bt 5.0, mesh network}
+\todo*{describe how statements in the introduction were met: \gls{SMPC} over self-forming, low maintenance/infrastructure-less network; framework offers reduced complexity, useful computation results for many gamification settings and other applications; performance for real life usage with good levels of security; outlook: will gain more significance for SIoT: secure Internet of things (revisit topic of insecure Internet); next steps: host public as open source to gain to use open source community to improve project further}
 
 \clearpage
 \renewcommand{\bibname}{References} % rename Bibliograpy to References
