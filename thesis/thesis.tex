@@ -31,7 +31,7 @@
 	In recent years gamification has become a part in many areas of our daily routine. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. In contrast, gamification concerning our work life has to satisfy much higher privacy demands. Since comparison is a key component for gamification, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography. Existing frameworks for \gls{SMPC} utilize the Internet Protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Facilities with sensible measuring systems, e.g. medical devices in hospitals, often avoid Wi-Fi to reduce the risk of electromagnetic interference.
 	To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of \gls{MANET} and proposes the design of a \gls{SMPC} framework for \gls{MANET}, especially based on Bluetooth technology, and the implementation as a C library. 
 	
-	Since \gls{MANET}s have a \todo*{bad word high acceptable here?} high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a blockchain based distributed database is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution. Since the framework aims to provide distributed computations of comparable values, protocols for secure addition and secure comparison are implemented, enabling the computation of minimum, maximum and average.
+	Since \glspl{MANET} have a \todo*{bad word high acceptable here?} high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a blockchain based distributed database is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution. Since the framework aims to provide distributed computations of comparable values, protocols for secure addition and secure comparison are implemented, enabling the computation of minimum, maximum and average.
 	
 	Devices of diverse computational power will be used to verify the applicability for wearables and \gls{IoT} grade devices. Also field-tests with a \gls{SPAN}(20-50 nodes) will be conducted to evaluated real life use cases. In contrast, the security of the framework and attack scenarios will be discussed. In summary, this thesis proposes a framework for \gls{SMPC} for decentralized, distributed systems.
 \end{abstract}
@@ -73,15 +73,16 @@ Roadmap
 	
 		\paragraph{Wireless Networks in Hospitals}
 
+\FloatBarrier
 \chapter{Background} \todo*{10-15\%; thorough review of the state of the art; informed audience}
 \label{Background}
 	
-	In this chapter a general understanding of \gls{SMPC} and the key features of \gls{MANET}s is established.  
+	In this chapter a general understanding of \gls{SMPC} and the key features of \glspl{MANET} is established.  
 	
 	First the general idea for \gls{SMPC} is introduced in \ref{Secure Multi-Party Computation} \nameref{Secure Multi-Party Computation}. Since secret sharing is used for the development of \gls{SMPC} protocols, Shamir's secret sharing scheme is presented in \ref{Secret Sharing} \nameref{Secret Sharing}.
 	Protocols for secure addition and secure comparison with passive security are introduced in \ref{Secure Addition Protocol} and \ref{Secure Comparison Protocol} and existing frameworks for \gls{SMPC} are discussed in \ref{Existing Frameworks}.
 	
-	To be able to define requirements for the new framework, the key features of \gls{MANET}s are identified in \fullref{Mobile Ad Hoc Networks}, with a focus on the wireless technology standards Bluetooth and Wi-Fi and the differences to similar network types like mesh networks.
+	To be able to define requirements for the new framework, the key features of \glspl{MANET} are identified in \fullref{Mobile Ad Hoc Networks}, with a focus on the wireless technology standards Bluetooth and Wi-Fi and the differences to similar network types like mesh networks.
 	
 	Since the \gls{SMPC} protocols expect a secure communication channel, while a pairing-less connection doesn't provide security by default, public key cryptography is needed. The key generation, as well as Shamir's secret sharing scheme, requires random numbers. Computer systems can generate pseudo-random numbers and the randomness of such an \gls{PRNG} is discussed in\fullref{Communication Layer}.
 		
@@ -373,6 +374,7 @@ Roadmap
 			\end{tabular}
 		\end{table}
 
+		\FloatBarrier
 		\subsubsection*{Protocol Description}
 		Assumptions:
 		% \vspace{-\topsep}
@@ -435,13 +437,13 @@ Roadmap
 	
 	\section{Mobile Ad Hoc Networks}
 	\label{Mobile Ad Hoc Networks}
-	The framework developed as part of this thesis focuses on providing \gls{SMPC} for \gls{MANET}s. In this section the network topologies related to \gls{MANET}s are briefly described (see \ref{Network Topologies}) and the implementability based on current technology standards are examined (see \ref{Implementability}).
+	The framework developed as part of this thesis focuses on providing \gls{SMPC} for \glspl{MANET}. In this section the network topologies related to \glspl{MANET} are briefly described (see \ref{Network Topologies}) and the implementability based on current technology standards are examined (see \ref{Implementability}).
 		
 	\subsection{Network Topologies}
 	\label{Network Topologies}
 	
-	\textcite{Dorri2015} describe a \gls{MANET}s as an "infrastructure-independent network with wireless mobile nodes" \autocite[p. 15]{Dorri2015}. \gls{MANET}s are similar to mesh networks, but the distinctive feature is the nodes' spatial degree of freedom. In comparison to a star network, there is no central switch dedicated to routing messages. Instead each node provides message passing abilities and acts as a multi-hop relay.
-	The advantage of \gls{MANET}s is the open network boundary: nodes can freely join and leaving nodes do not affect the functionality of the \gls{MANET}:
+	\textcite{Dorri2015} describe a \glspl{MANET} as an "infrastructure-independent network with wireless mobile nodes" \autocite[p. 15]{Dorri2015}. \glspl{MANET} are similar to mesh networks, but the distinctive feature is the nodes' spatial degree of freedom. In comparison to a star network, there is no central switch dedicated to routing messages. Instead each node provides message passing abilities and acts as a multi-hop relay.
+	The advantage of \glspl{MANET} is the open network boundary: nodes can freely join and leaving nodes do not affect the functionality of the \gls{MANET}:
 	
 	%\vspace{-\topsep}
 	\begin{itemize}  
@@ -456,11 +458,9 @@ Roadmap
 			
 	The message passing can either be done by routing or flooding. Since the nodes can move freely, the neighbors will change often, so maintaining routing tables is expensive. The passing of messages without the availability of authentication protocols like \gls{HTTPS} makes the communication vulnerable against man-in-the-middle attacks. Of course flooding means broadcasting and is not cheap either. For simplicity all communications related to this thesis are flooding broadcasts, if they have non-critical privacy demands and direct, encrypted message exchanges between neighbors for all \gls{SMPC}.
 	
-	\todo*{figure mesh vs \gls{MANET}}
-		
 	\subsection{Implementability on Android Devices}
 	\label{Implementability}
-	\gls{MANET}s are especially of interest for military applications and disaster management but they are also gaining research focus for civil usage for example in context of \gls{IoT} devices. Demonstrations of the implementability can be found for example in Open Gardens MeshKit \gls{SDK} \autocite{Online:MeshKit}, which offers \gls{MANET} abilities for Android and iOS devices and thereby forming a \gls{SPAN}. MeshKit is also the foundation for Open Gardens well-known FireChat \autocite{Online:FireChat}, which is for example known in context of pro-democracy demonstrations. MeshKit is not open source, so a simplified (but extendable) implementation of \gls{SPAN} is developed (compare \ref{Communication Layer}).
+	\glspl{MANET} are especially of interest for military applications and disaster management but they are also gaining research focus for civil usage for example in context of \gls{IoT} devices. Demonstrations of the implementability can be found for example in Open Gardens MeshKit \gls{SDK} \autocite{Online:MeshKit}, which offers \gls{MANET} abilities for Android and iOS devices and thereby forming a \gls{SPAN}. MeshKit is also the foundation for Open Gardens well-known FireChat \autocite{Online:FireChat}, which is for example known in context of pro-democracy demonstrations. MeshKit is not open source, so a simplified (but extendable) implementation of \gls{SPAN} is developed (compare \ref{Communication Layer}).
 	Both for Wi-Fi and Bluetooth based connections, there can be limitations in regard to maximum concurrent connections. Vendor specific restrictions (hardware, driver) are hard to compensate reactive at runtime, so this issue has to be addressed proactive in \ref{Architecture} \nameref{Architecture}.
 	
 	\subsubsection{Bluetooth Based \gls{MANET}}
@@ -486,8 +486,9 @@ Roadmap
 			
 		%\todo*{lib will require a callback for random number generator -> maybe mention with outlook for requirements}
 
-
+\FloatBarrier
 \chapter{Design} \todo*{15-20\%; explains complete processing chain; explains what methods are used; for someone that wants to know what was done in detail}
+\label{Design}
 
 Based on the findings in chapter \fullref{Background} extended with \gls{UML} use case diagrams the requirements for the framework are specified in \fullref{Requirements}. In \fullref{Decentralized, Distributed Computing} specific requirements in context of complex processes are substantiated with algorithms for decentralized, distributed computing. Finally, a draft design is presented \fullref{Architecture}.
 
@@ -567,7 +568,6 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 	\end{table}
 
 	\FloatBarrier
-
 	\subsection{Non-Functional Requirements}
 	\label{Non-Functional Requirements}
 
@@ -607,7 +607,7 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		\subsection{Coordinator Election and Coordinator Role}
 		\label{Coordinator Election}
 		
-		As discussed in \fullref{Implementability} fully featured \gls{MANET}s are currently not provided and mapping it completely in the application layer is beyond the scope of this thesis. Overcoming the technical limitation, the system can be build with sequential communications instead of parallel. As stated in \fullref{Network Topologies} communication in context of \gls{SMPC} computations is only done in a fully meshed subgroup of the network, which also simplifies the coordinator election.
+		As discussed in \fullref{Implementability} fully featured \glspl{MANET} are currently not provided and mapping it completely in the application layer is beyond the scope of this thesis. Overcoming the technical limitation, the system can be build with sequential communications instead of parallel. As stated in \fullref{Network Topologies} communication in context of \gls{SMPC} computations is only done in a fully meshed subgroup of the network, which also simplifies the coordinator election.
 		
 		\noindent A node will try to become the coordinator, when \nolinebreak
 		%\vspace{-\topsep}
@@ -675,7 +675,6 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		The combination of processes with the same communication partners, single-digit bytes of payloads and short process termination is a good option to reduces the total message-occurrence in the network: for example when a coordinator requests the states of nearby nodes, it can be combined with the clock synchronization.
 		
 		\FloatBarrier
-		
 		\subsection{Clock Synchronization}
 		\label{Clock synchronization}
 		
@@ -715,7 +714,6 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		 The framework does not change the actual clock setting on the hosting system, but stores the computed time difference $\Delta_t$ and applies the value to all time-related actions. To make sure that a node is time-synchronized before scores and computations are acquired, it is reasonable to trigger a synchronization when the node joins the network. 
 		 
 		\FloatBarrier
-		
 		\subsection{Non-termination Detection}
 		\label{Non-termination Detection}
 		
@@ -737,7 +735,6 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		\end{figure}
 		
 		\FloatBarrier
-		
 		\subsection{Distributed Databases}
 		\label{Distributed Database}
 		
@@ -768,7 +765,7 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 			\end{rcases*} \overline{v}_i=\frac{v_1+v_2}{n_1+n_2}
 		\end{align*}
 		 
-		Since the framework offers three types of \gls{SMPC}s the entry must reflect the source of the value. By comparison and updating, each node will have eventually all entries, so a distributed database has eventual consistency.
+		Since the framework offers three types of \glspl{SMPC} the entry must reflect the source of the value. By comparison and updating, each node will have eventually all entries, so a distributed database has eventual consistency.
 		To meet with the requirement \ref{req:Database Synchronization} each node holds the sum of the entries' hashes within a specified time-window. This value is used to compare the database-states between nodes: if the values are equal, the databases are likely consistent (collisions are possible though), otherwise entries are compared and exchanged. First the coordinator request the hash-sum. If they match an acknowledgment is send, otherwise up to n (predefined upper bound) hashes of the entries in anti-chronological order are send in an array to the node. The node response with an array of booleans, representing if the hashes are known. If the response-array contains zeros, then the unknown entries are transmitted. After an entry-exchange the hash-sums are compared, to determine if consistency is reached (coordinator request hash-sum if needed, compare figure \ref{figure:Database synchronization scheme}). If the hash-sums do not match, the node sends up to n entry-hashes to the coordinator, skipping already evaluated entries. This is repeated until consistency is reached or a request times out and the process is aborted.
 		Figure \ref{figure:Database synchronization scheme} displays the basic process for $n=2$, with ASCII-values as hashes:
 		
@@ -789,7 +786,6 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 %			\subsubsection*{Strategies for Aggregation of Participants in Sparse Networks}
 
 	\FloatBarrier
-
 	\subsection{Securing the Communication Channel}
 	\label{Securing the Communication Channel}
 	
@@ -798,7 +794,6 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 	For the asymmetric encryption the public-key cryptosystem \acs{RSA} as described by \textcite[pp. 49-76]{Delfs2015} is used.
 	\gls{AES} encrypts and decrypts faster than \gls{RSA}, because \gls{RSA} requires long keys (2048 bit and longer recommended) for proper security. But \gls{AES} needs sender and receiver to know the cipher, and the exchange of this key over an insecure channel only with \gls{AES} is not possible.
 	
-	\todo*{figure for \gls{AES} and \gls{RSA} combination}
 	\begin{figure}[!htbp] % h for placement here
 		\caption{Securing communication with \gls{RSA} and \gls{AES}}
 		\includegraphics[scale=1.0]{figures/encryption.png}
@@ -811,30 +806,45 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 	For the symmetric encryption, booth partners use the same key. \gls{AES} is an iterated block cipher with a block length of 128 bits and key length of 128, 192 or 256 bits. The iterations (called rounds) follow the Rijndael algorithm. A detailed description of the algorithm can be found in \textcite[pp. 20-25]{Delfs2015}.
 	
 	\FloatBarrier
-			
 	\section{Architecture}
 	\label{Architecture}
 	
-	
-			% Grobdesign, Komponentenbeschreibung, globale Eigenschaft des Gesamtsystems
-	
-			\todo*{FURPS: Functionality, Usability, Reliability, Performance, Supportability; how followed to be system independent}
-	
-			\todo*{UML; module structure}
+	Based on \ref{Coordinator Election} it is sensible, that the central element in this framework is a node component. Figure \ref{figure:UML component diagram}displays the \gls{UML} component diagram for the framework design and illustrates the basic conjunctions between the components, as well as key-functionalities. The node component can also act as the coordinator and in either state communications and computations let it pass through different states of activity. This framework therefor uses the state pattern: the current state determines the behavior and abilities of the node.
+	In regard to the hosting system the node component utilizes a HostInterface component which uses callback to bind the communication layer and the system clock to the framework in accordance with \ref{req:Supportability}. To handle the message encryption a cryptography module is needed, providing the functionality described in \ref{Securing the Communication Channel}. As described in \ref{Non-termination Detection} a handler for timeout detection and heartbeat message triggering is provided. Parameters for communication, cryptography and \gls{SMPC} need to be accessible in a central component to meet \ref{req:Usability}.
+		
+	\begin{figure}[!htbp] % h for placement here
+		\caption{\gls{UML} component diagram}
+		\includegraphics[scale=1.0]{figures/uml-component.png}
+		\label{figure:UML component diagram}
+	\end{figure}
+		
+	Since it is likely, that the technical limitations described in \ref{Implementability} will be overcome in future releases, the framework's core functionality is independent from the efforts to provide the self-forming network abilities (avoidance of code smell change preventer/shotgun surgery). So in case of full \gls{MANET} implementation only the node component has to be adopted.
+	\todo*{state machine; state pattern; client server architecture; \gls{UML} state diagrams for 1. joining network (get time; set clock delta), 2. finding computation partners, 3. running computation, 4. compare database}
 			
-			\todo*{state machine; state pattern; client server architecture; \gls{UML} state diagrams for 1. joining network (get time; set clock delta), 2. finding computation partners, 3. running computation, 4. compare database}
-			
-			\todo*{describe how it will change for a real \gls{MANET}: simplification, reduction of states}
-			
-			\todo*{describe what is handled internally and what is handled externally by the hosting system and why (external: providing time, providing secure seed, providing timeout timer, providing communication channel: send (id based), receive (id based), query neighbors; )}
-			
-	\FloatBarrier
-
+\FloatBarrier
 \chapter{Implementation} \todo*{15-20\%; details on the implementation; for someone who wants to continue the work}
 \label{Implementation}
 
-	%\section{Development Tools}
-	\todo*{UML class or component diagram}
+While the algorithms and protocols described in chapters \ref{Background} and \ref{Design} are language-independent, it is sensible to use C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}.
+
+\todo*{mention: development tools?}
+
+	\todo*{UML class diagram}
+	
+	\todo*{modular programming: separating interface from implementation}
+	
+	\todo*{describe components ~documentation style}
+	
+	\todo*{describe the message protocol detailed/bit level}
+	
+	\todo*{describe the database entry struct}
+	
+	\todo*{describe the node-states: state machine in combination with state struct}
+	
+	\todo*{describe usage of framework in a C environment with example for Linux with BlueZ stack-RFCOMM}
+	\todo*{describe usage of framework in a Java environment with example for Android with Android Bluetooth API (Bluedroid stack)}
+	
+		
 	
 	\section{Communication Layer}
 	\label{Communication Layer}
@@ -887,6 +897,7 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		
 		\todo*{describe how library is used with android \gls{NDK}; describe Java wrapper}
 		
+\FloatBarrier
 \chapter{Evaluation} \todo*{5-15\%; outcome; how was it tested; for supervisor}
 \label{Evaluation}
 
@@ -915,6 +926,7 @@ Based on the findings in chapter \fullref{Background} extended with \gls{UML} us
 		
 		%\section{Examination of Distribution Time Dependent on Number of Participants}
 
+\FloatBarrier
 \chapter{Discussion} \todo*{5-15\%; outcome for a design-reader}
 \label{Discussion}
 
@@ -933,6 +945,7 @@ Based on the gamification related target group, assumptions regarding the signif
 
 \todo*{QoS control needed}
 
+\FloatBarrier
 \chapter{Conclusion} \todo*{5-10\%; outcome for an introduction-reader}
 \label{Conclusion}
 
