@@ -10,6 +10,7 @@
       <h>220</h>
     </coordinates>
     <panel_attributes>symbol=component
+halign=Left
 Node
 --
 coordinator election
@@ -28,6 +29,7 @@ lw=2</panel_attributes>
       <h>220</h>
     </coordinates>
     <panel_attributes>symbol=component
+halign=Left
 CryptoEngine
 --
 RSA encryption/decryption
@@ -45,7 +47,8 @@ lw=2</panel_attributes>
       <h>220</h>
     </coordinates>
     <panel_attributes>symbol=component
-HostInterface
+halign=Left
+API
 --
 communication callbacks
 system clock access
@@ -61,6 +64,7 @@ lw=2</panel_attributes>
       <h>220</h>
     </coordinates>
     <panel_attributes>symbol=component
+halign=Left
 Configurations
 --
 SMPC parameter
@@ -78,7 +82,8 @@ lw=2</panel_attributes>
       <h>220</h>
     </coordinates>
     <panel_attributes>symbol=component
-SMPCModule
+halign=Left
+SMPC
 --
 shares generation/recombination 
 lw=2</panel_attributes>
@@ -177,7 +182,8 @@ lw=2</panel_attributes>
       <h>220</h>
     </coordinates>
     <panel_attributes>symbol=component
-NonTerminationTimer
+halign=Left
+Non-Termination Detection
 --
 Heartbeat notify
 timeout notify
