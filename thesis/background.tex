@@ -187,9 +187,9 @@
 		\item The coordinator broadcasts the reconstructed sum.
 		\end{enumerate}
 	
-	In total $(n+3)\cdot (n-1)=n^2+2n-3$ messages are exchanged, so the traffic increases with the number of parties squared. Selecting a lower threshold for the secret reconstruction $\frac{n}{2} \leq k<n$ lowers the total messages by $\Delta_{\text{messages}}=n^2-n(k-1)$.
-	
-	For a secure channel this protocol is information-theoretically secure: independent from computation power an adversary with $m_\text{leaked}<k$ shares will gain no information regarding the inputs. 
+		In total $(n+3)\cdot (n-1)=n^2+2n-3$ messages are exchanged, so the traffic increases with the number of parties squared. Selecting a lower threshold for the secret reconstruction $\frac{n}{2} \leq k<n$ lowers the total messages by $\Delta_{\text{messages}}=n^2-n(k-1)$.
+		
+		For a secure channel this protocol is information-theoretically secure: independent from computation power an adversary with $m_\text{leaked}<k$ shares will gain no information regarding the inputs.
 	
 		\todo*{secure addition with verification \autocite{Cramer2015}; number of messages}
 		
@@ -327,31 +327,30 @@
 		
 		\subsection{Existing Frameworks} \label{Existing Frameworks}
 		
-		\todo*{brief, why not fitting, focus on web, badly documented, complex}
+		In this section a short overview over existing \gls{SMPC} solutions is given. While \gls{SMPC} is an intensely researched field, practical work is less common.
 		
-		 \href{http://www.brics.dk/SMCL/}{SMCL} discontinued; points to: \href{http://viff.dk/}{VIFF} discontinued; points to: SPDZ
+		The following solutions were considered
 		
-		\todo*{maybe: mention \href{http://www.cs.huji.ac.il/project/Fairplay/FairplayMP.html}{FairplayMP}, but also abandoned, issue from 2015 unanswered}
+		\begin{itemize}
+			\item MpcLib (see \textcite{Online:MpcLib})
+			\item SEPIA (see \textcite{Online:Sepia})
+			\item SPDZ (see \textcite{Online:SPDZ})
+			\item Sharemind (see \textcite{Online:Sharemind})
+			\item Enigma (see \textcite{Online:Enigma})
+		\end{itemize}
 		
-		\paragraph{SPDZ Software}
-		\todo*{SPDZ Software}
-		\href{https://www.cs.bris.ac.uk/Research/CryptographySecurity/SPDZ/\#software}{link}
+		Some key-features of the solutions are illustrated in figure \ref{figure:existing frameworks}. All projects emerged from university research. With the exception of Sharemind and Enigma, the frameworks seem to target primarily other researchers, reflecting in the lack of documentation and thereby reduced usability. The open-source library MpcLib is C\# based, SPDZ uses C++ and Python and SEPIA is a Java library.  Sharemind and Enigma are also booth based on university research (Enigma at MIT and Sharemind at University of Tartu) but evolved into market-ready business solutions. While Sharemind uses dedicated application-server, Enigma uses a distributed system of nodes based on Blockchain technology for \gls{SMPC}, booth with a focus on scalable secure data analysis.
+		All solution are based on the Internet protocol suite and require at least locally run server or Internet access.
 		
-		\paragraph{SEPIA}
-		\todo*{SEPIA Java lib}
-		\href{http://www.sepia.ee.ethz.ch/}{link}
+		\begin{figure}[!htb] % h for placement here
+			\caption{Existing \gls{SMPC} software grouped by properties} \label{figure:existing frameworks}
+			\includegraphics[scale=1.0]{figures/frameworks.png}
+		\end{figure}
+	
+		While all frameworks exceed the requirements regarding the \gls{SMPC} functionality, they don't provide a solution for local ad-hoc networks without permanently available servers. Also the support for low-level devices is either undocumented or not given through programming language dependencies.
+		The development of a framework with a focus on cross-platform usage, usability for developers without cryptographic research background and applicability for local ad-hoc networks for the described gamification use-cases is therefor justified.
 		
-		\paragraph{MpcLib}
-		\todo*{MpcLib: no documentation}
-		\href{https://github.com/mahdiz/mpclib}{link}	
-		
-		\paragraph{Sharemind}
-		\todo*{sharemind}
-		\href{https://sharemind.cyber.ee//}{link}	
-		
-		\paragraph{Enigma}
-		\todo*{Enigma for \gls{SMPC} based cloud services; MIT}
-		\href{http://www.enigma.co/}{link}	
+	\FloatBarrier
 	
 	\section{Mobile Ad Hoc Networks}
 	\label{Mobile Ad Hoc Networks}
@@ -380,21 +379,21 @@
 	
 	\subsection{Implementability on Android Devices} \label{Implementability}
 	
-	\glspl{MANET} are especially of interest for military applications and disaster management but they are also gaining research focus for civil usage for example in context of \gls{IoT} devices. Demonstrations of the implementability can be found for example in Open Gardens MeshKit \gls{SDK} \autocite{Online:MeshKit}, which offers \gls{MANET} abilities for Android and iOS devices and thereby forming a \gls{SPAN}. MeshKit is also the foundation for Open Gardens well-known FireChat \autocite{Online:FireChat}, which is for example known in context of pro-democracy demonstrations. MeshKit is not open source, so a simplified (but extendable) implementation of \gls{SPAN} is developed (compare \ref{Coordinator Election}).
+	\glspl{MANET} are especially of interest for military applications and disaster management but they are also gaining research focus for civil usage for example in context of \gls{IoT} devices. Demonstrations of the implementability can be found for example in Open Gardens MeshKit \gls{SDK} \autocite{Online:MeshKit}, which offers \gls{MANET} abilities for Android and iOS devices and thereby forming a \gls{SPAN}. MeshKit is also the foundation for Open Gardens FireChat \autocite{Online:FireChat}, which is for example known in context of pro-democracy demonstrations. Since Android does not provide an \gls{API} for \gls{MANET} functionality on Android devices (\gls{API} 24 at the time of writing) and the MeshKit \gls{SDK} is not open source and only available through Open Gardens partner program, a simplified (but extendable) implementation of \gls{MANET}-like behavior is developed in the application layer (compare \ref{Coordinator Election}).
 	Both for Wi-Fi and Bluetooth based connections, there can be limitations in regard to maximum concurrent connections. Vendor specific restrictions (hardware, driver) are hard to compensate reactive at runtime, so this issue has to be addressed proactive in \ref{Architecture} \nameref{Architecture}.
 	
 	\subsubsection{Bluetooth Based \gls{MANET}}
-	Usually Bluetooth connections with smart phones requires pairing and user actions. This is not a useful process flow to build a \gls{MANET} since nodes cannot simply join the network. 
+	
+	Usually Bluetooth connections with smartphones require pairing and user actions. This is not a useful process flow to build a \gls{MANET}-like network, since nodes cannot simply join.
 	Using the Bluetooth protocol \gls{RFCOMM} an insecure connection can be established, without the need for pairing and user interaction. \textcite{RFCOMM2012} describe \gls{RFCOMM} as the emulation of serial ports over \gls{L2CAP}, supporting the emulation of multiple ports between two devices and ports between multiple devices (device dependent).
-	Since multiple simultaneous connection have to share the available bandwidth per node, it takes $\frac{n}{2}$ times longer to share the same amount of data using only one-to-one connections. For the targeted number of computation partners in this thesis, this is a tolerable overhead.
-	The Bluetooth Special Interest Group has announced mesh networking protocols for upcoming specifications \autocite{Online:BluetoothMesh}. 
-	\todo*{mention Bluetooth 5}
+	Since multiple simultaneous connection have to share the available bandwidth per node, it takes $\frac{n}{2}$ times longer to share the same amount of data when using only one-to-one connections sequentially. For the targeted number of computation partners in this thesis, this is a tolerable overhead and practical system parameters will be evaluated in \ref{Evaluation} and \ref{Discussion}.
+	The Bluetooth Special Interest Group has announced mesh networking protocols for upcoming specifications \autocite{Online:BluetoothMesh}. This is very promising in regard of system provided \gls{MANET} features, though it will take time (from experience with Bluetooth LE likely years) until enough devices are equipped with compliant Bluetooth modules.
 
 	\subsubsection{Wi-Fi Based \gls{MANET}}
 			
-	Situations in which we can use Wi-Fi (or \gls{GSM}) usually provide Internet access, so Wi-Fi is not the primary target technology for this thesis. The callback-based architecture of the developed framework (compare \ref{Architecture} \nameref{Architecture}) enables the usage of different wireless technologies.
+	Situations in which we can use Wi-Fi (or \gls{GSM}) usually provide Internet access, so Wi-Fi is not the primary target technology for this thesis. Generally, the callback-based architecture of the developed framework (compare \ref{Architecture} \nameref{Architecture}) enables the usage of different wireless technologies though. Even the interconnection of \gls{MANET}-like networks is conceivable (as demonstrated with MeshKit), but it complicates the forming of the computation group (compare \ref{Coordinator Election}), because different optional channels between nodes have to be evaluated.
 	With Android 4.0 (\gls{API} level 14) the Wi-Fi Peer-to-Peer framework was introduced, which complies with the Wi-Fi Alliance's Wi-Fi Direct certificate program. Wi-Fi Direct states that one-to-one or group (many-to-one) connections are possible. One device acts as a group owner (soft access point), so it forms a star topology. To imitate a \gls{SPAN} with Wi-Fi Direct multi-group communication has to be provided. In \textcite{Funai2015} limitations of Android in regard of multi-group networking as well as solutions are discussed.
-	Other solutions (compare \textcite{Online:SPANProject}) include usage of custom kernels on rooted smart phones. Even though  demonstrations on selected devices have shown the feasibility, such system modifications neglect the target group and the intentions of this framework.
+	Other solutions (compare \textcite{Online:SPANProject}) include usage of custom kernels on rooted smartphones. Even though  demonstrations on selected devices have shown the feasibility, such system modifications neglect the target group and the intentions of this framework.
 								
 		%\section{Pseudo-Random Numbers} %maybe move to implementation/secureing channel
 		%\label{sec:Pseudo-Random Numbers}
