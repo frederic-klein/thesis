@@ -381,14 +381,13 @@ Assumptions:
 	\item upper bound of sum $s \leq b$ can be estimated, so a prime $p > b$ can be chosen 
 \end{itemize}
 The secure comparison protocol, as used in this thesis, consists of the phases for secure addition within iterations for the bitwise length of a predefined upper bound for the inputs: 
+\begingroup
+\sloppy
 \begin{enumerate}
-	% \itemsep-0.5em
 	\item The coordinator announces the number of parties for the computation and the indexation of each party.
 	\item For minimum-search: each party negates the secret input.
 	\item For each bit in the secret input starting from \gls{MSB} to \gls{LSB} each party runs through iterations:
-	%\vspace{-\topsep}
 	\begin{enumerate}
-		% \itemsep-0.5em
 		\item If input is flagged as lower than maximum, then use $s_j=0$ as the input. Otherwise multiply actual bit $b$ with a random value $R$: $s_j=b \cdot R$.
 		\item Each party $j$ sends shares $s_{j,i}$ of the input $s_j$ to the other parties.
 		\item Each party $i$ computes the sum over the received shares $s_{j,i}$.
@@ -400,6 +399,7 @@ The secure comparison protocol, as used in this thesis, consists of the phases f
 	\end{enumerate}
 	\item For minimum-search: each party negates the stored sum-result.
 \end{enumerate}
+\endgroup
 
 Note: the assumption $n>2$ for the secure addition and secure comparison protocols is not strict enough, if sum, $\min$ and $\max$ are computed for the same parties, since for $n=3$ the secret between minimum and maximum can be restored (for a honest majority the mapping of values to parties is still secure though).
 
@@ -430,14 +430,15 @@ The development of a framework with a focus on cross-platform usage, usability f
 
 \FloatBarrier
 
-\section{Mobile Ad Hoc Networks}
-\label{Mobile Ad Hoc Networks}
+\section{Mobile Ad Hoc Networks} \label{Mobile Ad Hoc Networks}
 The framework developed as part of this thesis focuses on providing \gls{SMPC} for \glspl{MANET} or \gls{MANET}-like networks. In this section the network topologies related to \glspl{MANET} are briefly described (see \ref{Network Topologies}) and the implementability based on current technology standards are examined (see \ref{Implementability}).
 
-\subsection{Network Topologies}
-\label{Network Topologies}
+\subsection{Network Topologies} \label{Network Topologies}
 
-\textcite{Dorri2015} describe a \gls{MANET} as an "infrastructure-independent network with wireless mobile nodes" \autocite[p. 15]{Dorri2015}. \glspl{MANET} are similar to mesh networks, but the distinctive feature is the nodes' spatial degree of freedom. In comparison to a star network, there is no central switch dedicated to routing messages. Instead each node provides message passing abilities and acts as a multi-hop relay.
+\begingroup 
+\sloppy
+\textcite{Dorri2015} describe a \gls{MANET} as an "infrastructure-in\-de\-pen\-dent network with wireless mobile nodes" \autocite[p. 15]{Dorri2015}. A \gls{MANET} is similar to a mesh network, but the distinctive feature is the nodes' spatial degree of freedom. In comparison to a star network, there is no central switch dedicated to routing messages. Instead each node provides message passing abilities and acts as a multi-hop relay.
+\endgroup
 The advantage of \glspl{MANET} is the open network boundary: nodes can freely join and leaving nodes do not affect the functionality of the \gls{MANET}. The key-features are:
 
 %\vspace{-\topsep}
@@ -531,7 +532,7 @@ Based on the use-cases functional requirements can easily be identified and spec
 \begin{table}[!htb] % h for placement here
 	\centering
 	\caption{Functional requirements} \label{table:functional requirements}
-	\begin{tabular}{|l|p{\textwidth*4/5}|}
+	\begin{tabular}{|l|p{\textwidth*5/6-7mm}|}
 		\toprule
 		Name & \funcreq{Pairing-less Connection}\label{req:Pairing-less Connection} \\ \midrule
 		Requirement & As a node I want to join the system without having to pair with other devices so that the system remains unobtrusive. \\
@@ -942,7 +943,13 @@ Since it is likely, that the technical limitations described in \ref{Implementab
 
 \clearpage
 \renewcommand{\bibname}{References} % rename Bibliograpy to References
+
+\begingroup
+\sloppy
 \printbibliography[heading=bibintoc] % add References chapter and display it in toc
+\endgroup
+
+
 
 %\begin{appendices}
 %	\chapter{Some name}
