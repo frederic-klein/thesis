@@ -2,8 +2,8 @@
 
 \todo*{15-20\%; details on the implementation; for someone who wants to continue the work}
 
-While the algorithms and protocols described in chapters \ref{Background} and \ref{Design} are language-independent, it is sensible to use C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}. In this chapter the development environment and tools are introduced in \ref{Development Tools}, followed by descriptions of the implemented modules in \ref{Module Structure}. Important structures like the messages passed between nodes or the database entries are also described in \ref{Module Structure}. For the encryption of the messages the open-source library WolfCrypt is embedded (see \ref{Cryptography Module}).
-In \fullref{Interfacing the Library} the implementation tasks required for the usage of this library in a C project (in a Linux environment) as well as in an Android project are demonstrated.
+%While the algorithms and protocols described in chapters \ref{Background} and \ref{Design} are language-independent, it is sensible to use C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}. In this chapter the development environment and tools are introduced in \ref{Development Tools}, followed by descriptions of the implemented modules in \ref{Module Structure}. Important structures like the messages passed between nodes or the database entries are also described in \ref{Module Structure}. For the encryption of the messages the open-source library WolfCrypt is embedded (see \ref{Cryptography Module}).
+%In \fullref{Interfacing the Library} the implementation tasks required for the usage of this library in a C project (in a Linux environment) as well as in an Android project are demonstrated.
 
 	\section{Development Tools}	\label{Development Tools}
 	
@@ -13,7 +13,7 @@ In \fullref{Interfacing the Library} the implementation tasks required for the u
 
 	\section{Module Structure} \label{Module Structure}
 	
-	The framework follows a modular code design: functions are separated into modules based on affiliation.
+	% The framework follows a modular code design: functions are separated into modules based on affiliation.
 
 	\todo*{UML class diagram}
 	
@@ -35,7 +35,7 @@ In \fullref{Interfacing the Library} the implementation tasks required for the u
 
 	\todo*{describe the database entry struct}
 	
-	Hashing with wolfCrypt: Embedded Crypto Engine
+	% Hashing with wolfCrypt: Embedded Crypto Engine
 	
 	\subsection{Non-Termination Detection Module} \label{Non-Termination Detection Module}
 	
@@ -43,7 +43,7 @@ In \fullref{Interfacing the Library} the implementation tasks required for the u
 	
 	\subsection{Cryptography Module: WolfCrypt} \label{Cryptography Module}
 	
-	\gls{RSA}/\gls{AES} with wolfCrypt: Embedded Crypto Engine \textcite{Online:WolfCrypt}
+	% \gls{RSA}/\gls{AES} with wolfCrypt: Embedded Crypto Engine \textcite{Online:WolfCrypt}
 	
 	\todo*{describe how external system can provide better seeds for the public key system}
 	

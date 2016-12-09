@@ -252,7 +252,7 @@
 			\begin{tabular}{|l|l|l|l|l|l|l|}
 				\hline
 				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Randomized} \\ \hline
-				13                 & 0    & \underline{0}    & $\cancelto{0}{45}$    & $\cancelto{0}{61}$    & 0   & $\cancelto{0}{57}$   \\ \hline
+				13                 & 0    & \textcolor{red}{\underline{0}}    & $\cancelto{\textcolor{red}{0}}{45}$    & $\cancelto{\textcolor{red}{0}}{61}$    & \textcolor{red}{0}   & $\cancelto{\textcolor{red}{0}}{57}$   \\ \hline
 				27                 & 0    & 12    & 31    & 0    & 5   & 15   \\ \hline
 				17                 & 0    & 24    & 0    & 0    & 0   & 9   \\ \hline
 			\end{tabular}
@@ -266,7 +266,7 @@
 				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Randomized} \\ \hline
 				13                 & 0    & 0    & 0    & 0    & 0   & 0   \\ \hline
 				27                 & 0    & 12    & 31    & 0    & 5   & 15   \\ \hline
-				17                 & 0    & 24    & \underline{0}    & 0    & 0   & $\cancelto{0}{9}$   \\ \hline
+				17                 & 0    & 24    & \textcolor{red}{\underline{0}}    & \textcolor{red}{0}    & \textcolor{red}{0}   & $\cancelto{\textcolor{red}{0}}{9}$   \\ \hline
 			\end{tabular}
 		\end{table}
 
@@ -283,12 +283,12 @@
 				\hline
 				Decimal $s_{i,10}$ & \multicolumn{6}{l|}{Binary $s_{i,2}$}  & \multicolumn{6}{l|}{Negated $\bar{s}_{i,2}$} \\ \hline
 				13                 & 0    & 0    & 1    & 1    & 0   & 1 & 1    & 1    & 0    & 0    & 1   & 0   \\ \hline
-				27                 & 0    & 1    & 1    & 0    & 1   & 1 & 1    & 0    & 0    & 1    & 0   & 0   \\ \hline
-				17                 & 0    & 1    & 0    & 0    & 0   & 1 & 1    & 0    & 1    & 1    & 1   & 0   \\ \hline
+				27                 & 0    & 1    & 1    & 0    & 1   & 1 & 1    & \textcolor{red}{\underline{0}} & 0    & 1    & 0   & 0   \\ \hline
+				17                 & 0    & 1    & 0    & 0    & 0   & 1 & 1    & \textcolor{red}{\underline{0}} & 1    & 1    & 1   & 0   \\ \hline
 			\end{tabular}
 		\end{table}
 	
-		In the second round booth $P_2$ and $P_3$ disqualify themselves as maximum. After six rounds each party holds: $1|1|0|0|1|0$ as the maximum. Negated this gives the minimum as $0|0|1|1|0|1_2=13_{10}$ 
+		In the second round booth $P_2$ and $P_3$ disqualify themselves as maximum. After six rounds each party holds: $1|1|0|0|1|0$ as the maximum (see red markings in table \ref{table:secure minimum negation}). Negated this gives the minimum as $0|0|1|1|0|1_2=13_{10}$ 
 
 		\FloatBarrier
 		
