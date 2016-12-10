@@ -52,3 +52,7 @@ dkms.conf
 
 # IDE project files
 *.geany
+
+# Doxygen output
+html/
+latex/

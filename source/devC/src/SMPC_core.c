@@ -1,6 +1,7 @@
-#include<stdio.h>
-#include<sodium.h>
+#include <stdio.h>
+#include <sodium.h>
 #include "SMPC_math.h"
+#include "lib/wolfssl/wolfcrypt/sha.h"
 
 //TEMP use make all
 
@@ -39,7 +40,7 @@
 	// bluetooth
 	
 
-//TODO move to test/examlpe
+//TODO move to test/example
 /* min included, max excluded */
 uint32_t randomNumberGenerator(uint32_t min, uint32_t max){
 	char myString[32]; // char 1 Byte
@@ -83,6 +84,17 @@ int main() {
     printf("test1=%i\n",test1);
     printf("test2=%i\n",test2);
     printf("test3=%i\n",test3);
+    
+    
+    byte shaSum[SHA_DIGEST_SIZE];
+	byte buffer[1024];
+	/*fill buffer with data to hash*/
+	Sha sha;
+	wc_InitSha(&sha);
+	wc_ShaUpdate(&sha, buffer, sizeof(buffer)); /*can be called again
+	and again*/
+	wc_ShaFinal(&sha, shaSum);
+    
     
     //getPrime(1000,2000);
     

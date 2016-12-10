@@ -1,17 +1,49 @@
-#include<stdio.h>
-#include<stdint.h>
+/*! \file SMPC_math.c
+    \brief My Documented file.
+    
+    Details.
+*/
 
-// pass function to lib for random number generation
-typedef uint32_t (*Fct)(uint32_t, uint32_t);
+/*! \mainpage My Personal Index Page
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation
+ *
+ * \subsection step1 Step 1: Opening the box
+ *  
+ * etc...
+ */
+
+/*! \brief Brief description.
+ *         Brief description continued.
+ *
+ *  Detailed description starts here.
+ */
+ 
+#include "SMPC_math.h"
 
 Fct rng;
 
+/**
+ * cryptographic modulo 
+ */
 // computes the cryptographic modulo definition
 unsigned int mod (int x, int p){
-	int value = x%p;
-	if(value<0){
-		value=value+p;
+	int value;
+	// = x%p;
+	//if(value<0){
+	//	value=value+p;
+	//}
+	
+	if(x<0){
+		value = p-((-x)%p);
+	}else{
+		value = x%p;
 	}
+	
 	return value;
 }
 
