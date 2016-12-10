@@ -121,7 +121,7 @@ q(x)=\underbrace{D}_{a_0} + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1}
 To divide $D$ into $n$ pieces the polynomial is evaluated: $D_i=q(i),\ i=1,...,n$. For cryptographic protocols it is not practical to work with real arithmetic, instead a finite field is used: \textcite{Shamir1979} specifies that modular instead of real arithmetic is used. A prime $p$ with $p>D$, $p>n$ is selected and used to define the set $[0, p)$. "The coefficients $a_1, ..., a_{k-1}$ in $q(x)$ are randomly chosen	from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$" \autocite[p. 613]{Shamir1979} (compare \ref{eq:polynomial modular}).
 \begin{equation}
 \label{eq:polynomial modular}
-q(x) = D + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1} \mod p \qquad D,\ a_i \in [0,p)\ , \quad p \in \mathbb{P}
+q(x) = D + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1} \mod p \qquad D,\ a_i \in [0,p)\ , \quad p \in \gls{doubleP}
 \end{equation}
 \textcite[p. 7]{Cramer2015} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
 
@@ -195,11 +195,11 @@ s_{1,i} = f_1(x_i) = & s_1 + \alpha_{1,1} x_i + \alpha_{1,2} x_i^2 + ... + \alph
 &\vdots \\
 s_{m,i} = f_n(x_i) = & s_n + \beta_{n,1} x_i + \beta_{n,2} x_i^2 + ... + \beta_{n,k-1}x_i^{k-1} \mod p
 \end{cases} \nonumber \\
-& \text{with} \ \{l \in \mathbb{N} \ | \ 1 \leq l \leq m \},
-\ \{i \in \mathbb{N} \ | \ 1 \leq i \leq n \},
-\ \{ p \in \mathbb{P} \ | \ p > \sum_l s_l \}, \nonumber \\
-&\{ \alpha \in \mathbb{N} \ | \ 0 \leq \alpha \leq p \},
-\ \{k \in \mathbb{N} \ | \ 2 < k \leq n \} \nonumber
+& \text{with} \ \{l \in \gls{doubleN} \ | \ 1 \leq l \leq m \},
+\ \{i \in \gls{doubleN} \ | \ 1 \leq i \leq n \},
+\ \{ p \in \gls{doubleP} \ | \ p > \sum_l s_l \}, \nonumber \\
+&\{ \alpha \in \gls{doubleN} \ | \ 0 \leq \alpha \leq p \},
+\ \{k \in \gls{doubleN} \ | \ 2 < k \leq n \} \nonumber
 \end{alignat}
 
 Lagrange-interpolation for secret $s_l$:
@@ -782,7 +782,7 @@ For this framework two kinds of encryption are used: first asymmetric cryptograp
 \end{figure}
 
 The basis for the cryptosystem by \gls{RSA} is the prime-factorization, which requires super-polynomial time. \gls{RSA} is asymmetric, since there is one key for encryption and one key for decryption. In this setting, the public key is used for encryption, so only the receiver with the private key can decrypt the secret.
-For the key generation two large prime numbers are selected: $p,q \in \mathbb{P} \ \text{with} \ p\neq q$. The product $n=p\cdot q$ is computed. Euler's Phi function $\phi (n)=(p-1)(q-1)$ is computed and a coprime integer $e$ is selected $1<e<\phi(n)$. A common value for $e$ is $65537$. The public key is formed by $n$ and $e$.
+For the key generation two large prime numbers are selected: $p,q \in \gls{doubleP} \ \text{with} \ p\neq q$. The product $n=p\cdot q$ is computed. Euler's Phi function $\phi (n)=(p-1)(q-1)$ is computed and a coprime integer $e$ is selected $1<e<\phi(n)$. A common value for $e$ is $65537$. The public key is formed by $n$ and $e$.
 The private key is formed from $n$ and $d$, where d meets $e\cdot d\equiv 1\mod \phi(n)$.
 
 For the symmetric encryption, booth partners use the same key. \gls{AES} is an iterated block cipher with a block length of 128 bits and key length of 128, 192 or 256 bits. The iterations (called rounds) follow the Rijndael algorithm. A detailed description of the algorithm can be found in \textcite[pp. 20-25]{Delfs2015}.
@@ -799,17 +799,18 @@ In regard to the hosting system the node component utilizes an \gls{API} compone
 	\includegraphics[scale=1.0]{figures/uml-component.png}
 \end{figure}
 
+\FloatBarrier
+
 Since it is likely, that the technical limitations described in \ref{Implementability} will be overcome in future releases, the framework's core functionality is independent from the efforts to provide the self-forming network abilities (avoidance of code smell known as change preventer or shotgun surgery). So in case of availability of full \gls{MANET} capabilities (secure multi-hop routing and parallel communications) only the node component has to be adopted.
 
-\todo*{state machine; state pattern; client server architecture; \gls{UML} state diagrams for 1. joining network (get time; set clock delta), 2. finding computation partners, 3. running computation, 4. compare database}
+%\todo*{state machine; state pattern; client server architecture; \gls{UML} state diagrams for 1. joining network (get time; set clock delta), 2. finding computation partners, 3. running computation, 4. compare database}
 
-\FloatBarrier
 
 \chapter{Implementation} \label{Implementation}
 
 \todo*{15-20\%; details on the implementation; for someone who wants to continue the work}
 
-%While the algorithms and protocols described in chapters \ref{Background} and \ref{Design} are language-independent, it is sensible to use C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}. In this chapter the development environment and tools are introduced in \ref{Development Tools}, followed by descriptions of the implemented modules in \ref{Module Structure}. Important structures like the messages passed between nodes or the database entries are also described in \ref{Module Structure}. For the encryption of the messages the open-source library WolfCrypt is embedded (see \ref{Cryptography Module}).
+While the algorithms and protocols described in chapters \ref{Background} and \ref{Design} are language-independent, it is sensible to use C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}. In this chapter the development environment and tools are introduced in \ref{Development Tools}, followed by descriptions of the implemented modules in \ref{Module Structure}. Important structures like the messages passed between nodes or the database entries are also described in \ref{Module Structure}. For the encryption of the messages the open-source library WolfCrypt is embedded (see \ref{Cryptography Module}).
 %In \fullref{Interfacing the Library} the implementation tasks required for the usage of this library in a C project (in a Linux environment) as well as in an Android project are demonstrated.
 
 \section{Development Tools}	\label{Development Tools}
@@ -887,7 +888,6 @@ Since it is likely, that the technical limitations described in \ref{Implementab
 \todo*{https://developer.android.com/reference/java/security/SecureRandom.html}
 
 \FloatBarrier
-
 \chapter{Evaluation} \label{Evaluation}
 \todo*{5-15\%; outcome; how was it tested; for supervisor}
 

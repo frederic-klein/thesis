@@ -1,3 +1,6 @@
 [submodule "source/devC/lib/Unity"]
 	path = source/devC/lib/Unity
 	url = git@github.com:ThrowTheSwitch/Unity.git
+[submodule "source/devC/lib/wolfssl"]
+	path = source/devC/lib/wolfssl
+	url = git@github.com:wolfSSL/wolfssl.git
