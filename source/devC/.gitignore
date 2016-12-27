@@ -52,7 +52,14 @@ dkms.conf
 
 # IDE project files
 *.geany
+.idea/
+cmake-build-debug/
+CMakeLists.txt
 
 # Doxygen output
 html/
 latex/
+
+#builds
+node
+tester

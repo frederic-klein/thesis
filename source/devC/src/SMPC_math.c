@@ -1,43 +1,25 @@
 /*! \file SMPC_math.c
-    \brief My Documented file.
+    \brief My Documented file 1.
     
     Details.
 */
 
-/*! \mainpage My Personal Index Page
- *
- * \section intro_sec Introduction
- *
- * This is the introduction.
- *
- * \section install_sec Installation
- *
- * \subsection step1 Step 1: Opening the box
- *  
- * etc...
- */
-
-/*! \brief Brief description.
- *         Brief description continued.
- *
- *  Detailed description starts here.
- */
- 
 #include "SMPC_math.h"
 
 Fct rng;
 
-/**
- * cryptographic modulo 
- */
-// computes the cryptographic modulo definition
-unsigned int mod (int x, int p){
+int modInverse(int a, int m);
+
+
+/*!
+  Computes the modulo x mod p based on the cryptographic modulo definition.
+  \param x is an integer and the dividend.
+  \param p is an integer and the divisor.
+  \return The remainder of x mod p as an unsigned integer.
+*/
+unsigned int mod (long long x, int p){
 	int value;
-	// = x%p;
-	//if(value<0){
-	//	value=value+p;
-	//}
-	
+
 	if(x<0){
 		value = p-((-x)%p);
 	}else{
@@ -45,6 +27,44 @@ unsigned int mod (int x, int p){
 	}
 	
 	return value;
+}
+
+unsigned int mod_fraction(int x, int p){
+
+    int value;
+    // If a and m are relatively prime, then modulo inverse
+    // is a^(m-2) mod m
+     value = modInverse(x,p);
+    return value;
+}
+
+int modInverse(int a, int m)
+{
+    int m0 = m, t, q;
+    int x0 = 0, x1 = 1;
+
+    if (m == 1)
+        return 0;
+
+    while (a > 1)
+    {
+        // q is quotient
+        q = a / m;
+        t = m;
+        // m is remainder now, process same as
+        // Euclid's algo
+        m = a % m;
+        a = t;
+
+        t = x0;
+        x0 = x1 - q * x0;
+        x1 = t;
+    }
+
+    // Make x1 positive
+    if (x1 < 0) x1 += m0;
+
+    return x1;
 }
 
 
@@ -57,6 +77,7 @@ void setRNG(uint32_t(*fct)(uint32_t, uint32_t)){
 uint32_t getRandom(uint32_t min, uint32_t max){
 	return rng(min, max);
 }
+
 
 // computes a array of prime candidates between low and high (exclusive)
 unsigned int getPrime(int low, int high){
@@ -100,3 +121,6 @@ unsigned int getPrime(int low, int high){
 	
 	return 1;
 }
+
+// function to genereate shares
+
