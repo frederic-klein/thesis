@@ -86,6 +86,21 @@ void smpc_generate_shares(int shares[], int n, int k, int secret){
 */
 int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
 
+    printf("mod_fractions test started...");
+    mod_fraction(2, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(3, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(4, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(5, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(6, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(7, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(8, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(9, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(10, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(11, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(12, CONFIGURATIONS_BOUNDING_PRIME);
+    mod_fraction(13, CONFIGURATIONS_BOUNDING_PRIME);
+
+    printf(" done.\n");
     int secret = 0;
 
     int party;
@@ -102,11 +117,14 @@ int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
 //            numerator = mod((numerator*(-involved_parties[j])),CONFIGURATIONS_BOUNDING_PRIME);
 //            numerator = numerator > 0? -1*(((long long)numerator*(involved_parties[j]))%CONFIGURATIONS_BOUNDING_PRIME) : ((long long)numerator*(involved_parties[j]))%CONFIGURATIONS_BOUNDING_PRIME;
             numerator = ( (long long)numerator*(involved_parties[j]) )%CONFIGURATIONS_BOUNDING_PRIME;
-            denominator *= (party - involved_parties[j]);
 
-            if(denominator>CONFIGURATIONS_BOUNDING_PRIME){
-                reduce(&numerator,&denominator);
-            }
+            numerator = mod( ( (long long)numerator*mod_fraction(party - involved_parties[j],CONFIGURATIONS_BOUNDING_PRIME)),CONFIGURATIONS_BOUNDING_PRIME);
+
+//            denominator *= (party - involved_parties[j]);
+//
+//            if(denominator>CONFIGURATIONS_BOUNDING_PRIME){
+//                reduce(&numerator,&denominator);
+//            }
 //            numerator = mod(numerator, CONFIGURATIONS_BOUNDING_PRIME);
         }
 
@@ -127,35 +145,34 @@ int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
         numerator = mod((long long)numerator*shares[party-1],CONFIGURATIONS_BOUNDING_PRIME);
 
 //        long double result_candidate = ((long double)mod(shares[party-1]*numerator,CONFIGURATIONS_BOUNDING_PRIME))/denominator;
-        int result;
-        long double result_candidate = (long double)numerator/denominator;
-
-        printf("\tpost reduce: %i/%i\n",numerator,denominator);
-
-
-        if(ceill(result_candidate) != result_candidate){
-
-            printf("float-problem:%Lf\n", result_candidate);
-//            printf("\t%i*%i/%i\n",shares[party-1],numerator,denominator);
-
-            int denominator_fixed;
-            if(denominator<0){
-                denominator_fixed = -1*mod_fraction(-1*denominator, CONFIGURATIONS_BOUNDING_PRIME);
-            }else{
-                denominator_fixed = mod_fraction(denominator, CONFIGURATIONS_BOUNDING_PRIME);
-            }
-            printf("fixed to: %i\n", denominator_fixed);
-//            result_candidate = (long double)shares[party-1]*numerator*denominator_fixed;
-            result = mod((long long)numerator*denominator_fixed, CONFIGURATIONS_BOUNDING_PRIME);
-        }else{
-            result = (int)result_candidate;
-        }
+//        int result;
+//        long double result_candidate = (long double)numerator/denominator;
+//
+//        printf("\tpost reduce: %i/%i\n",numerator,denominator);
+//
+//
+//        if(ceill(result_candidate) != result_candidate){
+//
+//            printf("float-problem:%Lf\n", result_candidate);
+//
+//            int denominator_fixed;
+//            if(denominator<0){
+//                denominator_fixed = -1*mod_fraction(-1*denominator, CONFIGURATIONS_BOUNDING_PRIME);
+//            }else{
+//                denominator_fixed = mod_fraction(denominator, CONFIGURATIONS_BOUNDING_PRIME);
+//            }
+//            printf("fixed to: %i\n", denominator_fixed);
+//            result = mod((long long)numerator*denominator_fixed, CONFIGURATIONS_BOUNDING_PRIME);
+//        }else{
+//            result = (int)result_candidate;
+//        }
 
 
 //        secret += result_candidate;
-        secret = mod((long long)secret+result, CONFIGURATIONS_BOUNDING_PRIME);
+//        secret = mod((long long)secret+result, CONFIGURATIONS_BOUNDING_PRIME);
+        secret = mod((long long)secret+numerator, CONFIGURATIONS_BOUNDING_PRIME);
 
-        printf("secret + result(%i)=%i\n",result,secret);
+        printf("secret + result(%i)=%i\n",numerator,secret);
     }
     secret = mod(secret, CONFIGURATIONS_BOUNDING_PRIME);
 

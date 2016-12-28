@@ -29,13 +29,16 @@ unsigned int mod (long long x, int p){
 	return value;
 }
 
-unsigned int mod_fraction(long long x, int p){
+int mod_fraction(long long x, int p){
 
     int value;
+    int sign = x<0 ? -1 : 1;
+    x = x<0 ? -1*x : x;
+
     // If a and m are relatively prime, then modulo inverse
     // is a^(m-2) mod m
      value = modInverse(x,p);
-    return value;
+    return sign*value;
 }
 
 int modInverse(long long a, int m)
