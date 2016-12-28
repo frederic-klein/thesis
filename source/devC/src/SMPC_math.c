@@ -8,7 +8,7 @@
 
 Fct rng;
 
-int modInverse(int a, int m);
+int modInverse(long long a, int m);
 
 
 /*!
@@ -29,7 +29,7 @@ unsigned int mod (long long x, int p){
 	return value;
 }
 
-unsigned int mod_fraction(int x, int p){
+unsigned int mod_fraction(long long x, int p){
 
     int value;
     // If a and m are relatively prime, then modulo inverse
@@ -38,10 +38,10 @@ unsigned int mod_fraction(int x, int p){
     return value;
 }
 
-int modInverse(int a, int m)
+int modInverse(long long a, int m)
 {
-    int m0 = m, t, q;
-    int x0 = 0, x1 = 1;
+    long long m0 = m, t, q;
+    long long x0 = 0, x1 = 1;
 
     if (m == 1)
         return 0;

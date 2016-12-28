@@ -16,6 +16,8 @@ typedef unsigned int   word32;
 typedef enum {false, true} bool;
 
 uint32_t randomNumberGenerator(uint32_t min, uint32_t max);
+void reduce(int *numerator, long long *denominator);
+int mod_power(int base, int power, int mod);
 
 // public functions
 
@@ -35,7 +37,13 @@ void smpc_generate_shares(int shares[], int n, int k, int secret){
     unsigned int p = CONFIGURATIONS_BOUNDING_PRIME;
 
     unsigned int factors[k-1];
-    factors[0]=1;
+//    factors[0]=1;
+//    factors[1]=1526125442;
+//    factors[2]=27295061;
+//    factors[3]=664522661;
+//    factors[4]=42112407;
+//    factors[5]=1427106314;
+
     // define randomly chosen factors
     for (int l = 1; l < k; ++l) {
         factors[l]=getRandom(1,p);
@@ -44,21 +52,28 @@ void smpc_generate_shares(int shares[], int n, int k, int secret){
     // compute share for each party
     for (int i = 0; i < n; ++i) {
 
-        long long share = secret;
+        int share = secret;
+
         printf("s_%i=%i",(i+1),secret);
 
         for (int j = 1; j < k; ++j) {
 
             printf(" + %u*%u^%u",factors[j], (i+1), j);
 
-            unsigned long long power = (unsigned long long)powl((long double)(i+1),j);
+//            unsigned long long power = (unsigned long long)powl((long double)(i+1),j);
+            int power = mod_power((i+1),j,CONFIGURATIONS_BOUNDING_PRIME);
 
-            printf("\n%u^%u=%llu\n",i+1,j,power);
+            printf("\n%u^%u=%i\n",i+1,j,power);
 
-            share += ((unsigned long long)factors[j])*power;
+//            share += (factors[j]*power)%CONFIGURATIONS_BOUNDING_PRIME;
+            int poly = ((unsigned long long)factors[j]*power)%CONFIGURATIONS_BOUNDING_PRIME;
+
+            share = ((long long)share+poly)%CONFIGURATIONS_BOUNDING_PRIME;
+
+            printf("\t\tpoly=%i\tshare=%i\n",poly, share);
         }
         shares[i]=(int)(share%p);
-        printf("\n%llu mod %u -> shares[%u]=%u\n",share,p,i,shares[i]);
+        printf("\n%u mod %u -> shares[%u]=%u\n",share,p,i,shares[i]);
     }
 }
 
@@ -71,31 +86,52 @@ void smpc_generate_shares(int shares[], int n, int k, int secret){
 */
 int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
 
-    long long secret = 0;
+    int secret = 0;
 
     int party;
     for (int i = 0; i < k; ++i) {
         party = involved_parties[i];
 
-        long long numerator=1;
+        int numerator=1;
         long long denominator=1;
 
         for (int j = 0; j < k; ++j) {
 
             if(i==j) continue;
 
-            numerator *= -involved_parties[j];
+//            numerator = mod((numerator*(-involved_parties[j])),CONFIGURATIONS_BOUNDING_PRIME);
+//            numerator = numerator > 0? -1*(((long long)numerator*(involved_parties[j]))%CONFIGURATIONS_BOUNDING_PRIME) : ((long long)numerator*(involved_parties[j]))%CONFIGURATIONS_BOUNDING_PRIME;
+            numerator = ( (long long)numerator*(involved_parties[j]) )%CONFIGURATIONS_BOUNDING_PRIME;
             denominator *= (party - involved_parties[j]);
 
+            if(denominator>CONFIGURATIONS_BOUNDING_PRIME){
+                reduce(&numerator,&denominator);
+            }
+//            numerator = mod(numerator, CONFIGURATIONS_BOUNDING_PRIME);
         }
 
+        if(k%2==0){
+            numerator *= -1;
+        }
         // check if numerator/demoninator without rest
 
-        // TODO all modulo... 
+        // TODO all modulo...
 
-        long double result_candidate = ((long double)shares[party-1])*((double)numerator/denominator);
+        printf("\tpre reduce: %i*%i/%i\n",shares[party-1],numerator,denominator);
 
-        printf("\t%i*%i/%i\n",shares[party-1],numerator,denominator);
+
+//        numerator = mod(numerator, CONFIGURATIONS_BOUNDING_PRIME);
+
+        reduce(&numerator,&denominator);
+
+        numerator = mod((long long)numerator*shares[party-1],CONFIGURATIONS_BOUNDING_PRIME);
+
+//        long double result_candidate = ((long double)mod(shares[party-1]*numerator,CONFIGURATIONS_BOUNDING_PRIME))/denominator;
+        int result;
+        long double result_candidate = (long double)numerator/denominator;
+
+        printf("\tpost reduce: %i/%i\n",numerator,denominator);
+
 
         if(ceill(result_candidate) != result_candidate){
 
@@ -110,12 +146,16 @@ int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
             }
             printf("fixed to: %i\n", denominator_fixed);
 //            result_candidate = (long double)shares[party-1]*numerator*denominator_fixed;
-            result_candidate = (long double)shares[party-1]*numerator*denominator_fixed;
+            result = mod((long long)numerator*denominator_fixed, CONFIGURATIONS_BOUNDING_PRIME);
+        }else{
+            result = (int)result_candidate;
         }
-//        secret += result_candidate;
-        secret += mod(result_candidate, CONFIGURATIONS_BOUNDING_PRIME);
 
-        printf("secret+ resultcandidate(%Lf)=%lli\n",result_candidate,secret);
+
+//        secret += result_candidate;
+        secret = mod((long long)secret+result, CONFIGURATIONS_BOUNDING_PRIME);
+
+        printf("secret + result(%i)=%i\n",result,secret);
     }
     secret = mod(secret, CONFIGURATIONS_BOUNDING_PRIME);
 
@@ -156,9 +196,58 @@ int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
 //TODO provide function to set value for computation
 	// for what time-window?
 
-//TODO provide function to set callback for searching and connecting devices
-	// bluetooth
-	
+int mod_power(int base, int power, int mod){
+
+    int value=base;
+
+    for (int i = 1; i < power; ++i) {
+        value = ((long long)value*base)%mod;
+    }
+
+    return value;
+
+}
+
+void reduce(int *numerator, long long *denominator) {
+
+    printf("%i/%lli ->",*numerator,*denominator);
+
+    int gcd;
+    int sign = 1;
+    if(*numerator<0 && *denominator>0 || *numerator>0 && *denominator<0){
+        sign = -1;
+    }
+    if(*numerator<0){
+        *numerator *=-1;
+    }
+
+    if(*denominator<0){
+        *denominator *=-1;
+    }
+
+    if(*numerator>*denominator){
+        gcd = *denominator;
+     }else{
+        gcd=*numerator;
+    }
+
+    while(gcd>1){
+        if(*numerator%gcd==0 && *denominator%gcd==0){
+            *numerator=*numerator/gcd;
+            *denominator=*denominator/gcd;
+            gcd = *numerator>*denominator ? *denominator : *numerator;
+        }else{
+            gcd--;
+        }
+    }
+
+    if(sign<0){
+        *numerator *= sign;
+    }
+
+    printf(" %i/%lli\n",*numerator,*denominator);
+}
+
 
 //TODO move to test/example
 /* min included, max excluded */

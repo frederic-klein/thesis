@@ -89,9 +89,11 @@ void node_pass_score(int newScore){
 
 
             if(restored_secret!=score){
-
                 printf("\033[31m" "secret=%u restored=%u\n" "\033[0m", score, restored_secret);
+            }else{
+                printf("\033[32m" "secret=%u restored=%u\n" "\033[0m", score, restored_secret);
             }
+            break;
         }
 
     }
