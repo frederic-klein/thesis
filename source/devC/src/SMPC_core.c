@@ -34,46 +34,31 @@ void smpc_init(){
 */
 void smpc_generate_shares(int shares[], int n, int k, int secret){
 
-    unsigned int p = CONFIGURATIONS_BOUNDING_PRIME;
+    int p = CONFIGURATIONS_BOUNDING_PRIME;
+
+    int l, i, j, share, power, poly;
 
     unsigned int factors[k-1];
-//    factors[0]=1;
-//    factors[1]=1526125442;
-//    factors[2]=27295061;
-//    factors[3]=664522661;
-//    factors[4]=42112407;
-//    factors[5]=1427106314;
 
     // define randomly chosen factors
-    for (int l = 1; l < k; ++l) {
+    for (l = 1; l < k; ++l) {
         factors[l]=getRandom(1,p);
     }
 
     // compute share for each party
-    for (int i = 0; i < n; ++i) {
+    for (i = 0; i < n; ++i) {
 
-        int share = secret;
+        share = secret;
 
-        printf("s_%i=%i",(i+1),secret);
+//        printf("s_%i=%i",(i+1),secret);
 
-        for (int j = 1; j < k; ++j) {
-
-            printf(" + %u*%u^%u",factors[j], (i+1), j);
-
-//            unsigned long long power = (unsigned long long)powl((long double)(i+1),j);
-            int power = mod_power((i+1),j,CONFIGURATIONS_BOUNDING_PRIME);
-
-            printf("\n%u^%u=%i\n",i+1,j,power);
-
-//            share += (factors[j]*power)%CONFIGURATIONS_BOUNDING_PRIME;
-            int poly = ((unsigned long long)factors[j]*power)%CONFIGURATIONS_BOUNDING_PRIME;
-
+        for (j = 1; j < k; ++j) {
+            power = mod_power((i+1),j,CONFIGURATIONS_BOUNDING_PRIME);
+            poly = ((unsigned long long)factors[j]*power)%CONFIGURATIONS_BOUNDING_PRIME;
             share = ((long long)share+poly)%CONFIGURATIONS_BOUNDING_PRIME;
-
-            printf("\t\tpoly=%i\tshare=%i\n",poly, share);
         }
         shares[i]=(int)(share%p);
-        printf("\n%u mod %u -> shares[%u]=%u\n",share,p,i,shares[i]);
+//        printf("\n%u mod %u -> shares[%u]=%u\n",share,p,i,shares[i]);
     }
 }
 
@@ -86,21 +71,6 @@ void smpc_generate_shares(int shares[], int n, int k, int secret){
 */
 int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
 
-    printf("mod_fractions test started...");
-    mod_fraction(2, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(3, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(4, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(5, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(6, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(7, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(8, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(9, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(10, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(11, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(12, CONFIGURATIONS_BOUNDING_PRIME);
-    mod_fraction(13, CONFIGURATIONS_BOUNDING_PRIME);
-
-    printf(" done.\n");
     int secret = 0;
 
     int party;
@@ -108,7 +78,7 @@ int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
         party = involved_parties[i];
 
         int numerator=1;
-        long long denominator=1;
+//        long long denominator=1;
 
         for (int j = 0; j < k; ++j) {
 
@@ -133,14 +103,12 @@ int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
         }
         // check if numerator/demoninator without rest
 
-        // TODO all modulo...
-
-        printf("\tpre reduce: %i*%i/%i\n",shares[party-1],numerator,denominator);
+//        printf("\tpre reduce: %i*%i/%i\n",shares[party-1],numerator,denominator);
 
 
 //        numerator = mod(numerator, CONFIGURATIONS_BOUNDING_PRIME);
 
-        reduce(&numerator,&denominator);
+//        reduce(&numerator,&denominator);
 
         numerator = mod((long long)numerator*shares[party-1],CONFIGURATIONS_BOUNDING_PRIME);
 
@@ -172,9 +140,9 @@ int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k){
 //        secret = mod((long long)secret+result, CONFIGURATIONS_BOUNDING_PRIME);
         secret = mod((long long)secret+numerator, CONFIGURATIONS_BOUNDING_PRIME);
 
-        printf("secret + result(%i)=%i\n",numerator,secret);
+//        printf("secret + result(%i)=%i\n",numerator,secret);
     }
-    secret = mod(secret, CONFIGURATIONS_BOUNDING_PRIME);
+//    secret = mod(secret, CONFIGURATIONS_BOUNDING_PRIME);
 
     return secret;
 

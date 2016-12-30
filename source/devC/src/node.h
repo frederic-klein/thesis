@@ -7,7 +7,7 @@
 #ifndef DEVC_NODE_H
 #define DEVC_NODE_H
 
-    void node_init();
+    void node_init(char *mac);
 
     void node_pass_score(int score /**< New score provided by the host system. */ ); //!< function to pass new score
 
@@ -17,6 +17,9 @@
 
     void node_set_send_function(void(*func)(char *target, char *message));
 
-    void node_debug_run_test();
+    void node_set_await_function(char * (*func)(char * source));
+
+
+    void node_debug_run_test(char *options);
 
 #endif //DEVC_NODE_H
