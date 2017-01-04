@@ -17,7 +17,7 @@
 
     void node_set_send_function(void(*func)(char *target, char *message));
 
-    void node_set_await_function(char * (*func)(char * source));
+    void node_set_await_function(int (*func)(char * source, char[]));
 
 
     void node_debug_run_test(char *options);

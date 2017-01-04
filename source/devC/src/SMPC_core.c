@@ -4,25 +4,177 @@
     TODO insert detailed description.
 */
 
+#ifndef WOLFSSL_KEY_GEN
+    #define WOLFSSL_KEY_GEN
+#endif
+
+
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <sodium.h>
 #include "SMPC_math.h"
 #include "../lib/wolfssl/wolfssl/wolfcrypt/md5.h"
+#include "../lib/wolfssl/wolfssl/wolfcrypt/rsa.h"
+#include "../lib/wolfssl/wolfssl/wolfcrypt/aes.h"
+#include "../lib/wolfssl/wolfssl/wolfcrypt/random.h"
+#include "../lib/wolfssl/wolfssl/wolfcrypt/integer.h"
 #include "configurations.h"
+
 
 typedef unsigned char  byte;
 typedef unsigned int   word32;
 typedef enum {false, true} bool;
 
 uint32_t randomNumberGenerator(uint32_t min, uint32_t max);
-void reduce(int *numerator, long long *denominator);
+//void reduce(int *numerator, long long *denominator);
 int mod_power(int base, int power, int mod);
+int RsaPublicKeyDecodeRaw(const byte* n, word32 nSz, const byte* e,
+                             word32 eSz, RsaKey* key);
+
+//RsaKey private;
+//RsaKey public;
 
 // public functions
 
 void smpc_init(){
     setRNG(randomNumberGenerator);
+
+    //todo prepare shares for max computation group
+
+    RsaKey priv;
+    RNG rng;
+    int ret = 0;
+    long e = 65537; // standard value to use for exponent
+
+    wc_InitRsaKey(&priv, NULL); // not using heap hint. No custom memory
+    wc_InitRng(&rng);
+
+//    ret = wc_MakeRsaKey(&priv, 2048, e, &rng); // generate 2048 bit long private key
+    ret = wc_MakeRsaKey(&priv, CONFIGURATIONS_RSA_KEY_SIZE, e, &rng); // generate 2048 bit long private key
+
+    if( ret != 0 ) {
+        // error generating private key
+        printf("error generation private-key\n");
+    }else{
+        printf("no error generation private-key\n");
+
+//        mp_int priv_n = priv.n;
+//        unsigned long long  priv_n_int = *priv_n.dp;
+//
+//        printf("N=%llu\n", *priv.n.dp);
+//
+//        printf("sizes needed: n=%i, e=%i\n", mp_unsigned_bin_size(&priv.n), mp_unsigned_bin_size(&priv.e));
+        byte n[384];
+        //byte n[mp_unsigned_bin_size(&priv.n)];
+//        mp_to_unsigned_bin(&priv.n, n);
+//
+        byte e[3];
+//        byte e[mp_unsigned_bin_size(&priv.e)];
+//        mp_to_unsigned_bin(&priv.e, e);
+
+        RsaKey pub;
+        wc_InitRsaKey(&pub, NULL); // not using heap hint. No custom memory
+
+        word32 n_size;
+        word32 e_size;
+/*        wc_RsaFlattenPublicKey(&priv, e, &e_size, n, &n_size);
+
+        printf("%i %i\n", e_size, n_size);
+
+        ret = RsaPublicKeyDecodeRaw(n, n_size, e, e_size, &pub);*//*
+
+*/
+/*        byte *in = "Hallo World, How are you today? Everything fine? 1111111111111111 222222222222222222 12345 123456789"
+                "3333333333333333 4444444444444444444 5555555555555555 6666666666666666 7777777777 888888 12345 12345"
+                "888888888 9999999999999 11111111 2222222222 33333333333?";
+        printf("%s %u\n", in, strlen(in));
+
+        int rsa_encrypt_size;
+        rsa_encrypt_size=wc_RsaEncryptSize(&pub);
+        printf("RsaEncryptSize %i\n", rsa_encrypt_size);
+
+
+        byte out[1024];
+        int outLen;
+        outLen = wc_RsaPublicEncrypt(in, strlen(in), out, sizeof(out), &pub, &rng);
+
+        printf("outlen=%i\n", outLen);
+
+        byte plain[1024];
+
+        int plainSz;
+        plainSz = wc_RsaPrivateDecrypt(out, outLen, plain, sizeof(plain), &priv);
+
+        printf("RSA decrypted: %i %.*s\n",plainSz,plainSz,plain);*/
+
+    }
+
+
+/*    Aes enc;
+    Aes dec;
+
+    const byte key[] = { '1','2','3','4','5','6','7','8','9','1','2','3','4','5','6','7','8','9','1','2','3','4','5','6' }; // 24 Byte =
+    const byte iv[] = { '1','2','3','4','5','6','7','8','9','1','2','3','4','5','6','7' }; // 16 Byte
+
+    byte * message = "Hallo Welt rethsdh srtjsrtjs srtth rt mdtzkjsrt jsrtjsr jsrtjxfgmhjk,dh sdfgnsdrtjA";
+    int message_length=strlen(message);
+
+    int buffer_size = (message_length/16+1)*16;
+
+    byte plain[buffer_size];   // an increment of 16, fill with data
+    byte cipher[buffer_size];
+    byte plain_dec[buffer_size];
+
+
+//    strncpy(plain, "Hallo Welt RtrejHallo Welt abcdefg", 32);
+    strncpy(plain, message, strlen(message));
+
+    printf("buffer size=%u key size=%u plain=%.*s\n", buffer_size, sizeof(key), strlen(message), plain);
+
+    // encrypt
+    wc_AesSetKey(&enc, key, sizeof(key), iv, AES_ENCRYPTION);
+    wc_AesCbcEncrypt(&enc, cipher, plain, sizeof(plain));
+
+    printf("plain:%.*s -> cipher: %.*s\n", strlen(message), plain, strlen(message), cipher);
+
+    //    cipher now contains the cipher text from the plain text.
+
+    // decrypt
+    wc_AesSetKey(&dec, key, sizeof(key), iv, AES_DECRYPTION);
+    wc_AesCbcDecrypt(&dec, plain_dec, cipher, sizeof(cipher));
+
+    printf("cipher: %.*s -> plain: %.*s\n", strlen(message), cipher, strlen(message), plain_dec);*/
+
+}
+
+
+int RsaPublicKeyDecodeRaw(const byte* n, word32 nSz, const byte* e,
+                             word32 eSz, RsaKey* key)
+{
+
+    key->type = RSA_PUBLIC;
+
+    if (mp_init(&key->n) != MP_OKAY)
+        return -1;
+
+    if (mp_read_unsigned_bin(&key->n, n, nSz) != 0) {
+        mp_clear(&key->n);
+        return -2;
+    }
+
+    if (mp_init(&key->e) != MP_OKAY) {
+        mp_clear(&key->n);
+        return -3;
+    }
+
+    if (mp_read_unsigned_bin(&key->e, e, eSz) != 0) {
+        mp_clear(&key->n);
+        mp_clear(&key->e);
+        return -4;
+    }
+
+    return 0;
 }
 
 /*!
@@ -42,7 +194,7 @@ void smpc_generate_shares(int shares[], int n, int k, int secret){
 
     // define randomly chosen factors
     for (l = 1; l < k; ++l) {
-        factors[l]=getRandom(1,p);
+        factors[l]=getRandom(1,(unsigned int)p);
     }
 
     // compute share for each party
@@ -57,10 +209,14 @@ void smpc_generate_shares(int shares[], int n, int k, int secret){
             poly = ((unsigned long long)factors[j]*power)%CONFIGURATIONS_BOUNDING_PRIME;
             share = ((long long)share+poly)%CONFIGURATIONS_BOUNDING_PRIME;
         }
-        shares[i]=(int)(share%p);
+        shares[i]=share%p;
 //        printf("\n%u mod %u -> shares[%u]=%u\n",share,p,i,shares[i]);
     }
 }
+
+
+
+
 
 /*!
   TODO description
@@ -193,7 +349,7 @@ int mod_power(int base, int power, int mod){
 
 }
 
-void reduce(int *numerator, long long *denominator) {
+/*void reduce(int *numerator, long long *denominator) {
 
     printf("%i/%lli ->",*numerator,*denominator);
 
@@ -231,7 +387,7 @@ void reduce(int *numerator, long long *denominator) {
     }
 
     printf(" %i/%lli\n",*numerator,*denominator);
-}
+}*/
 
 
 //TODO move to test/example
@@ -280,7 +436,7 @@ void smpc_core_debug_run_test() {
     
     char string[] = "Franz jagt im komplett verwahrlosten Taxi quer durch Bayernaaaaa";
     
-    printf("length%i\n",sizeof(string)/sizeof(string[0]));
+    printf("length%i\n",(int)(sizeof(string)/sizeof(string[0])));
     
 	
     

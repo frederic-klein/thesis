@@ -18,7 +18,7 @@ int modInverse(long long a, int m);
   \return The remainder of x mod p as an unsigned integer.
 */
 unsigned int mod (long long x, int p){
-	int value;
+	unsigned int value;
 
 	if(x<0){
 		value = p-((-x)%p);
@@ -67,7 +67,7 @@ int modInverse(long long a, int m)
     // Make x1 positive
     if (x1 < 0) x1 += m0;
 
-    return x1;
+    return (int)x1;
 }
 
 
@@ -83,7 +83,7 @@ uint32_t getRandom(uint32_t min, uint32_t max){
 
 
 // computes a array of prime candidates between low and high (exclusive)
-unsigned int getPrime(int low, int high){
+/*unsigned int getPrime(int low, int high){
 	
 	if(low<0 || high<0 || low>high) return 0;
 	
@@ -123,7 +123,7 @@ unsigned int getPrime(int low, int high){
 	}
 	
 	return 1;
-}
+}*/
 
 // function to genereate shares
 
