@@ -20,10 +20,26 @@
 \usepackage{hyperref} % for nameref
 \usepackage[makeroom]{cancel} % crossed out numbers
 \usepackage{booktabs} % thick rules for tables
+\usepackage{listings} % source code
 
+\lstdefinestyle{customc}{
+	belowcaptionskip=1\baselineskip,
+	breaklines=true,
+	% frame=L,
+	xleftmargin=\parindent,
+	language=C,
+	showstringspaces=false,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\bfseries\color{green!40!black},
+	commentstyle=\itshape\color{purple!40!black},
+	identifierstyle=\color{blue},
+	stringstyle=\color{orange},
+}
+\lstset{escapechar=@,style=customc}
 
-\setcounter{tocdepth}{1} % include only section in toc
-\setcounter{secnumdepth}{3} % number also subsections
+% reenable for final version
+%\setcounter{tocdepth}{1} % include only section in toc
+%\setcounter{secnumdepth}{3} % number also subsections
 
 % \bibliography{references}
 \addbibresource{references.bib}
@@ -82,6 +98,7 @@
 \newacronym{SPAN}{SPAN}{smart phone ad hoc network}
 \newacronym{IoT}{IoT}{Internet of Things}
 \newacronym{NDK}{NDK}{Native Development Kit}
+\newacronym{JNI}{JNI}{Java Native Interface}
 \newacronym{PRNG}{PRNG}{pseudo-random number generator}
 \newacronym{2PC}{2PC}{secure two-party computation}
 \newacronym{DDoS}{DDoS}{Distributed Denial of Service}
@@ -100,6 +117,10 @@
 \newacronym{MAC}{MAC}{media access control}
 \newacronym{RSA}{RSA}{Rivest, Shamir and Adleman}
 \newacronym{AES}{AES}{Advanced Encryption Standard}
+\newacronym{GCC}{GCC}{GNU Compiler Collection}
+\newacronym{IDE}{IDE}{integrated development environment}
+\newacronym{HTML}{HTML}{HyperText Markup Language}
+\newacronym{TI-RTOS}{TI-RTOS}{Texas Instruments Real-Time Operating System}
 \newacronym[plural=OS's,firstplural=Operating Systems (OS)]{OS}{OS}{operating system}
 
 %=====================SYMBOLS=====================%
