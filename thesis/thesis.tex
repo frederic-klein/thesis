@@ -793,17 +793,17 @@ Since it is likely, that the technical limitations described in \autoref{practic
 
 \todo*{15-20\%; details on the implementation; for someone who wants to continue the work}
 
-While the algorithms and protocols described in \autoref{Background} and \autoref{Design} are language-independent, it is sensible to use C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}. 
+While the algorithms and protocols described in \autoref{Background} and \autoref{Design} are language-independent, it is sensible to use the programming language C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}. 
 To evaluate the practicability of the proposed framework design for real-life usage, the core system is implemented.
 To simplify the utilization and further development of the framework, first the development environments and tools used for the implementation of the core system are described.
 
-Since the project will be hosted as an open-source project alongside a generated \gls{API}, this thesis does not provide an extensive documentation but important features of the modules are introduced along with more general notes regarding experienced problems.
+Since the project will be hosted as an open-source project alongside a generated \gls{API}, important features of the modules are introduced along with notes regarding experienced problems.
 
 \section{Development Tools}	\label{Development Tools}
 
-The core implementation was developed on Arch Linux using the \gls{GCC} version 6.2.1. As \gls{IDE} JetBrains CLion 2016.3.1 was selected, because it is cross-platform, offers code completion and analysis and supports Doxygen.
+The core implementation was developed on Arch Linux using the \gls{GCC} version 6.2.1. JetBrains CLion 2016.3.1 was selected as \gls{IDE}, because it is cross-platform, offers code completion and analysis and supports Doxygen.
 
-Doxygen is a tool for generating documentation based on annotated sources (\autoref{Doxygen function annotation}), similar to Javadoc. Maintaining the documentation in the source files simplifies the process of keeping the documentation up to date after code changes and avoids version conflicts between \gls{API} and source code, since developers can generate the \gls{API} on their local system from source. Doxygen offers the documentation as \gls{HTML} (\autoref{Doxygen function documentation}) and LaTeX, making it easy to provide platform independent documentation.
+Doxygen is a tool for generating documentation based on annotated sources (\autoref{Doxygen function annotation}), similar to Javadoc. Maintaining the documentation in the source files simplifies the process of keeping the documentation up to date after code changes and the documentation generation can be included in the build pipeline. This helps to avoid version conflicts between \gls{API} and source code, since developers can generate the \gls{API} on their local system from the sources, guaranteeing that the documentation at hand is the correct one for the used release of the source code. Doxygen offers the documentation as \gls{HTML} (\autoref{Doxygen function documentation}) and LaTeX, making it easy to provide platform independent documentation.
 
 \begin{lstlisting}[language=C, caption={Doxygen function annotation}, label={Doxygen function annotation}]
 /*!
@@ -820,11 +820,11 @@ unsigned int mod (long long x, int p);
 	\includegraphics[scale=1.4]{figures/doxygen.png}
 \end{figure}
 
-For managing changes to documents, the distributed version control git is used and the project is hosted on GitHub. Besides providing access to the project and easy maintainability the intention is to let other developers suggest improvements using the pull requests.
+For managing changes to documents, the distributed version control git is used and the project is hosted on GitHub. Besides providing access to the project and easy maintainability the intention is to let other developers suggest improvements using pull requests.
 
-To validate the correctness of implemented functions, the unit test library Unity\footnote{\url{https://github.com/ThrowTheSwitch/Unity}} is used as a submodule. Using the parameter \lstinline|--recursive| the GitHub repository for Unity is checked out with the Security Games repository. 
+To validate the correctness of implemented functions, the unit test library Unity\footnote{\url{https://github.com/ThrowTheSwitch/Unity}} is used as a submodule. Using the parameter \lstinline|--recursive| the GitHub repository for Unity is embedded in the Security Games repository. 
 
-For unit tests with Unity, test files are added to the project including validations of predefined test cases with known output (\autoref{Unity test file}). When build for testing (\lstinline|make test|), the defined tests are executed and the results are printed out (\autoref{Unity test result}).
+For unit tests with Unity, test files are added to the project including validations of predefined test cases with known output (\autoref{Unity test file}). When build for testing (\lstinline|make test|), the defined tests are executed and the results are displayed (\autoref{Unity test result}).
 
 \begin{lstlisting}[language=C, caption=Unity test file, label={Unity test file}, float,floatplacement=H]
 #include "../src/SMPC_math.h"
@@ -890,8 +890,6 @@ To compute the share matrix, the number of nodes in the computation group needs 
 
 Once the host system passes a score to the node, the behavior of the node is controlled by different states. \autoref{Node module state machine} displays a simplified state diagram for coordinators and regular nodes once a score is passed.
 
-The 
-
 \begin{figure}[!htbp] % h for placement here
 	\caption{Offline preparation for online computation} \label{Offline preparation for online computation}
 	\includegraphics[scale=1.0]{figures/node_phases.png}
@@ -929,7 +927,7 @@ For a broadcast the communication flow is:
 	\end{enumerate}
 	\item For each node in a passed list
 		\begin{enumerate}
-		\item send normal request: get result of long action
+		\item send request: get result of long action
 		\item await response
 	\end{enumerate}
 \end{enumerate}
@@ -948,30 +946,30 @@ All messages are byte arrays (respectively char arrays), with varying length, de
 	\end{tabular}
 \end{table}
 
-Of course the transmitted \gls{SMPC} shares are encrypted using \gls{AES} encryption provided by the cryptography module.
+The transmitted \gls{SMPC} shares are encrypted using \gls{AES} encryption provided by the cryptography module.
 
 \subsection{Cryptography Module: wolfCrypt} \label{Cryptography Module}
 
 The cryptography engine wolfCrypt is open-source (GPLv2) and was selected because of the following reasons:
 
 \begin{itemize}
-	\item provides asymmetric encryption with \gls{RSA} (for exchanging the symmetric key)
-	\item provides symmetric encryption with \gls{AES} (for exchanging encrypted messages)
-	\item provides hash algorithms, which will be utilized for the database features
-	\item lightweight library, usable on embedded systems (e.g. \gls{TI-RTOS})
+	\item Provides asymmetric encryption with \gls{RSA} (for exchanging the symmetric key)
+	\item Provides symmetric encryption with \gls{AES} (for exchanging encrypted messages)
+	\item Provides hash algorithms, which will be utilized for the database features
+	\item Lightweight library, usable on embedded systems (e.g. \gls{TI-RTOS})
 \end{itemize}
 
-Like the Unity framework, wolfCrypt is referenced int the repository as a submodule. Using the parameter \lstinline|--recursive| the GitHub repository for Unity is checked out with the Security Games repository, ensuring relative paths in header includes and in the makefile are preserved. Submodules also reference a specific commit, so build errors through different source code versions can be reduced.
+Like the Unity framework, wolfCrypt is referenced int the repository as a submodule. Using the parameter \lstinline|--recursive| the GitHub repository for Unity is embedded in the Security Games repository, ensuring relative paths in header includes and in the makefile are preserved. Submodules also reference a specific commit, so build errors through different source code versions can be reduced.
 
-To meet up-to-date security demands (\ref{Securing the Communication Channel}), \gls{RSA} keys of length 3072 bits are generated and \gls{AES} keys with 192 bit are used (\ref{Configuration}) as defaults, though changes can be made in \lstinline|configurations.h|.
+To meet up-to-date security demands (see \autoref{Securing the Communication Channel}), \gls{RSA} keys of length 3072 bits are generated and \gls{AES} keys with 192 bit are used (see \autoref{Configuration}) as defaults, though changes can be made in \lstinline|configurations.h|.
 
-For the generation of the \gls{RSA} private key \lstinline|WOLFSSL_API int wc_MakeRsaKey(RsaKey* key, int size, long e, WC_RNG* rng);| is used, which is only available when \lstinline|WOLFSSL_KEY_GEN| is defined, therefore 
+For the generation of the \gls{RSA} private key \lstinline|WOLFSSL_API int wc_MakeRsaKey(RsaKey* key, int size, long e, WC_RNG* rng);| is used, which is only available when \lstinline|WOLFSSL_KEY_GEN| is defined, therefore \lstinline|rsa.o| is compiled with the \lstinline|-DWOLFSSL_KEY_GEN| option.
 
 Specific required modules from the library are embedded in the framework but not altered or extended, hence for further information the extensive wolfCrypt documentation\footnote{\url{https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-18-wolfcrypt-api-reference.html}} can be consulted.
 
 \subsection{\gls{SMPC} Module} \label{SMPC Module}
 
-The \gls{SMPC} module provides functions to create shares for the secure sum, minimum and maximum computation. As described in \ref{Secure Comparison Protocol} the shares for following rounds change, when a node disqualifies itself as the maximum. For the off-line preparation the \gls{SMPC} module therefore generates for each computation round additional shares for the disqualification case.
+The \gls{SMPC} module provides functions to create shares for the secure sum, minimum and maximum computation. As described in \autoref{Secure Comparison Protocol} the shares for following rounds change, when a node disqualifies itself as the maximum. For the off-line preparation the \gls{SMPC} module therefore generates for each computation round additional shares for the disqualification case.
 For large computation groups and large upper limits for the maximum score storage has to be considered, especially when running the framework on embedded system. 
 \begin{alignat}{3}
 \intertext{For example, the upper bound for the maximum score is 10000 and the computation group has a size of 20 and scores are 4 byte integers:}
@@ -981,10 +979,9 @@ For large computation groups and large upper limits for the maximum score storag
 &\text{Secure max disqualified:} \ && \text{14 rounds:} \quad && 14\cdot 20 \cdot 4\text{ byte}=1120\text{ byte} \nonumber \\
 &\text{Secure min:} \ && \text{14 rounds:} \quad && 14\cdot 20 \cdot 4\text{ byte}=1120\text{ byte} \nonumber \\
 &\text{Secure min disqualified:} \ && \text{14 rounds:} \quad && 14\cdot 20 \cdot 4\text{ byte}=1120\text{ byte} \nonumber
-\intertext{In total: $4560$ byte need to be stored for the given example values.}
+\intertext{In total: $4560$ byte need to be stored for the given example values.} \nonumber
 \end{alignat}
-
-The \gls{SMPC} module offers also the restoration of the secret using Lagrange interpolation (see \autoref{Public function prototypes in smpc.h}). The interpretation of the result remains in the control of the node module. So if the Lagrange interpolation for a round in the secure max protocol returns a value unequal to zero the node has to set the related bit for the maximum result and so on.
+The \gls{SMPC} module also offers the restoration of the secret using Lagrange interpolation (see \autoref{Public function prototypes in smpc.h}). The interpretation of the result remains in the control of the node module. If the Lagrange interpolation for a round in the secure max protocol returns a value unequal to zero the node has to set the related bit for the maximum result and so on.
 
 \begin{lstlisting}[language=C, caption={Public function prototypes in smpc.h}, label={Public function prototypes in smpc.h}, float, floatplacement=H]
 void smpc_generate_shares(int shares[], int n, int k, int secret, smpc_share_type type);
@@ -1001,12 +998,13 @@ int mod_fraction(long long x, int p);
 
 \section{Interfacing the Library} \label{Interfacing the Library}
 
-As mentioned in \ref{Node Module} for the usage of the library \lstinline|node.h| provides the prototypes for function callbacks, that need to be provided from the host system, to give the library access to the communication layer. In the current implementation the system is intended for the usage with Bluetooth and devices are identified by \gls{MAC}, but with moderate effort the system is portable to an IP address based system.
+As mentioned in \autoref{Node Module} for the usage of the library \lstinline|node.h| provides the prototypes for function callbacks, that need to be provided from the host system, to give the library access to the communication layer. In the current implementation the system is intended for the usage with Bluetooth and devices are identified by \gls{MAC}, but with moderate effort the system is portable to an IP address based system: only the arrays containing the discovery results and related messages in the node module need adjustments, otherwise the computations are independent from the communication layer.
 Based on tests on various Android device with different \gls{API} levels only the \gls{RFCOMM}Bluetooth protocol offers the ability to connect devices without (with minimum) user-interaction.
 
 \subsection{Configuration} \label{Configuration}
 
-Before the system is used, the settings in \lstinline|configuration.h| should be adjusted to the demands of the own system. The default values are displayed in \autoref{Definitions in configurations.h}
+Before the system is used, the settings in \lstinline|configuration.h| should be adjusted to the demands of the own system. The default values are displayed in \autoref{Definitions in configurations.h}.
+
 \begin{lstlisting}[language=C, caption={Definitions in configurations.h}, label={Definitions in configurations.h}, float, floatplacement=H]
 #define CONFIGURATIONS_MINIMUM_COMPUTATION_GROUP 20
 #define CONFIGURATIONS_MAXIMUM_COMPUTATION_GROUP 20
@@ -1015,10 +1013,12 @@ Before the system is used, the settings in \lstinline|configuration.h| should be
 #define CONFIGURATIONS_AES_KEY_SIZE 192
 #define CONFIGURATIONS_RSA_KEY_SIZE 3072
 #define CONFIGURATIONS_BOUNDING_PRIME 2147483647
-// OPTIONAL
-#define CONFIGURATIONS_MIN_SCORE 100
 \end{lstlisting}
-Smaller computation groups offer better performance and reduce the risk of network separation, but for security reasons no adversaries should be tolerated. Providing a narrow estimation for the filed of the possible scores thorough the maximum score value is important for the secure maximum and secure minimum protocols, because it determines the number of needed rounds.
+
+As previously described the value for minimum and maximum computation group size are set to the same value, making the group size static and enabling the computation of the shares in the off-line phase (see \autoref{Offline preparation for online computation}). 
+
+Smaller computation groups offer better performance and reduce the risk of network separation, but for security reasons no adversaries should be tolerated. Providing a narrow estimation for the possible scores thorough the maximum score value is important for the secure maximum and minimum protocols, because it determines the number of needed rounds.
+
 The selected key sizes for \gls{RSA} and \gls{AES} meet currently considered secure settings.  
 
 \subsection{Usage in C}	\label{Usage in C}
@@ -1052,8 +1052,9 @@ node_pass_score(score);
 
 
 \subsection{Usage in Android} \label{Usage in Android}
-Using the Android \gls{NDK} it is possible to utilize C (and C++) libraries inside of activities, to reuse existing code base.
-To develop native code for Android with Android Studio \gls{SDK} Tools are needed (through SDK Manager)
+Using the Android \gls{NDK} it is possible to utilize C and C++ libraries inside of activities, to reuse existing code base.
+
+To develop native code for Android with Android Studio the following \gls{SDK} Tools are needed and are provided through the integrated \gls{SDK} Manager
 
 \begin{itemize}
 	\item LLDB: a debugger, providing debugging of native code to Android Studio
@@ -1073,12 +1074,14 @@ Java_[package]_MainActivity_nodePassMessages(JNIEnv *env, jobject this, jstring 
 
 To provide a callback function, \gls{JNI} class lookup can be used. To call a Java method defined as \lstinline|public void sendMessage(String target, String message){ ... }| class and method references can be stored (see \autoref{Using a Java method as callback for native method}) and the reference to a wrapping function is passed to the C library.
 
-\begin{lstlisting}[language=Java, caption={Using a Java method as callback for native method}, label={Using a Java method as callback for native method}, float, floatplacement=H]
-    jclass mainClass = (*env)->FindClass(env, "de/fredericklein/securitygames/MainActivity");
+\begin{lstlisting}[language=C, caption={Using a Java method as callback for native method}, label={Using a Java method as callback for native method}, float, floatplacement=H]
+    jclass mainClass = (*env)->FindClass(env, "[package]/MainActivity");
 jmethodID id = (*env)->GetMethodID(env, mainClass, "sendMessage", "(Ljava/lang/String;Ljava/lang/String;)V");
 jobject javaObjectRef = (*env)->NewObject(env, mainClass, id);
 (*env)->CallVoidMethod(javaObjectRef, id, "some mac", "some message");
 \end{lstlisting}
+
+\subsubsection{Android Bluetooth Observations} \label{Android Bluetooth Observations}
 
 In regard to the implementation of the \gls{RFCOMM} communication, different versions of Android showed different behavior: when trying to set the visibility, older test devices running Android 4.0 up to Android 4.3 issued the initial user confirmation to become indefinitely discoverable (see \autoref{Android discoverable intent}), but stopped without notification after the duration set in the Bluetooth settings, deviation from the android documentation. In contrast Android 5 devices became discoverable indefinitely (until Bluetooth was disabled and re-enabled). 
 
