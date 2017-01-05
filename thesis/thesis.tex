@@ -626,34 +626,35 @@ Extending requirement \ref{req:Coordinator Election} and to avoid situations of 
 In regard to the execution of the \gls{SMPC} protocols in \ref{req:SMPC Module}, the coordinator has to find a computation group. In a mesh network with routing and point-to-point encryption as displayed in \autoref{figure:Formation of fully meshed computation group - a}, the green marked coordinator can simply broadcast a computation request and responding nodes form the computation group. Caused by the technical limitations (see \autoref{practicability of an implementation}), the coordinator has to find a fully meshed group within its reach: this guarantees that each node can directly communicate with all computation partners and messages required for securing the channel are not passed through other nodes. First the coordinator $n_1$ discovers nearby nodes (see \autoref{figure:Formation of fully meshed computation group - b}). Then a list of these devices (identified by \gls{MAC} address) is sent to every neighboring node (see $n_2$ to $n_7$ in \autoref{figure:Formation of fully meshed computation group - c}). Each node responds with the intersection of the received device list with the own list of discovered devices (see \autoref{figure:Formation of fully meshed computation group - d}). To reduce the payload of the responses, they only contain a list of booleans, indication if the device with the same index in the received device list is seen by the node. The coordinator then computes the maximum group of fully meshed nodes and sends computation partners an associative array assigning new 8-bit ids (see \autoref{figure:Formation of fully meshed computation group - e}), which reduce the payload in following steps. Nearby nodes, that are not part of the computation group, receive an indicator to abort the computation. Each node in the computation group has a list of the group and the assigned ids and can exchange public keys with group members, forming a fully meshed, end-to-end encrypted group (see figure \ref{figure:Formation of fully meshed computation group - f}).
 
 \begin{figure}[!htb] % h for placement here
-	\caption{Formation of fully meshed computation group} \label{figure:Formation of fully meshed computation group}
+
 	\centering
-	\subfloat[]{%
+	\subfloat[Coordinator initialzation]{%
 		\includegraphics[scale=1.0]{figures/coordinator-1.png}
 		\label{figure:Formation of fully meshed computation group - a}
 	}%
 	\hfill
-	\subfloat[]{%
+	\subfloat[Coordinator discovery]{%
 		\includegraphics[scale=1.0]{figures/coordinator-2.png}
 		\label{figure:Formation of fully meshed computation group - b}
 	}\\
-	\subfloat[]{%
+	\subfloat[Coordinator sends discovery request and own node list]{%
 		\includegraphics[scale=1.0]{figures/coordinator-3.png}
 		\label{figure:Formation of fully meshed computation group - c}
 	}%
 	\hfill
-	\subfloat[]{%
+	\subfloat[Nodes respond with intersection of discovered devices]{%
 		\includegraphics[scale=1.0]{figures/coordinator-4.png}
 		\label{figure:Formation of fully meshed computation group - d}
 	}\\
-	\subfloat[]{%
+	\subfloat[Coordinator computes and announces fully meshed computation group]{%
 		\includegraphics[scale=1.0]{figures/coordinator-5.png}
 		\label{figure:Formation of fully meshed computation group - e}
 	}%
 	\hfill
-	\subfloat[]{%
+	\subfloat[Meshed network is ready for \gls{SMPC} computation]{%
 		\includegraphics[scale=1.0]{figures/coordinator-6.png}
 		\label{figure:Formation of fully meshed computation group - f}
+	\caption{Formation of fully meshed computation group} \label{figure:Formation of fully meshed computation group}
 	}
 \end{figure}
 
@@ -684,16 +685,30 @@ Since the communication between the coordinator and a node takes time, the recei
 t'_i &=t_i+\underbrace{\frac{RTT}{2}}_{\text{correction value}}=t_i+\frac{t_e-t_s}{2} \label{eq:berkeley RTT}
 \end{alignat}
 
-\begin{figure}[!htbp] % h for placement here
-	\caption{Round Trip Time} \label{figure:berkeley RTT}
-	\includegraphics[scale=1.0]{figures/berkeley-ion.png}
-\end{figure}
+%\begin{figure}[!htbp] % h for placement here
+%	\caption{Round Trip Time} \label{figure:berkeley RTT}
+%	\includegraphics[scale=1.0]{figures/berkeley-ion.png}
+%\end{figure}
 
 By sending the adjustments $\Delta_i$ instead of the adjusted time, the receiving nodes do not need to compensate the received value with the \gls{RTT}. Figure \ref{figure:berkeley example} depicts the computation of the adjustments using Berkeley with \gls{RTT} correction for three nodes. 
 
-\begin{figure}[!htbp] % h for placement here
-	\caption{Example computation of adjustments with Berkeley} \label{figure:berkeley example}
-	\includegraphics[scale=1.0]{figures/berkeley-example-ion.png}
+%\begin{figure}[!htbp] % h for placement here
+%	\caption{Example computation of adjustments with Berkeley} \label{figure:berkeley example}
+%	\includegraphics[scale=1.0]{figures/berkeley-example-ion.png}
+%\end{figure}
+
+\begin{figure}[!htb] % h for placement here
+	\centering
+	\subfloat[Round Trip Time]{%
+		\includegraphics[scale=1.0]{figures/berkeley-ion.png}
+		\label{figure:berkeley RTT}
+	}%
+	\\
+	\subfloat[Example computation of adjustments with Berkeley]{%
+		\includegraphics[scale=0.8]{figures/berkeley-example-ion.png}
+		\label{figure:berkeley example}
+	}
+	\caption[Distributed clock synchronzation]{Internal clock synchronzation in distributed networks} \label{figure:Distributed clock synchronzation}
 \end{figure}
 
 For further improvement of the accuracy the processing duration between receiving a request and sending the response $t_{process}$ can be measured and send to the coordinator. In this thesis the simple approximation for $t_{response}$ is used, since the additional payload extends the transmission duration. The \gls{RTT} has to be below an upper bound though, otherwise there is to much uncertainty regarding the influence of $t_{request}$, $t_{process}$ and $t_{response}$.
@@ -706,7 +721,6 @@ The framework does not change the actual clock setting on the hosting system, bu
 Especially since the coordinator gives temporarily away the message token and goes into a waiting state, there has to be a protocol to detect non-termination for processes. Meeting \ref{req:Non-termination Detection} each request to another node and each local computation initializes the start of timers. The local timer triggers the transmission of a heartbeat message (compare \ref{req:Heartbeat}) to the coordinator, signaling that the process is still intact, but not yet finished. If the coordinator receives a heartbeat message, it informs the other nodes in the computation group (causing them to reset their local timers), and resets its local timeout-timer. If the coordinator reaches a limit for the timer without receiving a heartbeat message, non-termination is assumed and all group members are informed, that the computation failed. The heartbeat protocol for the coordinator waiting for response is outlined in figure \ref{figure:heartbeat coordinator}, while the protocol for a node in possession of the message token is displayed in figure \ref{figure:heartbeat node}.  
 
 \begin{figure}[!htb] % h for placement here
-	\caption[Heartbeat messages for termination control]{Avoidance of false non-termination detection through heartbeat messages} \label{figure:False non-termination detection with heartbeat messages}
 	\centering
 	\subfloat[]{%
 		\includegraphics[scale=0.8]{figures/heartbeat-coordinator.png}
@@ -717,6 +731,7 @@ Especially since the coordinator gives temporarily away the message token and go
 		\includegraphics[scale=0.8]{figures/heartbeat-node.png}
 		\label{figure:heartbeat node}
 	}
+	\caption[Heartbeat messages for termination control]{Avoidance of false non-termination detection through heartbeat messages} \label{figure:False non-termination detection with heartbeat messages}
 \end{figure}
 
 \subsection{Distributed Databases} \label{Distributed Database}
@@ -736,8 +751,8 @@ The framework deals only with entry-sets of the database and lets the hosting sy
 	\item value
 \end{itemize}
 
-The combination of hash and Unix timestamp generates a key for the entry that is most likely collision free. The size of the computation group is needed to compute the arithmetic average from multiple entry-sum-values in a specified time-window: 
-\begin{align*}
+The combination of hash and Unix timestamp generates a key for the entry that is most likely collision free. The size of the computation group is needed to compute the arithmetic average from multiple entry-sum-values in a specified time-window (compare \autoref{eq:average of average}).
+\begin{align}
 \begin{rcases*}
 \begin{rcases*}
 \mathmakebox[2.5cm][c]{ \underbrace{s_1, s_2, s_3, s_4, s_5}_{n_1=5} }  & \quad
@@ -745,11 +760,11 @@ The combination of hash and Unix timestamp generates a key for the entry that is
 \begin{rcases*}
 \mathmakebox[2.5cm][c]{ \underbrace{s_6, s_7, s_8}_{n_2=3} } & \quad
 \end{rcases*} v_2=\sum_{i}s_i
-\end{rcases*} \overline{v}_i=\frac{v_1+v_2}{n_1+n_2}
-\end{align*}
+\end{rcases*} \overline{v}_i=\frac{v_1+v_2}{n_1+n_2} \label{eq:average of average}
+\end{align}
 
-Since the framework offers three types of \glspl{SMPC} the entry must reflect the source of the value. By comparison and updating, each node will have eventually all entries, so a distributed database has eventual consistency.
-To meet with the requirement \ref{req:Database Synchronization} each node holds the sum of the entries' hashes within a specified time-window. This value is used to compare the database-states between nodes: if the values are equal, the databases are likely consistent (collisions are possible though but only for short durations until new \gls{SMPC} results are generated or collision free nodes are encountered), otherwise entries are compared and exchanged. First the coordinator request the hash-sum. If they match an acknowledgment is send, otherwise up to n (predefined upper bound) hashes of the entries in anti-chronological order are send in an array to the node. The node response with an array of booleans, representing if the hashes are known. If the response-array contains zeros, then the unknown entries are transmitted. After an entry-exchange the hash-sums are compared, to determine if consistency is reached (coordinator request hash-sum if needed, compare figure \ref{figure:Database synchronization scheme}). If the hash-sums do not match, the node sends up to n entry-hashes to the coordinator, skipping already evaluated entries. This is repeated until consistency is reached or a request times out and the process is aborted.
+Since the framework offers three types of \glspl{SMPC}, the entry must reflect the source of the value. By comparing and updating, each node will have eventually all entries, so a distributed database has eventual consistency.
+To meet with the requirement \ref{req:Database Synchronization} each node holds the sum of the entries' hashes within a specified time-window. This value is used to compare the database-states between nodes: if the values are equal, the databases are likely consistent (collisions are possible though but only for short durations until new \gls{SMPC} results are generated or collision free nodes are encountered), otherwise entries are compared and exchanged. First the coordinator request the hash-sum. If they match an acknowledgment is send, otherwise up to $n$ (predefined upper bound) hashes of the entries in anti-chronological order are sent in an array to the node. The node response with an array of booleans, representing if the hashes are known. If the response-array contains zeros, then the unknown entries are transmitted. After an entry-exchange the hash-sums are compared, to determine if consistency is reached (coordinator request hash-sum if needed, compare figure \ref{figure:Database synchronization scheme}). If the hash-sums do not match, the node sends up to n entry-hashes to the coordinator, skipping already evaluated entries. This is repeated until consistency is reached or a request times out and the process is aborted.
 Figure \ref{figure:Database synchronization scheme} displays the basic process for $n=2$, with ASCII-values as mock-up hashes:
 
 \begin{figure}[!htbp] % h for placement here
@@ -891,7 +906,7 @@ To compute the share matrix, the number of nodes in the computation group needs 
 Once the host system passes a score to the node, the behavior of the node is controlled by different states. \autoref{Node module state machine} displays a simplified state diagram for coordinators and regular nodes once a score is passed.
 
 \begin{figure}[!htbp] % h for placement here
-	\caption{Off-line preparation for online computation} \label{Off-line preparation for online computation}
+	\caption{Off-line preparation for online computation} \label{figure:Off-line preparation for online computation}
 	\includegraphics[scale=1.0]{figures/node_phases.png}
 \end{figure}
 
@@ -967,7 +982,7 @@ For the generation of the \gls{RSA} private key \lstinline|WOLFSSL_API int wc_Ma
 
 Specific required modules from the library are embedded in the framework but not altered or extended, hence for further information the extensive wolfCrypt documentation\footnote{\url{https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-18-wolfcrypt-api-reference.html}} can be consulted.
 
-\subsection{\gls{SMPC} Module} \label{SMPC Module}
+\subsection{Secure Multi-Party Computation Module} \label{SMPC Module}
 
 The \gls{SMPC} module provides functions to create shares for the secure sum, minimum and maximum computation. As described in \autoref{Secure Comparison Protocol} the shares for following rounds change, when a node disqualifies itself as the maximum. For the off-line preparation the \gls{SMPC} module therefore generates for each computation round additional shares for the disqualification case.
 For large computation groups and large upper limits for the maximum score storage has to be considered, especially when running the framework on embedded system. 
@@ -1015,7 +1030,7 @@ Before the system is used, the settings in \lstinline|configuration.h| should be
 #define CONFIGURATIONS_BOUNDING_PRIME 2147483647
 \end{lstlisting}
 
-As previously described the value for minimum and maximum computation group size are set to the same value, making the group size static and enabling the computation of the shares in the off-line phase (see \autoref{Offline preparation for online computation}). 
+As previously described the value for minimum and maximum computation group size are set to the same value, making the group size static and enabling the computation of the shares in the off-line phase (see \autoref{figure:Off-line preparation for online computation}). 
 
 Smaller computation groups offer better performance and reduce the risk of network separation, but for security reasons no adversaries should be tolerated. Providing a narrow estimation for the possible scores thorough the maximum score value is important for the secure maximum and minimum protocols, because it determines the number of needed rounds.
 
@@ -1137,7 +1152,7 @@ All test were realized on a Sony Experia Z1 Compact:
 	\item disabled power saving modes
 \end{itemize}   
 
-Each test case has a runtime of one hour, to reduce the significance of measuring inaccuracy. At the beginning and after completion of the tests Bluetooth is disabled. Tests:
+Each test case has a runtime of one hour, to reduce the significance of measuring inaccuracy. At the beginning and after completion of the tests Bluetooth is disabled. Discoverable state is periodically verified during the test with another Android device in range. Tests:
 
 \begin{enumerate}
 	\item Bluetooth enabled, not discoverable, not discovering and not connected
@@ -1202,13 +1217,13 @@ Test settings for secure maximum protocol:
 %
 To evaluate the influence of computational power, the virtualization software VirtualBox was used: a Linux client running the tester application is limited through the CPU limit setting of VirtualBox. In VirtualBox the guest CPU setting can not be reduced beyond a lower bound (40\% on the development environment). Within these limits, the total computation time did not change reliable or reproducible.
 
-As an alternative approach cpulimit\footnote{\url{https://github.com/opsengine/cpulimit}} was used to limit the cpu usage of the tester processes. Again the online time was not affected besides for very small limit-values (1 to 5\%). The measurements embedded in the code revealed however, that the usage of SIGSTOP and SIGCONT signals distort the measurements and the results are not reproducible.
+As an alternative approach cpulimit\footnote{\url{https://github.com/opsengine/cpulimit}} was used to limit the cpu usage of the tester processes. Again the online time was not affected besides for very small limit-values (1 to 5\%). The measurements embedded in the code revealed however, that the usage of \lstinline|SIGSTOP| and \lstinline|SIGCONT| signals distort the measurements and the results are not reproducible.
 
-Finally the power management of the hosting system provided reproducible results. The changes in the related computations (encryption, decryption, summation, Lagrange interpolation) are very small, therefore the fixed value for discovery was removed, to highlight the differences (see \autoref{figure:Computation time over CPU Power}).
+Finally the power management of the hosting system provided reproducible results. The changes in the related computations (encryption, decryption, summation, Lagrange interpolation) are very small, therefore the fixed value for discovery was removed, to highlight the differences (see \autoref{figure:Computation time over CPU Power for 20 nodes}).
 
 For all tests the computation group size was defined as 20. The power management was than used to limit the CPU to levels of 20\%, 40\%, 60\%, 80\% and 100\%.
 \begin{figure}[!htbp] % h for placement here
-	\caption{Computation time over CPU Power} \label{figure:Computation time over CPU Power}
+	\caption{Computation time over CPU Power for 20 nodes} \label{figure:Computation time over CPU Power for 20 nodes}
 	\includegraphics[scale=1.0]{figures/eval_power.png}
 \end{figure}
 
@@ -1216,41 +1231,83 @@ For all tests the computation group size was defined as 20. The power management
 
 \chapter{Discussion} \label{Discussion}
 
+The evaluation of the core implementation in \autoref{Evaluation} demonstrates that the framework reaches a performance grade that makes it applicable for smaller computation group sizes. Besides the computation performance, the unobtrusiveness for the end-user is also important for the successful integration of the system for example in a work environment. The demands toward the system were outlined in \autoref{Requirements} and the requirement coverage is review.
+Finally solutions and improvement potential for design flaws, which were uncovered through the simulations and analysis of subroutines, are proposed for next  he evaluation also revealed first design flaws and improvement potential and solutions are proposed for the next development iterations.
 
 \section{Requirement Satisfaction in Real-Life Settings} \label{Requirement Satisfaction in Real-Life Settings}
 
-The results of the power consumption tests for Android (see \fullref{figure:Batterystats}) show, that having Bluetooth enabled, being discoverable and holding a \gls{RFCOMM} connection have no significance for the daily usage of a smartphone: being discoverable and connected for 24 hours consumes around the same amount of power as having the display activated for a few minutes. The discovery phase is expensive in regard of power consumption, but device dependent this phase is usually only active for around one to five seconds. Even for multiple retries to form a computation group, the total power consumption per hour for discovery will range significantly below 1 mA, for example for all three \gls{SMPC} protocols 10 retries to form a computation group were needed and the device runs discovery for 5 seconds, then the power consumption for the discovery phase would be $0,5$ mA in an hour. 
+The usage of the framework in \glspl{MANET} with the intention to use personal smartphones as hosts, require strict compliance with the requirements regarding unobtrusiveness (\ref{req:Pairing-less Connection}), privacy protection (\ref{req:SMPC Module}) and performance (\ref{req:Performance}). In the following sections conditions for compliance are discussed in context of real-life environments.
+
+\subsection{User Acceptance}
+The results of the power consumption tests for Android (see \fullref{figure:Batterystats}) show, that having Bluetooth enabled, being discoverable and holding a \gls{RFCOMM} connection have no significance for the daily usage of a smartphone: being discoverable and connected for 24 hours consumes around the same amount of power as having the display activated for a few minutes (also analyzed through the battery stats, compare \autoref{Android battery stats report}). 
+The discovery phase is expensive in regard of power consumption, but device dependent this phase is usually only active for around one to five seconds. Even for multiple retries to form a computation group, the total power consumption per hour for discovery will range significantly below 1 mA, for example if for all three \gls{SMPC} protocols 10 retries to form a computation group were needed and the device runs discovery for 5 seconds, then the power consumption for the discovery phase is $0,5$ mA in an hour. 
 
 In regard of the power consumption the framework is therefore fit for usage and worries regarding drainage of the battery can be easily invalidated.
 
-In the secure sum protocol for lower node numbers, the discovery is the major time consumer and up to 20 nodes, the computational costs are very low. For larger computation groups, the time needed to compute the secure sum reaches durations that make a network separation for moving nodes likely. Considering a typical walking speed of 1,5 meters per second, the distance after 7 seconds (compare \autoref{figure:walking range in computation time}) makes it likely that the connection to other nodes is lost because distance or shielding walls, especially if the other nodes are moving as well.
+Further the Android tests (see \autoref{Android Bluetooth Observations}) have shown, that at least for Android devices running Android 5.0 and up, the user interaction required for joining the system is limited to the permission of becoming discoverable. Until Bluetooth is disabled, no further interactions are required and no system settings have to be manually altered. Therefore requirement \ref{req:Pairing-less Connection} is also met.
+
+For developers \ref{req:Supportability} is met through the doxygen documentation, the clean interface provided by \lstinline|node.h| and the implementations in the tester application and the Android example. For \ref{req:Usability} all settings are adjusted in \lstinline|configurations.h|, simplifying the framework adaption and integration. 
+As described in \autoref{Interfacing the Library}, \ref{req:Expandability} is not fully met yet. The \gls{MAC} address bound identification of devices will be further abstracted to decouple the framework from a specific wireless technology.
+
+\subsection{Required Time for Computation}
+
+Since the system is intended for a \gls{MANET}, the computation time has to stay within limits, so that the computation can complete before the fully meshed computation group network is separated.
+
+In the secure sum protocol for lower node numbers, the discovery is the major time consumer and up to 20 nodes, the computational costs are comparatively negligible. For larger computation groups, the time needed to compute the secure sum reaches durations that make a network separation for moving nodes likely. Bluetooth range varies significantly among Bluetooth modules and power settings, but a range of 10 meters is a good rule of thumb. Considering a typical walking speed of 1,4 meters per second \autocite{Mohler2007}, the distance after 7 seconds (compare \autoref{figure:walking range in computation time}) makes it likely that the connection to other nodes is lost because of the distance or shielding walls, especially if the other nodes are moving as well.
 
 \begin{figure}[!htbp] % h for placement here
 	\caption{Walking range in computation time} \label{figure:walking range in computation time}
 	\includegraphics[scale=1.0]{figures/walking_range.png}
 \end{figure}
 
-The tests regarding computational power have shown, that the reduction of the online phase through scale up of the nodes is limited: the message driven nature of the system and the high amount of massages passed between the nodes in a sequential manner are not transmitted faster when upscaling. This demonstrates that the framework can tolerate nodes with comparatively low computational power, but the influence of the messages also request optimization of the message system (see \autoref{Design Flaws Detected Through Evaluation}).
+The core implementation provided in \autoref{Implementation} meets requirements \ref{req:Coordinator Election}, \ref{req:Token-Passing} and \ref{req:SMPC Module}, though based on the current performance simulations of the system (see \autoref{figure:Computation time over number of nodes for secure sum} and \autoref{figure:Computation time over number of nodes for secure maximum}) \ref{req:Performance} is only met for small computation groups ($n<20$). Since the simulations in \autoref{Evaluation} do not take into account durations needed for establishing the \gls{RFCOMM} connections, the simulations need to be adjusted based on further measurements on different Android devices. The development goal for the tester application is to make it a tool for analyzing the performance of the framework in the intended system configuration.
 
-\section{Design Flaws Detected Through Evaluation} \label{Design Flaws Detected Through Evaluation}
+The tests regarding computational power have shown, that the reduction of the online phase through scale up of the nodes is limited: the message driven nature of the system and the high amount of massages (raising with the number of nodes squared) passed between the nodes in a sequential manner are not transmitted faster when upscaling. This demonstrates that the framework can tolerate nodes with comparatively low computational power, but the influence of the messages also request optimization of the message system (see \autoref{Design Flaws Detected Through Evaluation}).
 
-Since the message passing between the nodes is causing 
+\section{Design Flaws Discussion} \label{Design Flaws Detected Through Evaluation}
+
+Since the sequential message passing between the nodes is causing a significant computation delay, the design needs to be optimized. The message format holds potential for optimization as well as the message exchange protocol.
+Message format improvements:
+\begin{itemize}
+	\item Currently the messages are zero terminated strings, which simplified the first implementation, but it also generates overhead: each message holds the additional termination character and numbers are digit-wise converted into ASCII characters. For a signed integer of eleven digit length, this produces an overhead of 8 bytes. Therefore all messages with known payload size can be transmitted in the native data type to reduce overhead. For encrypted messages this provides no message reduction though, because short messages are padded to the block size (16 byte).
+	\item The \gls{MAC} addresses are transmitted as passed from the host in the colon-separated form. Removing the separating colons removes 5 byte per \gls{MAC} address.
+	\item The \lstinline|Broadcast_Request| enumerator can be defined as the upper bound for all message types.  Instead of concatenating the broadcast and the message request, the sum of booth can be used as message type. Using $127$ as the broadcast value leaves $0$ to $126$ as message type values, while keeping the sum within a byte's length. The receiving node checks if the message type is larger than the broadcast request value to identify a broadcast request. This reduces the broadcast requests by 3 bytes.
+\end{itemize}
+
+Similar to software parallelization, where load is distributed among threads, in some cases the sequential message passing can be distributed among nodes:
+\begin{itemize}
+	\item Instead of sending each node in the computation group sequentially a broadcast message (compare \autoref{figure:Broadcast optimization - a}), the coordinator can distribute broadcasts with large payloads among nodes, which in turn transmit the message to a subgroup of nodes. The coordinator then sends \lstinline|ACK|-requests to each node to verify all nodes are ready (see \autoref{figure:Broadcast optimization - b}).
+\end{itemize}
+
+\begin{figure}[!htb] % h for placement here
+	\centering
+	\subfloat[Current implementation of computation group announcement]{%
+		\label{figure:Broadcast optimization - a}
+		\includegraphics[scale=1.0]{figures/broadcast_distribution_old.png}
+		
+	}\\
+	\subfloat[Improved computation group announcement]{%
+		\label{figure:Broadcast optimization - b}
+		\includegraphics[scale=1.0]{figures/broadcast_distribution_new.png}
+	}
+	\caption{Broadcast optimization} \label{figure:broadcast optimization}
+\end{figure}
  
-\todo*{combine requirements with evaluation}
+Protocol improvements:
+\begin{itemize}
+	\item The sum protocol currently limits the computation group, because an 32 bit integer is computed and returned. For larger scores, this can cause a integer overflow if the computation group is lager than the maximum value of the data type divided by the maximum score. Because of the expected group sizes based on \autoref{Evaluation}, using a 64 bit integer will fix the overflow risk.
+	\item A fixed size computation group reduces the online-phase and is therefore the preferred setting, but this will leave single nodes without the option to commit their scores. The computation priority should increase for these node. When a threshold is reached, the computation can tolerate a number of nodes (similar to the threshold for adversaries) using computation results as inputs. This has to be evaluated for correctness and privacy.
+\end{itemize}
 
-\todo*{extend protocol: implement merging of results, to reduce probability of not finding computation partner; implement alternative protocols}
+For the real-life usage a quality of service feature will be useful: if the configurations of the framework provide a high grade of privacy (larger computation group) but cause many network separation while computing, the user should be informed. For the assessment the following events should be collected:
+\begin{enumerate}
+	\item Forming of computation group was unsuccessful.
+	\item Computation was aborted due to network separation.
+\end{enumerate}
 
-\todo*{implement optional verification for addition, if performance is good enough for real life application}
-
-\todo*{computation group, implement fairness: after rejection as member of computation group either reduce backoff time or raise a priority indicator a do a weighted group}
-
-\todo*{outlook: bt 5.0, mesh network}
-
-\todo*{extend: combine dated data to reduce storage needs; incremental hash instead of sum}
+Using these values as a metric for system performance, the maintainer can then change the computation group size to improve the chances for computation completion.
 
 %Based on the gamification related target group, assumptions regarding the significance of dated data can be made: for example it is of interest to compare the general average for the previous year with the personal scores, maybe also on month or week level. In contrast a more fine-grained resolution of dated data will be rarely used while requiring extensive storage, compared to summarized data.
-
-\todo*{QoS control needed}
 
 \FloatBarrier
 

@@ -67,7 +67,7 @@
 \newcounter{funcreqcounter}
 \setcounter{funcreqcounter}{0}
 \makeatletter
-\newcommand{\funcreq}[1]{\stepcounter{funcreqcounter}\textbf{FR\pad{funcreqcounter} #1}\renewcommand{\@currentlabel}{FR\pad{funcreqcounter}~#1}}
+\newcommand{\funcreq}[1]{\stepcounter{funcreqcounter}\textbf{FR\pad{funcreqcounter} #1}\renewcommand{\@currentlabel}{\textit{FR\pad{funcreqcounter}~#1}}}
 \makeatother
 %
 
@@ -76,7 +76,7 @@
 \newcounter{nonfuncreqcounter}
 \setcounter{nonfuncreqcounter}{0}
 \makeatletter
-\newcommand{\nonfuncreq}[1]{\stepcounter{nonfuncreqcounter}\textbf{NFR\pad{nonfuncreqcounter} #1}\renewcommand{\@currentlabel}{NFR\pad{nonfuncreqcounter}~#1}}
+\newcommand{\nonfuncreq}[1]{\stepcounter{nonfuncreqcounter}\textbf{NFR\pad{nonfuncreqcounter} #1}\renewcommand{\@currentlabel}{\textit{NFR\pad{nonfuncreqcounter}~#1}}}
 \makeatother
 %
 
@@ -93,7 +93,7 @@
 
 %=====================ACRONYMS=====================%
 \newacronym[plural=SMPCs,firstplural=secure multi-party computations (SMPC)]{SMPC}{SMPC}{secure multi-party computation}
-\newacronym{LAN}{LAN}{local area network}
+\newacronym{LAN}{LAN}{Local Area Network}
 \newacronym[plural=MANETs,firstplural=mobile ad hoc networks (MANET)]{MANET}{MANET}{mobile ad hoc network}
 \newacronym{SPAN}{SPAN}{smart phone ad hoc network}
 \newacronym{IoT}{IoT}{Internet of Things}
@@ -107,10 +107,10 @@
 \newacronym{TLS}{TLS}{Transport Layer Security}
 \newacronym{HTTPS}{HTTPS}{HTTP over \gls{TLS}}
 \newacronym{GSM}{GSM}{Global System for Mobile Communications}
-\newacronym{API}{API}{application programming interface}
-\newacronym{SDK}{SDK}{software development kit}
+\newacronym{API}{API}{Application Programming Interface}
+\newacronym{SDK}{SDK}{software Development Kit}
 \newacronym{ADB}{ADB}{Android Debug Bridge}
-\newacronym{RFCOMM}{RFCOMM}{radio frequency communication}
+\newacronym{RFCOMM}{RFCOMM}{Radio Frequency Communication}
 \newacronym{L2CAP}{L2CAP}{Logical Link Control and Adaptation Protocol}
 \newacronym{UML}{UML}{Unified Modeling Language}
 \newacronym{UTC}{UTC}{Coordinated Universal Time}
@@ -119,7 +119,7 @@
 \newacronym{RSA}{RSA}{Rivest, Shamir and Adleman}
 \newacronym{AES}{AES}{Advanced Encryption Standard}
 \newacronym{GCC}{GCC}{GNU Compiler Collection}
-\newacronym{IDE}{IDE}{integrated development environment}
+\newacronym{IDE}{IDE}{Integrated Development Environment}
 \newacronym{HTML}{HTML}{HyperText Markup Language}
 \newacronym{TI-RTOS}{TI-RTOS}{Texas Instruments Real-Time Operating System}
 \newacronym[plural=OSs,firstplural=Operating Systems (OS)]{OS}{OS}{operating system}
