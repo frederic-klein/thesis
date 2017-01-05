@@ -5,9 +5,11 @@ touch $DISCOVERY
 
 echo "" > $DISCOVERY
 
-NODES=50
+NODES=20
 ADVERSARIES=0
 CPULIMIT=100
+SUM=0
+MAX=0
 
 make -B "n=$NODES" "a=$ADVERSARIES" tester
 
@@ -38,6 +40,11 @@ for i in `seq 1 $NODES`; do
 	rm "/tmp/$MAC"
 	
 	SCORE=$((($RANDOM)%9000+100))
+	SUM=$(($SUM+$SCORE))
+	
+	if [ "$MAX" -lt "$SCORE" ]; then
+		MAX=$SCORE
+	fi
 	
 	if [ "$i" -eq "1" ]; then
 		echo $MAC" "$SCORE" c" > $DISCOVERY
@@ -61,8 +68,7 @@ do
 		fi
 		COUNTER=$(($COUNTER+1))
 	done
-#    cpulimit --limit=$CPULIMIT -i ./tester $PARAM1 $PARAM2 $PARAM3 &
-    ./tester $PARAM1 $PARAM2 $PARAM3 &
+    #./tester $PARAM1 $PARAM2 $PARAM3 &
 done < <(tail -n +2 "$DISCOVERY")
 
 
@@ -80,9 +86,11 @@ do
 	fi
 	COUNTER=$(($COUNTER+1))
 done
-#cpulimit --limit=$CPULIMIT -i ./tester $PARAM1 $PARAM2 $PARAM3 
+#cpulimit --limit=2 -z -i ./tester $PARAM1 $PARAM2 $PARAM3 
 ./tester $PARAM1 $PARAM2 $PARAM3 
 
 pkill tester
+
+echo "sum="$SUM " max="$MAX 
 
 

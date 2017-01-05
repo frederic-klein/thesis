@@ -20,6 +20,7 @@
 #include "../lib/wolfssl/wolfssl/wolfcrypt/random.h"
 #include "../lib/wolfssl/wolfssl/wolfcrypt/integer.h"
 #include "configurations.h"
+#include <time.h>
 
 
 typedef unsigned char  byte;
@@ -111,13 +112,13 @@ void smpc_init(){
     }
 
 
-/*    Aes enc;
+    Aes enc;
     Aes dec;
 
     const byte key[] = { '1','2','3','4','5','6','7','8','9','1','2','3','4','5','6','7','8','9','1','2','3','4','5','6' }; // 24 Byte =
     const byte iv[] = { '1','2','3','4','5','6','7','8','9','1','2','3','4','5','6','7' }; // 16 Byte
 
-    byte * message = "Hallo Welt rethsdh srtjsrtjs srtth rt mdtzkjsrt jsrtjsr jsrtjxfgmhjk,dh sdfgnsdrtjA";
+    byte * message = "2147483647";
     int message_length=strlen(message);
 
     int buffer_size = (message_length/16+1)*16;
@@ -132,19 +133,33 @@ void smpc_init(){
 
     printf("buffer size=%u key size=%u plain=%.*s\n", buffer_size, sizeof(key), strlen(message), plain);
 
+
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
     // encrypt
     wc_AesSetKey(&enc, key, sizeof(key), iv, AES_ENCRYPTION);
     wc_AesCbcEncrypt(&enc, cipher, plain, sizeof(plain));
 
-    printf("plain:%.*s -> cipher: %.*s\n", strlen(message), plain, strlen(message), cipher);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    __time_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+    printf("\n\nencryption took: %lu useconds \n\n", delta_us);
+
+//    printf("plain:%.*s -> cipher: %.*s\n", strlen(message), plain, strlen(message), cipher);
 
     //    cipher now contains the cipher text from the plain text.
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
     // decrypt
     wc_AesSetKey(&dec, key, sizeof(key), iv, AES_DECRYPTION);
     wc_AesCbcDecrypt(&dec, plain_dec, cipher, sizeof(cipher));
 
-    printf("cipher: %.*s -> plain: %.*s\n", strlen(message), cipher, strlen(message), plain_dec);*/
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+    printf("\n\ndecryption took: %lu useconds \n\n", delta_us);
+
+    printf("plain: %.*s decoded to: %.*s\n", strlen(message), plain, strlen(message), plain_dec);
 
 }
 

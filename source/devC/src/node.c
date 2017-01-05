@@ -11,6 +11,7 @@
 #include "SMPC_core.h"
 #include "configurations.h"
 #include <time.h>
+#include <sys/time.h>
 
 // constants
 
@@ -146,22 +147,39 @@ void node_pass_score(int newScore){
         // TODO also prepare shares for min/max (each with two cases for each round)
 
 
+        struct timespec start, end;
+        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+//do stuff
+
+
+
+//        clock_t start, end;
+//        double cpu_time_used;
+        // online phase
+//        start = time(NULL);
         // TODO remove; test if shares and lagrange interpolation are correct
-//        for (int i = 0; i < n; ++i) {
-//            int parties_test[k];
-//            get_involved_parties(&share_matrix[0][0], parties_test, i+1, n, k);
-//
-//            printf("party: %u ", (i+1));
-//            print_array(&parties_test[0], k);
-//
-//            int restored_secret = smpc_lagrange_interpolation(parties_test, shares, k);
-//
-//            if(restored_secret!=score){
-//                printf("\033[31m" "secret=%u restored=%u\n" "\033[0m", score, restored_secret);
-//            }else{
-//                printf("\033[32m" "secret=%u restored=%u\n" "\033[0m", score, restored_secret);
-//            }
-//        }
+        for (int i = 0; i < n; ++i) {
+            int parties_test[k];
+            get_involved_parties(&share_matrix[0][0], parties_test, i+1, n, k);
+
+            //printf("party: %u ", (i+1));
+            //print_array(&parties_test[0], k);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+            int restored_secret = smpc_lagrange_interpolation(parties_test, shares, k);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            __time_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+            printf("\n\nlangrange took: %lu seconds \n\n", delta_us);
+
+            if(restored_secret!=score){
+                //printf("\033[31m" "secret=%u restored=%u\n" "\033[0m", score, restored_secret);
+            }else{
+                printf("\033[32m" "secret=%u restored=%u\n" "\033[0m", score, restored_secret);
+            }
+        }
+
+
+
+        return;
 
 
     }else{
@@ -381,11 +399,12 @@ void become_coordinator(){
     char state_request [3];
     sprintf(state_request, "%u", STATE_REQUEST);
 
+
     clock_t start, end;
     double cpu_time_used;
-
     // online phase
     start = time(NULL);
+
 
     for (int i = 0; i < mac_count; ++i) {
 //        char request[2] = {(char)STATE_REQUEST, '\0'};
@@ -527,17 +546,10 @@ void send_message(char *target, char *unencrypted_message){
 
     // size + 1 to copy NUL termination for string
     char encrypted_message[strlen(unencrypted_message)+1];
-//    char * encrypted_message;
 
     printf("send message: %u %s", strlen(unencrypted_message), unencrypted_message);
 
     strcpy(encrypted_message, unencrypted_message);
-
-/*    for (int i = 0; i < strlen(unencrypted_message); ++i) {
-        encrypted_message[i]=unencrypted_message[i];
-    }*/
-
-
 
     (*send_function_pointer)(target, encrypted_message);
 }
@@ -787,24 +799,33 @@ void node_debug_run_test(char *options){
 //    compute_max_computation_group(&computation_candidates_matrix[0][0], 10, computation_group);
 
 
+    //todo measure time
 // computation group for random matrix 100 node and max group of 20 ~ 9 seconds
-//    int a = 100;
-//    int random_value;
-//    int computation_candidates_matrix_new[a][a];
-//    for (int i = 0; i < a; ++i) {
-//        for (int j = 0; j < a; ++j) {
-//            if(i==j){
-//                computation_candidates_matrix_new[i][j] = 1;
-//            }else{
-//                random_value = rand();
-//                computation_candidates_matrix_new[i][j] = (random_value%2 || random_value%3);
-//            }
-//        }
-//    }
-//    int computation_group_new[a];
-//    compute_max_computation_group(&computation_candidates_matrix_new[0][0], a, computation_group_new);
+    int a = 100;
+    int random_value;
+    int computation_candidates_matrix_new[a][a];
+    for (int i = 0; i < a; ++i) {
+        for (int j = 0; j < a; ++j) {
+            if(i==j){
+                computation_candidates_matrix_new[i][j] = 1;
+            }else{
+                random_value = rand();
+                computation_candidates_matrix_new[i][j] = (random_value%2 || random_value%3);
+            }
+        }
+    }
+    int computation_group_new[a];
 
-    // test discovery function pointer
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+    //compute_max_computation_group(&computation_candidates_matrix_new[0][0], a, computation_group_new);
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    __time_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+    printf("\n\ncompute_max_computation_group took: %lu useconds \n\n", delta_us);
+
+//     test discovery function pointer
 //    (*discovery_function_pointer)(mac_adresses, &mac_count);
 //
 //    for (int l = 0; l < mac_count; ++l) {
