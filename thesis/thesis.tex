@@ -886,12 +886,12 @@ For the computation group a share matrix is required, that describes which nodes
 	\end{tabular}
 \end{table}
 
-To compute the share matrix, the number of nodes in the computation group needs to be known. The framework offers the setting for varying values for the minimum and the maximum computation group size. Small group sizes make it more likely that a computation is completed, in contrast larger group sizes improve the security. In general it is advised to settle for a value and define minimum and maximum group size with it. This enables the node to compute also all shares needed for the \gls{SMPC} computations without the interaction with other nodes and the online phase can be minimized (see \autoref{Offline preparation for online computation}).
+To compute the share matrix, the number of nodes in the computation group needs to be known. The framework offers the setting for varying values for the minimum and the maximum computation group size. Small group sizes make it more likely that a computation is completed, in contrast larger group sizes improve the security. In general it is advised to settle for a value and define minimum and maximum group size with it. This enables the node to compute also all shares needed for the \gls{SMPC} computations without the interaction with other nodes and the online phase can be minimized (see \autoref{Off-line preparation for online computation}).
 
 Once the host system passes a score to the node, the behavior of the node is controlled by different states. \autoref{Node module state machine} displays a simplified state diagram for coordinators and regular nodes once a score is passed.
 
 \begin{figure}[!htbp] % h for placement here
-	\caption{Offline preparation for online computation} \label{Offline preparation for online computation}
+	\caption{Off-line preparation for online computation} \label{Off-line preparation for online computation}
 	\includegraphics[scale=1.0]{figures/node_phases.png}
 \end{figure}
 
@@ -1072,6 +1072,11 @@ JNIEXPORT void JNICALL
 Java_[package]_MainActivity_nodePassMessages(JNIEnv *env, jobject this, jstring source, jstring message) { ... }
 \end{lstlisting}
 
+\begin{figure}[!htbp] % h for placement here
+	\caption{\gls{JNI} bridge between Java and C code} \label{JNI bridge between Java and C code}
+	\includegraphics[scale=1.0]{figures/jni_wrapper.png}
+\end{figure}
+
 To provide a callback function, \gls{JNI} class lookup can be used. To call a Java method defined as \lstinline|public void sendMessage(String target, String message){ ... }| class and method references can be stored (see \autoref{Using a Java method as callback for native method}) and the reference to a wrapping function is passed to the C library.
 
 \begin{lstlisting}[language=C, caption={Using a Java method as callback for native method}, label={Using a Java method as callback for native method}, float, floatplacement=H]
@@ -1095,43 +1100,141 @@ Also one device (Kindle Fire HDX based on Android 4.2.2) showed unexpected behav
 
 \FloatBarrier
 
+
 \chapter{Evaluation} \label{Evaluation}
 \todo*{5-15\%; outcome; how was it tested; for supervisor}
 
-\section{Testing Tools}	\label{Testing Tools}
+While the correctness of the implemented methods is verified using unit tests (see \autoref{Development Tools}), the influence of configurable options (see \fullref{Configuration}), like the group size has to be evaluated. Also the impact of devices with significant lower computation power is of interest when targeting wearables and \gls{IoT} grade devices.
+For the usage of the framework embedded in an Android application running battery powered devices like the personal smartphone, the power consumption is also an important topic.
 
-\todo*{Unity (Unit test for C); JUnit; Android based multi-device tests}
+%\section{Testing Tools}	\label{Testing Tools}
 
-\todo*{centralized client-server test application for android: trigger test runs, report results (measured execution time, correctness)}
+%\todo*{centralized client-server test application for android: trigger test runs, report results (measured execution time, correctness)}
 
 \section{Power Consumption for Bluetooth States} \label{Power Consumption for Bluetooth States}
+
+To evaluate the power consumption of Android devices in different Bluetooth states an application was developed enabling Bluetooth states for a specific amount a time. Then a report can be imported from the devices which contains estimated power usage\footnote{\url{https://developer.android.com/studio/profile/battery-historian.html}}.
+
+\begin{enumerate}
+	\item Using \gls{ADB} with a connected device, the battery stats are reseted to reduce the produced analysis file to the duration of interest: \lstinline|adb shell dumpsys batterystats --reset|
+	\item The device is disconnected from the development system, so battery stats are recorded
+	\item The application is executed for a fixed time duration
+	\item The device is reconnected to the development system and using \gls{ADB} the report is pulled from the device: \lstinline|adb bugreport > bugreport.txt|
+	\item The report contains a section labeled estimated power use (see \autoref{Android battery stats report})
+\end{enumerate}
+  
+\begin{lstlisting}[language=C, caption={Android battery stats report}, label={Android battery stats report}]
+Estimated power use (mAh):
+Capacity: 2300, Computed drain: 229, actual drain: 184-207
+Screen: 146
+Bluetooth: 12,0
+\end{lstlisting}
+  
+All test were realized on a Sony Experia Z1 Compact:
+\begin{itemize}
+	\item Android 5.1.1
+	\item Software Version 14.6.A.1.236
+	\item disabled power saving modes
+\end{itemize}   
+
+Each test case has a runtime of one hour, to reduce the significance of measuring inaccuracy. At the beginning and after completion of the tests Bluetooth is disabled. Tests:
+
+\begin{enumerate}
+	\item Bluetooth enabled, not discoverable, not discovering and not connected
+	\item Bluetooth enabled, discoverable, not discovering and not connected
+	\item Bluetooth enabled, discoverable, not discovering and connected over \gls{RFCOMM}
+	\item Bluetooth enabled, discoverable, not discovering, connected over \gls{RFCOMM} and exchanging small messages
+	\item Bluetooth enabled, discoverable, and discovering, not connected
+	\item Wi-Fi enabled, connected and receiving video-stream
+\end{enumerate}
+
+The results of the power consumption tests are displayed in \autoref{figure:Batterystats}.
 
 \begin{figure}[!htbp] % h for placement here
 	\caption{Batterystats for different Bluetooth states (logarithmic scale) } \label{figure:Batterystats}
 	\includegraphics[scale=1.0]{figures/eval_current_measurements.png}
 \end{figure}
 
-\section{Examination of Computation Time Dependent on Computing Power} \label{Examination of Computation Time Dependent on Computing Power}
-
-\todo*{test on: xadow (IoT); RaspberryPi 3 (SBC); Android 4 (single core, low RAM), Android 5 (multi-core, 2 GB RAM)}
-
-\todo*{test on pc: define CPU limited processes, use pipes as communication channel, run scalability tests}
-
 \section{Examination of Computation Time Dependent on Number of Participants} \label{Examination of Computation Time Dependent on Number of Participants}
 
-\todo*{n devices, n shares (highest security)}
+For the evaluation of the influence of computation power and computation group size a tester application was developed, that utilizes the framework by including node.h and providing the needed callbacks. Using a bash script, the group size $n$ can be passed as a parameter to the application and the script generates $n$ processes and assigns a \gls{MAC} to each process as well as a score value.
 
-\todo*{n devices, k (>n/2) shares (adjustable security)}
+The processes communicate using named pipes, with the \gls{MAC} as name, so the communication flow is very similar to the communication over a \gls{RFCOMM} socket.
 
-%\todo*{SNET with increasing number of android devices; predefined tests}
+To take the discovery duration into account, the tester application forces a sleep for 3 seconds, when discovery is called by the node module. Also a sleep duration based on the lower end for Bluetooth transmission rates (732,2 kbit/s) is applied for outgoing messages depending on the message length.
 
-%\section{Examination of Distribution Time Dependent on Number of Participants}
+The time critical part is the online phase of the computations (see \autoref{Off-line preparation for online computation}), therefore the coordinator measures the time (using the \lstinline|<time.h>| library) from sending the state request to all nodes nearby until the computation is concluded with the acknowledgment from all nodes in response to the computation result announcement.
+
+Test settings for secure sum protocol:
+\begin{enumerate}
+	\item Secure sum with 5 nodes
+	\item Secure sum with 10 nodes
+	\item Secure sum with 20 nodes
+	\item Secure sum with 40 nodes
+	\item Secure sum with 80 nodes
+	\item Secure sum with 100 nodes
+\end{enumerate}
+
+Test execution: each test was repeated three times and the displayed durations in \autoref{figure:Computation time over number of nodes for secure sum} and \autoref{figure:Computation time over number of nodes for secure maximum} are the arithmetic average to reduce the significance of disturbances through other processes.
+
+\begin{figure}[!htbp] % h for placement here
+	\caption{Computation time over number of nodes for secure sum} \label{figure:Computation time over number of nodes for secure sum}
+	\includegraphics[scale=1.0]{figures/eval_sum.png}
+\end{figure}
+
+Test settings for secure maximum protocol:
+\begin{enumerate}
+	\item Secure minimum/maximum with 5 nodes
+	\item Secure minimum/maximum with 10 nodes
+	\item Secure minimum/maximum with 20 nodes
+	\item Secure minimum/maximum with 40 nodes
+	\item Secure minimum/maximum with 80 nodes
+	\item Secure minimum/maximum with 100 nodes
+\end{enumerate}
+
+
+\begin{figure}[!htbp] % h for placement here
+	\caption{Computation time over number of nodes for secure maximum} \label{figure:Computation time over number of nodes for secure maximum}
+	\includegraphics[scale=1.0]{figures/eval_max.png}
+\end{figure}
+
+\section{Examination of Computation Time Dependent on Computing Power} \label{Examination of Computation Time Dependent on Computing Power}
+%
+To evaluate the influence of computational power, the virtualization software VirtualBox was used: a Linux client running the tester application is limited through the CPU limit setting of VirtualBox. In VirtualBox the guest CPU setting can not be reduced beyond a lower bound (40\% on the development environment). Within these limits, the total computation time did not change reliable or reproducible.
+
+As an alternative approach cpulimit\footnote{\url{https://github.com/opsengine/cpulimit}} was used to limit the cpu usage of the tester processes. Again the online time was not affected besides for very small limit-values (1 to 5\%). The measurements embedded in the code revealed however, that the usage of SIGSTOP and SIGCONT signals distort the measurements and the results are not reproducible.
+
+Finally the power management of the hosting system provided reproducible results. The changes in the related computations (encryption, decryption, summation, Lagrange interpolation) are very small, therefore the fixed value for discovery was removed, to highlight the differences (see \autoref{figure:Computation time over CPU Power}).
+
+For all tests the computation group size was defined as 20. The power management was than used to limit the CPU to levels of 20\%, 40\%, 60\%, 80\% and 100\%.
+\begin{figure}[!htbp] % h for placement here
+	\caption{Computation time over CPU Power} \label{figure:Computation time over CPU Power}
+	\includegraphics[scale=1.0]{figures/eval_power.png}
+\end{figure}
 
 \FloatBarrier
 
 \chapter{Discussion} \label{Discussion}
 
- \todo*{5-15\%; outcome for a design-reader}
+
+\section{Requirement Satisfaction in Real-Life Settings} \label{Requirement Satisfaction in Real-Life Settings}
+
+The results of the power consumption tests for Android (see \fullref{figure:Batterystats}) show, that having Bluetooth enabled, being discoverable and holding a \gls{RFCOMM} connection have no significance for the daily usage of a smartphone: being discoverable and connected for 24 hours consumes around the same amount of power as having the display activated for a few minutes. The discovery phase is expensive in regard of power consumption, but device dependent this phase is usually only active for around one to five seconds. Even for multiple retries to form a computation group, the total power consumption per hour for discovery will range significantly below 1 mA, for example for all three \gls{SMPC} protocols 10 retries to form a computation group were needed and the device runs discovery for 5 seconds, then the power consumption for the discovery phase would be $0,5$ mA in an hour. 
+
+In regard of the power consumption the framework is therefore fit for usage and worries regarding drainage of the battery can be easily invalidated.
+
+In the secure sum protocol for lower node numbers, the discovery is the major time consumer and up to 20 nodes, the computational costs are very low. For larger computation groups, the time needed to compute the secure sum reaches durations that make a network separation for moving nodes likely. Considering a typical walking speed of 1,5 meters per second, the distance after 7 seconds (compare \autoref{figure:walking range in computation time}) makes it likely that the connection to other nodes is lost because distance or shielding walls, especially if the other nodes are moving as well.
+
+\begin{figure}[!htbp] % h for placement here
+	\caption{Walking range in computation time} \label{figure:walking range in computation time}
+	\includegraphics[scale=1.0]{figures/walking_range.png}
+\end{figure}
+
+The tests regarding computational power have shown, that the reduction of the online phase through scale up of the nodes is limited: the message driven nature of the system and the high amount of massages passed between the nodes in a sequential manner are not transmitted faster when upscaling. This demonstrates that the framework can tolerate nodes with comparatively low computational power, but the influence of the messages also request optimization of the message system (see \autoref{Design Flaws Detected Through Evaluation}).
+
+\section{Design Flaws Detected Through Evaluation} \label{Design Flaws Detected Through Evaluation}
+
+Since the message passing between the nodes is causing 
  
 \todo*{combine requirements with evaluation}
 
