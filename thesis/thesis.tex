@@ -54,36 +54,120 @@
 \todo*{5-10\%, including motivation, general audience}
 
 \pagenumbering{arabic}
-%In the last couple of years gamification has found it's way into many areas of our daily life. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. In contrast, gamification concerning our work life can have much higher privacy demands. Since comparison is a key component for the gamification approach, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography.
 
-%Existing frameworks for \gls{SMPC} utilize the Internet protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Especially many hospitals tend to avoid Wi-Fi to reduce the risk of electromagnetic interference with medical devices.
+Comparison is one of the cornerstones of human life: everything is evaluated, from personal features like mood, health, sympathy to daily routines like prices, product features; simply spoken: everything. Companies are run by people, so again, in the business world everything gets compared as well, with the intention to predict customer behavior and adapt business strategies: big data, data mining and machine learning are just some of the buzz words related to data comparison in recent years.
+People also conduct social comparison, meaning they compare themselves to others. According to \textcite{Corcoran2011} self-evaluation, to maintain a positive self-image (downward comparison) or to fulfill the need for self-improvement are motivations for social comparison.
+Self-evaluation and self-improvement can be utilized: by monitoring the execution of a task and applying a numeric evaluation for the task completion, the executor can compare his result with others.
+Numerical evaluations can be:
+\begin{itemize}
+	\item Duration until completion of the task, for example time for running a marathon.
+	\item Number of tasks completed in a certain amount of time: for example keystrokes per minute.
+	\item Number of errors during the task: for example the number of mixed up orders of a waiter during a shift.
+\end{itemize}
+Providing a group with a system to evaluate a task and compare their results with the intention to generate motivation for self-improvement is called gamification. 
 
-%To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of mesh-networks and proposes describes the design of a \gls{SMPC} framework for mesh-networks.
+\section{Gamification} \label{Gamification}
 
-%Context
+According to \textcite{Herger2015} intrinsic motivation is the key component in gamification, while extrinsic motivators can even be counterproductive. Intrinsic motivators come from within the individual, while extrinsic motivators come from outside in form of incentives. For example running a marathon to improve a personal best time is intrinsic motivation, while running the marathon only to win the prize money is extrinsic motivation.
 
-\todo*{mention \gls{IoT} problems ( \gls{DDoS} and botnets), to emphasis usefulness of connected but not online}
+Though the psychological theory behind gamification is not new (compare \autocite{White1959}), gamification gained popularity for many areas of our daily life in the last years (see \autoref{figure:Google trends gamification})
 
-%Restatement of the problem
+\begin{figure}[!htb] % h for placement here
+	\caption[Google Trends: gamification]{Google Trends for global search term gamification} \label{figure:Google trends gamification}
+	\includegraphics[scale=1.0]{figures/google_trends_gamification.png}
+\end{figure}
 
-%Restatement of the response
+Some well working examples for systems utilizing gamification are:
+\begin{itemize}
+	\item Amazon uses gamification in form of user rankings and achievements (e.g. \textit{TOP 1000 REVIEWER}) to motivate users to write product reviews.
+	\item The StackExchange Q\&A communities use a point-system, badges and privileges (and sometimes hats) to motivate users to answer questions and handle review tasks (see \autoref{figure:StackOverflow})
+	\item Health-care related applications like Runtastic reward the user with badges and achievements for fitness activities.
+\end{itemize}
+Many more examples can and will be found, once you know what you are looking for.
 
-%Roadmap
+\begin{figure}[!htb] % h for placement here
+	\caption[StackExchange - StackOverflow]{Gamification statistics on StackExchange - StackOverflow} \label{figure:StackOverflow}
+	\includegraphics[scale=1.0]{figures/stackoverflow.png}
+\end{figure}
 
-\section{Case Study: "The Hygiene Games"} \label{Case Study: "The Hygiene Games"}
+There are however cases where companies or users do not want to share data publicly, because it would reveal sensitive information that might result in a disadvantage:
+\begin{itemize}
+	\item Companies for example might not want to release their current business figure while in negotiating
+	\item Medical insurance companies do not want to release patient data
+\end{itemize}
 
-\paragraph{Gamification}
+Another case is the system that motivated this thesis: the Hygiene Games.
 
-\paragraph{Wireless Networks in Hospitals}
+\section{Hygiene Games} \label{Hygiene Games}
+
+The Hygiene Games is a gamification approach to tackle hospital acquired infections \autocite{Klein2016}. Studies estimate that 30\% of the infections are preventable through hand-hygiene compliance. To introduce gamification in the hand-hygiene process, we first need a way to measure and evaluate the process. The Hygiene Games uses low cost sensor applied to faucets, soap dispensers and hand sanitizers in the hospital. A smartphone application can than count the usage and monitor the duration of usage of these hand-hygiene tools.
+
+The next step in the gamification implementation into the hygiene-process is providing comparison. Here we face two problems:
+\begin{enumerate}
+	\item Restrictions regarding Wi-Fi and \gls{GSM} limit the access to the Internet
+	\item When publicly available the observed data could be used to the disadvantage of the user.
+\end{enumerate}
+
+\subsection{Wireless Networks in Hospitals} \label{Wireless Networks in Hospitals}
+The reason for hospitals to restrict the usage of wireless technologies like \gls{GSM} and Wi-Fi is based on the risk of \gls{EMI} between sensitive medical devices and transmitting devices \autocite{Ishihara2014}, because they are using the same electromagnetic band, though modern medical devices are not prone to the electrical fields of smartphones.
+To provide the smartphones with a way to communicate, the wireless technology Bluetooth can be used: the lower transmission strength of Bluetooth resolves the risk of \gls{EMI}, but it also provides a reduces transmission range.
+
+\section{Secure Multi-Party Computation} \label{Introduction: Secure Multi-Party Computation}
+To gain acceptance for the gamification process, users have to understand the underlying processes and be able to trust, that their privacy demands are respected. Privacy and comparison first seem to contradict each other but there is a cryptography subfield dealing with privacy preserving computations: \gls{SMPC}.
+One of the ideas of \gls{SMPC} is dividing the personal, secret input into shares. Only with all shares the input can be restored, so exchanging shares with others preserves the privacy (see \autoref{figure:Secure Multi-Party Computation principle - b}). Holding a set of shares reveals no information about the initial input (\autoref{figure:Secure Multi-Party Computation principle - c}), but a interim result over the shares can be computed. These interim results are again exchanged with the other users \autoref{figure:Secure Multi-Party Computation principle - d}. Combining the interim results, each user has the result of a computation over the secret inputs without knowing the nature of the initial inputs.
+
+\begin{figure}[!htb] % h for placement here
+	
+	\centering
+	\subfloat[Starting point: three system users with private inputs]{%
+		\includegraphics[scale=1.0]{figures/smpc_principle_a.png}
+		\label{figure:Secure Multi-Party Computation principle - a}
+	}%
+	\hfill
+	\subfloat[Users divide private input into shares and exchange shares with other users]{%
+		\includegraphics[scale=1.0]{figures/smpc_principle_b.png}
+		\label{figure:Secure Multi-Party Computation principle - b}
+	}\\
+	\subfloat[Each user now has a set of shares, without information about the initial inputs]{%
+		\includegraphics[scale=1.0]{figures/smpc_principle_c.png}
+		\label{figure:Secure Multi-Party Computation principle - c}
+	}%
+	\hfill
+	\subfloat[Each users runs a computation (e.g. sum) on the shares and announces the result to the other users]{%
+		\includegraphics[scale=1.0]{figures/smpc_principle_d.png}
+		\label{figure:Secure Multi-Party Computation principle - d}
+	}\\
+	\subfloat[Combining the results, each user has the result of the computation over the secret inputs without any information about the inputs themselves]{%
+		\includegraphics[scale=1.0]{figures/smpc_principle_e.png}
+		\label{figure:Secure Multi-Party Computation principle - e}
+	}%
+	\hfill
+
+	\caption{Secure Multi-Party Computation principle} \label{figure:Secure Multi-Party Computation principle}
+\end{figure}
+
+\gls{SMPC} is therefore a fitting tool to provide comparison computations even when the inputs require privacy preserving. Useful computation results to compare against are the minimum, the average and the maximum. The personal score is set into perspective (see \autoref{figure:Secure Multi-Party Computation principle result}) and the user can evaluate the personal hand-hygiene performance. Performance below average will raise awareness, that the user is likely part of the problem and will hopefully result in motivation to self-improve.
+
+\begin{figure}[!htb] % h for placement here
+	\caption[Comparison of SMPC result and personal score]{Comparison of personal score to Secure Multi-Party Computation results} \label{figure:Secure Multi-Party Computation principle result}
+	\includegraphics[scale=1.0]{figures/smpc_principle_result.png}
+\end{figure}
+
+Besides wireless restrictions in hospitals the usage of a local Bluetooth network can further improve the trust in the system: the personal data never leaves the own device and the shares are not transmitted through unknown web-servers, reducing the accessibility for potential attackers significantly.
+
+Available \gls{SMPC} frameworks are intended for usage in an Internet accessible environment with central server, handling the computations.
+
+\section{Thesis Proposal}
+
+This thesis proposes the design of an \gls{SMPC} framework running distributed computations in a local network without central servers and non-stationary users, also known as a \gls{MANET}. The framework has to provide protocols for the privacy preserving computation of minimum, average and maximum, to allow comparison for a gamification approach in an environment with high privacy demands. The protocols have to be feasible with basic math knowledge to improve user acceptance. Besides for the Hygiene Games the system has to be adjustable to be versatile usable.
+
+The \gls{SMPC} protocols are developed based on Shamir's secret sharing scheme. The design is then extended with features required by the distributed system, namely clock synchronization, coordinator election and data distribution.
+
+A proof of concept system is provided to verify the timely completion of the computations and identify influential factors.
 
 \FloatBarrier
 
-
-
 \chapter{Background} \label{Background}
-
-\todo*{10-15\%; thorough review of the state of the art; informed audience}
-
 
 In this chapter a general understanding of \gls{SMPC} and the key features of \glspl{MANET} is established.  
 
@@ -653,9 +737,9 @@ In regard to the execution of the \gls{SMPC} protocols in \ref{req:SMPC Module},
 	\hfill
 	\subfloat[Meshed network is ready for \gls{SMPC} computation]{%
 		\includegraphics[scale=1.0]{figures/coordinator-6.png}
-		\label{figure:Formation of fully meshed computation group - f}
-	\caption{Formation of fully meshed computation group} \label{figure:Formation of fully meshed computation group}
 	}
+	\label{figure:Formation of fully meshed computation group - f}
+	\caption{Formation of fully meshed computation group} \label{figure:Formation of fully meshed computation group}
 \end{figure}
 
 Since parallel message exchange for the computation group cannot be guaranteed (see \autoref{practicability of an implementation}), the coordinator controls sequential message exchanges with token passing in accordance with \ref{req:Token-Passing}. For example when $n$ nodes want to exchange $n$ secrets divided into $n$ shares each, the coordinator first requests successively the shares for himself ($s_i,1$) from the other $n-1$ nodes, while transmitting his own shares ($s_1,j$) with the request. Then the communication token gets passed to the next node, which in turn requests the shares for himself from the other $n-2$ nodes while transmitting his own shares and so on. An exemplary share-exchange for $n=3$ with token-passing is illustrated in figure \ref{figure:coordinator token passing}.
@@ -901,7 +985,7 @@ For the computation group a share matrix is required, that describes which nodes
 	\end{tabular}
 \end{table}
 
-To compute the share matrix, the number of nodes in the computation group needs to be known. The framework offers the setting for varying values for the minimum and the maximum computation group size. Small group sizes make it more likely that a computation is completed, in contrast larger group sizes improve the security. In general it is advised to settle for a value and define minimum and maximum group size with it. This enables the node to compute also all shares needed for the \gls{SMPC} computations without the interaction with other nodes and the online phase can be minimized (see \autoref{Off-line preparation for online computation}).
+To compute the share matrix, the number of nodes in the computation group needs to be known. The framework offers the setting for varying values for the minimum and the maximum computation group size. Small group sizes make it more likely that a computation is completed, in contrast larger group sizes improve the security. In general it is advised to settle for a value and define minimum and maximum group size with it. This enables the node to compute also all shares needed for the \gls{SMPC} computations without the interaction with other nodes and the online phase can be minimized (see \autoref{figure:Off-line preparation for online computation}).
 
 Once the host system passes a score to the node, the behavior of the node is controlled by different states. \autoref{Node module state machine} displays a simplified state diagram for coordinators and regular nodes once a score is passed.
 
@@ -1178,7 +1262,7 @@ The processes communicate using named pipes, with the \gls{MAC} as name, so the 
 
 To take the discovery duration into account, the tester application forces a sleep for 3 seconds, when discovery is called by the node module. Also a sleep duration based on the lower end for Bluetooth transmission rates (732,2 kbit/s) is applied for outgoing messages depending on the message length.
 
-The time critical part is the online phase of the computations (see \autoref{Off-line preparation for online computation}), therefore the coordinator measures the time (using the \lstinline|<time.h>| library) from sending the state request to all nodes nearby until the computation is concluded with the acknowledgment from all nodes in response to the computation result announcement.
+The time critical part is the online phase of the computations (see \autoref{figure:Off-line preparation for online computation}), therefore the coordinator measures the time (using the \lstinline|<time.h>| library) from sending the state request to all nodes nearby until the computation is concluded with the acknowledgment from all nodes in response to the computation result announcement.
 
 Test settings for secure sum protocol:
 \begin{enumerate}
@@ -1315,7 +1399,30 @@ Using these values as a metric for system performance, the maintainer can then c
 
 \todo*{5-10\%; outcome for an introduction-reader}
 
-\todo*{describe how statements in the introduction were met: \gls{SMPC} over self-forming, low maintenance/infrastructure-less network; framework offers reduced complexity, useful computation results for many gamification settings and other applications; performance for real life usage with good levels of security; outlook: will gain more significance for SIoT: secure Internet of things (revisit topic of insecure Internet); next steps: host public as open source to gain to use open source community to improve project further}
+This thesis proposed the development of a \gls{SMPC} framework for \glspl{MANET}, providing privacy preserving computations of average, minimum and maximum to introduce gamification into local ad-hoc networks with high privacy demands.
+Since Android currently does not provide \gls{MANET} functionality, a self-forming network was developed using \gls{RFCOMM}. For the computation a fully meshed subnetwork is formed (see \autoref{figure:Formation of fully meshed computation group}). This way, each member in the computation group can directly communicate with all other members, which is needed for securing the communication using cryptography.
+Based on Shamir's secret sharing scheme a protocol for secure addition was developed. For the minimum and maximum computation, the secure sum protocol was extended to a multi-round, bitwise comparison protocol. Besides basic knowledge of mathematics only modulo arithmetic has to be known for manually reconstructing the computations and detailed examples are provided in \autoref{Secure Multi-Party Computation}. The protocols were implemented using the C programming language to be able to use the framework on a multitude of devices.
+
+For the user acceptance of the system the power consumption for a Bluetooth based network was analyzed. Even demanding operations like discovery will only have a minimal effect on the overall battery drainage since these phases are only run for short time periods.
+
+The behavior of the framework for different sizes of the computation group was simulated to identify influential factors:
+\begin{itemize}
+	\item For small computation groups the discovery phase is causing most of the computation time.
+	\item For larger groups the amount of messages becomes the relevant influence factor, since the amount of messages increases with number of parties in the group squared. 
+	\item The secure maximum protocol shows critical computation durations at around 20 nodes, but in a real-life situation network separation and thereby unintended computation termination is likely to occur at lower group sizes.
+	\item In general the trade-off is: larger computation groups strengthens the privacy, while smaller groups have better performance; but even a setting of a group size of 5 nodes provides good privacy and performance.
+\end{itemize}  
+
+Overall the framework-simulations performed well enough to be applicable for a gamification integration in a high-privacy environment.
+
+Outlook:
+\begin{itemize}
+	\item in a first incrementation of the framework the improvements proposed in \autoref{Design Flaws Detected Through Evaluation} will be implemented and the performance again evaluated.
+	\item Measurements of durations for establishing connections using \gls{RFCOMM} and achievable transmission rates will be performed on different Android devices, to improve the tester application with the intention to provide developers with decent approximations of the framework performance, so settings can be tested before deploying the system. 
+	\item Further the framework's coupling with Bluetooth will be loosened up, so it can be utilized more flexible in different environments.
+\end{itemize}
+
+Especially the announced implementation of mesh networking in upcoming Bluetooth versions will further improve the applicability of \gls{SMPC} for gamification approaches in ad-hoc networks.
 
 \clearpage
 \renewcommand{\bibname}{References} % rename Bibliograpy to References
