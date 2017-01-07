@@ -28,12 +28,12 @@
 \begin{abstract}
 	\thispagestyle{plain}
 	\setcounter{page}{1}
-	In recent years gamification has become a part in many areas of our daily routine. In regard to our personal life, companies like Amazon or Runtastic can base their gamification approach on publicly sharing personal achievements and statistics to improve user commitment. In contrast, gamification concerning our work life has to satisfy much higher privacy demands. Since comparison is a key component for gamification, privacy protecting computations of system wide statistical values (for example minimum and maximum) are needed. The solution comes in the form of \gls{SMPC}, a subfield of cryptography. Existing frameworks for \gls{SMPC} utilize the Internet Protocol, though access to the Internet or even a \gls{LAN} cannot be provided in all environments. Facilities with sensible measuring systems, e.g. medical devices in hospitals, often avoid Wi-Fi to reduce the risk of electromagnetic interference.
-	To be able to utilize \gls{SMPC} in environments with Wi-Fi restrictions, this thesis studies the characteristics of \gls{MANET} and proposes the design of a \gls{SMPC} framework for \gls{MANET}, especially based on Bluetooth technology, and the implementation as a C library.
-	
-	Since \glspl{MANET} have a \todo*{bad word high acceptable here?} high probability for network partition, a centralized architecture for the computation and data preservation is unfavorable. Therefor a blockchain based distributed database is implemented in the framework. Typical problems of distributed systems are addressed with the implementation of algorithms for clock synchronization and coordinator election as well as protocols for the detection of computation partners and data distribution. Since the framework aims to provide distributed computations of comparable values, protocols for secure addition and secure comparison are implemented, enabling the computation of minimum, maximum and average.
-	
-	Devices of diverse computational power will be used to verify the applicability for wearables and \gls{IoT} grade devices. Also field-tests with a \gls{SPAN}(20-50 nodes) will be conducted to evaluated real life use cases. In contrast, the security of the framework and attack scenarios will be discussed. In summary, this thesis proposes a framework for \gls{SMPC} for decentralized, distributed systems.
+	In recent years gamification was introduced by many companies for customer and employee commitment and also in our private life for example fitness related applications apply the gamification principle to generate intrinsic motivation. In some environments privacy demands limit the applicability of gamification: this thesis was motivated by the Hygiene Games project, which monitors hand-hygiene compliance of health-care professionals. The personal scores need to remain private, while comparison against statistical values is needed for the gamification approach. The solution comes in the form of \gls{SMPC}, which provides privacy preserving computations. Existing frameworks for \gls{SMPC} usually utilize the Internet Protocol, but for the clinical environment availability of Internet access cannot be guaranteed to avoid electromagnetic interference with medical devices.
+	This thesis therefore proposes the development of an \gls{SMPC} framework for \glspl{MANET} based in particular on Bluetooth technology.
+	The \gls{SMPC} protocols for sum, minimum and maximum are based on Shamir's secret sharing scheme.
+	For a \gls{MANET} without a central server a distributed database has to be provided. To avoid erroneous data in the database caused by different time setting in the network nodes time synchronization is provided using the Berkeley algorithm.
+	The framework is implemented in the C programming language and evaluated in regard to power consumption, processing time over computation group size  and processing time over computational power. The results are discussed in regard to applicability for real-life settings with moving nodes at walking speed and the framework is assessed to be in compliance with the requirements regarding performance and privacy preservation.
+	In summery a comprehensible approach for \textit{secure gamification} in \gls{MANET} for environments with high-privacy demands and optional network restrictions is provided.
 \end{abstract}
 
 \glsunsetall
@@ -56,34 +56,33 @@
 \pagenumbering{arabic}
 
 Comparison is one of the cornerstones of human life: everything is evaluated, from personal features like mood, health, sympathy to daily routines like prices, product features; simply spoken: everything. Companies are run by people, so again, in the business world everything gets compared as well, with the intention to predict customer behavior and adapt business strategies: big data, data mining and machine learning are just some of the buzz words related to data comparison in recent years.
-People also conduct social comparison, meaning they compare themselves to others. According to \textcite{Corcoran2011} self-evaluation, to maintain a positive self-image (downward comparison) or to fulfill the need for self-improvement are motivations for social comparison.
-Self-evaluation and self-improvement can be utilized: by monitoring the execution of a task and applying a numeric evaluation for the task completion, the executor can compare his result with others.
-Numerical evaluations can be:
+People also conduct social comparison, meaning they compare themselves to others. According to \textcite{Corcoran2011} motivations for social comparison are self-evaluation, to maintain a positive self-image (downward comparison) or to fulfill the need for self-improvement.
+Self-evaluation and self-improvement can be utilized for instance to enhance employee performance: by monitoring the execution of a task and applying a numeric evaluation for the task completion, the executor can compare his result with others.
+Numerical evaluations can be, among others:
 \begin{itemize}
 	\item Duration until completion of the task, for example time for running a marathon.
 	\item Number of tasks completed in a certain amount of time: for example keystrokes per minute.
 	\item Number of errors during the task: for example the number of mixed up orders of a waiter during a shift.
 \end{itemize}
-Providing a group with a system to evaluate a task and compare their results with the intention to generate motivation for self-improvement is called gamification. 
+One approach using a system for task evaluation based on performance indicators and enabling users to compare their results with the intention to generate motivation for self-improvement is called gamification. 
 
 \section{Gamification} \label{Gamification}
 
-According to \textcite{Herger2015} intrinsic motivation is the key component in gamification, while extrinsic motivators can even be counterproductive. Intrinsic motivators come from within the individual, while extrinsic motivators come from outside in form of incentives. For example running a marathon to improve a personal best time is intrinsic motivation, while running the marathon only to win the prize money is extrinsic motivation.
+According to \textcite{Herger2015}, intrinsic motivation is the key component in gamification, while extrinsic motivators can even be counterproductive. Intrinsic motivators come from within the individual, while extrinsic motivators come from outside in form of incentives. For example running a marathon to improve a personal best time is intrinsic motivation, while running the marathon only to win the prize money is extrinsic motivation.
 
-Though the psychological theory behind gamification is not new (compare \autocite{White1959}), gamification gained popularity for many areas of our daily life in the last years (see \autoref{figure:Google trends gamification})
+Though the psychological theory behind gamification is not new (compare \autocite{White1959}), gamification gained popularity for many areas of our daily life in the last years (see \Cref{figure:Google trends gamification}).
 
-\begin{figure}[!htb] % h for placement here
-	\caption[Google Trends: gamification]{Google Trends for global search term gamification} \label{figure:Google trends gamification}
+\begin{figure}[tbp] % h for placement here
+	\caption[Google Trends: gamification]{Google Trends: global searches for the term gamification in \% related to the maximum} \label{figure:Google trends gamification}
 	\includegraphics[scale=1.0]{figures/google_trends_gamification.png}
 \end{figure}
 
 Some well working examples for systems utilizing gamification are:
 \begin{itemize}
 	\item Amazon uses gamification in form of user rankings and achievements (e.g. \textit{TOP 1000 REVIEWER}) to motivate users to write product reviews.
-	\item The StackExchange Q\&A communities use a point-system, badges and privileges (and sometimes hats) to motivate users to answer questions and handle review tasks (see \autoref{figure:StackOverflow})
+	\item The StackExchange Q\&A communities use a point-system, badges and privileges (and sometimes hats) to motivate users to answer questions and handle review tasks (see \Cref{figure:StackOverflow})
 	\item Health-care related applications like Runtastic reward the user with badges and achievements for fitness activities.
 \end{itemize}
-Many more examples can and will be found, once you know what you are looking for.
 
 \begin{figure}[!htb] % h for placement here
 	\caption[StackExchange - StackOverflow]{Gamification statistics on StackExchange - StackOverflow} \label{figure:StackOverflow}
@@ -94,13 +93,14 @@ There are however cases where companies or users do not want to share data publi
 \begin{itemize}
 	\item Companies for example might not want to release their current business figure while in negotiating
 	\item Medical insurance companies do not want to release patient data
+	\item Employees might not want their employers to track theier performance too detailed because the fear repercussions or disadvantages in futures negotiations.
 \end{itemize}
 
-Another case is the system that motivated this thesis: the Hygiene Games.
+One example for the latter point is the gamification approach ``The Hygiene Games'', currently developed at the mHealth Division of the RWTH Aachen University.
 
 \section{Hygiene Games} \label{Hygiene Games}
 
-The Hygiene Games is a gamification approach to tackle hospital acquired infections \autocite{Klein2016}. Studies estimate that 30\% of the infections are preventable through hand-hygiene compliance. To introduce gamification in the hand-hygiene process, we first need a way to measure and evaluate the process. The Hygiene Games uses low cost sensor applied to faucets, soap dispensers and hand sanitizers in the hospital. A smartphone application can than count the usage and monitor the duration of usage of these hand-hygiene tools.
+The Hygiene Games is a gamification approach which aims to tackle hospital acquired infections \autocite{Klein2016}. Studies estimate that 30\% of the infections are preventable through hand-hygiene compliance. To introduce gamification in the hand-hygiene process, we first need a way to measure and evaluate the process. The Hygiene Games uses low cost sensor applied to faucets, soap dispensers and hand sanitizers in the hospital. A smartphone application counts the usage and monitors the duration of usage of these hand-hygiene tools.
 
 The next step in the gamification implementation into the hygiene-process is providing comparison. Here we face two problems:
 \begin{enumerate}
@@ -109,12 +109,19 @@ The next step in the gamification implementation into the hygiene-process is pro
 \end{enumerate}
 
 \subsection{Wireless Networks in Hospitals} \label{Wireless Networks in Hospitals}
-The reason for hospitals to restrict the usage of wireless technologies like \gls{GSM} and Wi-Fi is based on the risk of \gls{EMI} between sensitive medical devices and transmitting devices \autocite{Ishihara2014}, because they are using the same electromagnetic band, though modern medical devices are not prone to the electrical fields of smartphones.
+The reason for hospitals to restrict the usage of wireless technologies like \gls{GSM} and Wi-Fi is based on the risk of \gls{EMI} between sensitive medical devices and transmitting devices \autocite{Ishihara2014}. Those devices use the same electromagnetic band, though modern medical devices are not prone to the electrical fields of smartphones.
 To provide the smartphones with a way to communicate, the wireless technology Bluetooth can be used: the lower transmission strength of Bluetooth resolves the risk of \gls{EMI}, but it also provides a reduces transmission range.
 
 \section{Secure Multi-Party Computation} \label{Introduction: Secure Multi-Party Computation}
 To gain acceptance for the gamification process, users have to understand the underlying processes and be able to trust, that their privacy demands are respected. Privacy and comparison first seem to contradict each other but there is a cryptography subfield dealing with privacy preserving computations: \gls{SMPC}.
-One of the ideas of \gls{SMPC} is dividing the personal, secret input into shares. Only with all shares the input can be restored, so exchanging shares with others preserves the privacy (see \autoref{figure:Secure Multi-Party Computation principle - b}). Holding a set of shares reveals no information about the initial input (\autoref{figure:Secure Multi-Party Computation principle - c}), but a interim result over the shares can be computed. These interim results are again exchanged with the other users \autoref{figure:Secure Multi-Party Computation principle - d}. Combining the interim results, each user has the result of a computation over the secret inputs without knowing the nature of the initial inputs.
+One of the ideas of \gls{SMPC} is dividing the personal, secret input into shares, which individually carry no usable information.
+\begin{enumerate}
+	\item Only with all shares available the input can be restored, so exchanging shares with others preserves the privacy (see \Cref{figure:Secure Multi-Party Computation principle - b}). 
+	\item Holding a set of shares reveals no information about the initial input (\Cref{figure:Secure Multi-Party Computation principle - c}), but an interim result over the shares can be computed.
+	\item  These interim results are again exchanged with the other users (see \Cref{figure:Secure Multi-Party Computation principle - d}). 
+	\item Combining the interim results, each user has the result of a computation over the secret inputs without revealing the initial inputs.
+\end{enumerate}
+
 
 \begin{figure}[!htb] % h for placement here
 	
@@ -143,23 +150,25 @@ One of the ideas of \gls{SMPC} is dividing the personal, secret input into share
 	}%
 	\hfill
 
-	\caption{Secure Multi-Party Computation principle} \label{figure:Secure Multi-Party Computation principle}
+	\caption{Secure Multi-Party Computation principle\protect\footnotemark} \label{figure:Secure Multi-Party Computation principle}
 \end{figure}
+\footnotetext{Nurse by Danil Polshin from the Noun Project}
 
-\gls{SMPC} is therefore a fitting tool to provide comparison computations even when the inputs require privacy preserving. Useful computation results to compare against are the minimum, the average and the maximum. The personal score is set into perspective (see \autoref{figure:Secure Multi-Party Computation principle result}) and the user can evaluate the personal hand-hygiene performance. Performance below average will raise awareness, that the user is likely part of the problem and will hopefully result in motivation to self-improve.
+
+\gls{SMPC} is therefore a fitting tool for providing comparison computations even when the inputs require privacy preserving. Useful computation results to compare against are the minimum, the average and the maximum. The personal score is set into perspective (see \Cref{figure:Secure Multi-Party Computation principle result}) and the user can evaluate the personal hand-hygiene performance. Performance below average will raise awareness, that the user is likely part of the problem and will hopefully result in motivation to self-improve.
 
 \begin{figure}[!htb] % h for placement here
 	\caption[Comparison of SMPC result and personal score]{Comparison of personal score to Secure Multi-Party Computation results} \label{figure:Secure Multi-Party Computation principle result}
 	\includegraphics[scale=1.0]{figures/smpc_principle_result.png}
 \end{figure}
 
-Besides wireless restrictions in hospitals the usage of a local Bluetooth network can further improve the trust in the system: the personal data never leaves the own device and the shares are not transmitted through unknown web-servers, reducing the accessibility for potential attackers significantly.
+Besides wireless restrictions in hospitals the usage of a local Bluetooth network can further improve the trust in the system: the personal data never leaves the own device and the shares are not transmitted through non-trusted web-servers, reducing the accessibility for potential attackers significantly.
 
 Available \gls{SMPC} frameworks are intended for usage in an Internet accessible environment with central server, handling the computations.
 
 \section{Thesis Proposal}
 
-This thesis proposes the design of an \gls{SMPC} framework running distributed computations in a local network without central servers and non-stationary users, also known as a \gls{MANET}. The framework has to provide protocols for the privacy preserving computation of minimum, average and maximum, to allow comparison for a gamification approach in an environment with high privacy demands. The protocols have to be feasible with basic math knowledge to improve user acceptance. Besides for the Hygiene Games the system has to be adjustable to be versatile usable.
+This thesis proposes the design of an \gls{SMPC} framework running distributed computations in a local network without central servers and non-stationary users, also known as a \gls{MANET}. The framework has to provide protocols for privacy preserving computation of minimum, average and maximum, to allow comparison for a gamification approach in an environment with high privacy demands. User acceptance depends among other factors like usability on the ability to understand the principles providing the privacy. To address an interdisciplinary audience equally the protocols have to be feasible with basic math knowledge, so users can reproduce the example computations given in this thesis and provided with the framework documentation. Besides for the Hygiene Games the system has to be versatile usable for other environments: number of users, technology for the communication layer and expected value-range have to will be adjustable to simplify the the framework integration.
 
 The \gls{SMPC} protocols are developed based on Shamir's secret sharing scheme. The design is then extended with features required by the distributed system, namely clock synchronization, coordinator election and data distribution.
 
@@ -171,58 +180,55 @@ A proof of concept system is provided to verify the timely completion of the com
 
 In this chapter a general understanding of \gls{SMPC} and the key features of \glspl{MANET} is established.  
 
-First the idea for \gls{SMPC} is introduced in \ref{Secure Multi-Party Computation} \nameref{Secure Multi-Party Computation}. Since secret sharing is used for the development of \gls{SMPC} protocols, Shamir's secret sharing scheme is presented in \ref{Secret Sharing} \nameref{Secret Sharing}.
-Protocols for secure addition and secure comparison with passive security are introduced in \ref{Secure Addition Protocol} and \ref{Secure Comparison Protocol} and existing frameworks for \gls{SMPC} are briefly discussed in \ref{Existing Frameworks}.
+The main tool for privacy preservation used in the proposed framework is secret sharing, and Shamir's secret sharing scheme is presented consisting of the construction of shares from the secret input and the restoration of the secret using Lagrange interpolation. Using Shamir's secret sharing scheme, it is shown, that Lagrange interpolation applied to the sum over shares results in the sum over the secrets. This is utilized to formulate a secure sum protocol. For minimum and maximum, parties need to compare themselves. This can be achieved through a multi-round, bit-wise usage of the sum protocol. Schamir's secret sharing, secure sum, secure maximum and secure minimum are provided in the form of a formal description as well as detailed example computations for comprehensibility.
 
-To be able to define requirements for the new framework (see \ref{Requirements}), the key features of \glspl{MANET} are identified in \fullref{Mobile Ad Hoc Networks}, with a focus on the wireless technology standards Bluetooth and Wi-Fi and the differences to similar network types like mesh networks.
-
-%Since the \gls{SMPC} protocols expect a secure communication channel, while a pairing-less connection doesn't provide security by default, public key cryptography is needed (see \ref{Securing the Communication Channel}). 
-%The key generation, as well as Shamir's secret sharing scheme, requires random numbers. Computer systems can generate pseudo-random numbers and the randomness of such an \gls{PRNG} is discussed in\fullref{Communication Layer}.
+In the second part of this chapter we inspect the target network: a local ad-hoc network with moving nodes, which is called a \gls{MANET} or a \gls{SPAN}, if all nodes are smartphones. This type of network is currently not provided by Android, therefore \gls{MANET} key-features and Android limitations are discussed. 
 
 \section{Secure Multi-Party Computation} \label{Secure Multi-Party Computation}
 
 \todo*{general idea}
-\gls{SMPC} is a subfield of cryptography. The target of \gls{SMPC} is to run computations over inputs from multiple parties while keeping these inputs secret. In 1982 Yao described the problem of two millionaires trying to find out, which one is wealthier, without giving each other information about their actual capital \autocite{Yao1982}. Yaos solution for this \gls{2PC} is considered to be the basis for general \gls{SMPC} protocols.
-\textcite{Cramer2015} describe for example benchmark analysis as a use-cases for \gls{SMPC}: companies want to know how well they are doing in their business area compared to other companies, while they do not want to share their current business numbers with competitors. Using a protocol for secure comparison (as described in \fullref{Secure Comparison Protocol}) the companies can calculate the best performer without leaking business information. 
-\textcite{Clifton2002} describe privacy preserving data mining as another use-case: data mining on patient data can for example be used to indicate disease outbreaks but there is of course a privacy concern. Using \gls{SMPC} algorithms, statistics can be computed while keeping the personal patient data private.
+\gls{SMPC} is a subfield of cryptography. The goal of \gls{SMPC} is to run computations over a set of input values from multiple parties while keeping these inputs secret. In 1982 Yao described the problem of two millionaires trying to find out which one is wealthier, without disclosing information about their actual capital \autocite{Yao1982}. Yao's solution for this secure two-party computation using a trapdoor function and modular arithmetic is considered to be the basis for general \gls{SMPC} protocols.
+Besides Yao's more theoretical problem \textcite{Cramer2015} describe a benchmark analysis as a practical use-cases for \gls{SMPC}: companies want to find out how well they are doing in their business area compared to other companies, while they do not want to share their current business numbers with competitors. Using a protocol for secure comparison (see \Cref{Secure Comparison Protocol}) the companies candetermine the best performer without leaking business information. 
+\textcite{Clifton2002} describe privacy preserving data mining as another use-case: data mining on patient data can be used to indicate disease outbreaks but there is a privacy concern, because patients want their medical history to be private and there are strict data protection laws concerning medical data. Using \gls{SMPC} algorithms, statistics can be computed while keeping the personal patient data private.
 
-For \gls{SMPC} two types of adversaries have to be considered: semi-honest and malicious adversaries.
-Semi-honest adversaries "follow the protocol specification, yet may attempt to learn additional information by analyzing the transcript of messages received during the execution" \autocite{Aumann2007}. Malicious adversaries "are not bound in any way to following the instructions of the specified protocol" \autocite{Aumann2007}.
-\gls{SMPC} protocols that can tolerate semi-honest parties (up to a specific threshold) provide semi-honest or passive security. \gls{SMPC} protocols that are secure against malicious adversaries achieve malicious or active security.
-\textcite[p. 82]{Cramer2015} also differentiate between unconditional or perfect security and computational security: if security can be proven for an adversary with unlimited computation power a protocol has unconditional security. In contrast, computational security can only be proven for a polytime adversary.
+\subsection{Adversary Types}
 
-Since the target group for the protocols used in this thesis are gamification systems potential adversaries are likely of the semi-honest type. Gamification system are usually based on intrinsic motivation. Especially in the context of workplace related gamification without public recognition, there is nothing to be gained from trying to corrupt the system, only the significance of the computation results is reduced.
+For \gls{SMPC} two types of adversaries have to be considered: semi-honest and malicious adversaries:
+\begin{itemize}
+	\item Semi-honest adversaries ``follow the protocol specification, yet may attempt to learn additional information by analyzing the transcript of messages received during the execution'' \autocite{Aumann2007}.
+	\item Malicious adversaries ``are not bound in any way to following the instructions of the specified protocol'' \autocite{Aumann2007}.
+\end{itemize}
+\gls{SMPC} protocols that can tolerate semi-honest parties up to a specific threshold provide semi-honest or passive security, whereas \gls{SMPC} protocols that are secure against malicious adversaries achieve malicious or active security, meaning that the protocol detects protocol deviations and aborts the computation.
+\textcite[p. 82]{Cramer2015} further differentiate between unconditional or perfect security and computational security: if security can be proven for an adversary with unlimited computation power a protocol has unconditional security. In contrast, computational security can only be proven for a polynomial time adversary.
 
-Honest, but curious parties are more likely, but providing the majority of semi-honest parties (which is the requirement for gaining additional information from combined shares, see \ref{Secret Sharing}), requires considerable efforts. Even if single scores are revealed, their isolated information content is almost valueless for the adversaries and targeting specific nodes over a longer amount of time adds additional complexity because of the spatial degree of freedom of the nodes (compare \ref{Mobile Ad Hoc Networks}).
-Therefor, in context of gamification systems, this thesis focuses on practical \gls{SMPC} protocols for passive security based on secret sharing.
+Since the main application for the protocols used in this thesis are gamification systems potential adversaries are likely to be of the semi-honest type. Gamification systems are based on intrinsic user motivation (see \Cref{Gamification}), in contrast to reward systems using extrinsic motivators. Especially in the context of workplace related gamification without public recognition, neither a social nor a economical benefit can be gained from trying to corrupt the system, only the significance of the computation results is reduced.
+
+Honest but curious parties are more likely, but providing the majority of semi-honest parties (which is the requirement for gaining additional information from combined shares, see \Cref{Secret Sharing}), requires considerable efforts. Even if single scores are revealed, their isolated information content is almost valueless for the adversaries and targeting specific nodes over a longer amount of time adds additional complexity because of the spatial degree of freedom of the nodes (see \Cref{Mobile Ad Hoc Networks}): to attack a user the adversary has to keep within reach of the target and gain access to all nodes in the computation group which will be different for each computation.
+Therefore, in context of gamification systems, this thesis focuses on practical \gls{SMPC} protocols for passive security based on secret sharing, which is explained in the following section.
 
 \subsection{Secret Sharing}	\label{Secret Sharing}
 
-\textcite[p. 32]{Cramer2015} describe secret sharing schemes as the main tool to build a \gls{SMPC} protocol with passive security. In 1979 Adi Shamir described a $(k, n)$ threshold scheme for sharing secret data $D$: "Our goal is to divide $D$ into $n$ pieces $D_i$, ..., $D_n$ in such a way that:
-(1) knowledge of any k or more $D_i$ pieces makes $D$ easily computable; (2) knowledge of any $k-1$ or fewer $D_i$ pieces leaves $D$ completely undetermined (in the sense that all its possible values are equally likely)" \autocite{Shamir1979}.
-Shamir's secret sharing scheme is based on polynomials of degree $k-1$ with $a_0=D$ (compare \ref{eq:polynomial}). 
+\textcite[p. 32]{Cramer2015} describe secret sharing schemes as the main building block a \gls{SMPC} protocol with passive security. In 1979 Adi Shamir described a $(k, n)$ threshold scheme for sharing secret data $D$: ``Our goal is to divide $D$ into $n$ pieces $D_i,...,D_n$ in such a way that:
+(1) knowledge of any k or more $D_i$ pieces makes $D$ easily computable; (2) knowledge of any $k-1$ or fewer $D_i$ pieces leaves $D$ completely undetermined (in the sense that all its possible values are equally likely)'' \autocite{Shamir1979}.
+Shamir's secret sharing scheme is based on polynomials of degree $k-1$ with $a_0=D$ (see \Cref{eq:polynomial}). 
 \begin{equation}
 \label{eq:polynomial}
-q(x)=\underbrace{D}_{a_0} + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1}
+q(x)=\underbrace{D}_{a_0} + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1} \quad a_i, D \in \gls{doubleN}
 \end{equation}
 
-To divide $D$ into $n$ pieces the polynomial is evaluated: $D_i=q(i),\ i=1,...,n$. For cryptographic protocols it is not practical to work with real arithmetic, instead a finite field is used: \textcite{Shamir1979} specifies that modular instead of real arithmetic is used. A prime $p$ with $p>D$, $p>n$ is selected and used to define the set $[0, p)$. "The coefficients $a_1, ..., a_{k-1}$ in $q(x)$ are randomly chosen	from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$" \autocite[p. 613]{Shamir1979} (compare \ref{eq:polynomial modular}).
+To divide $D$ into $n$ pieces the polynomial is evaluated: $D_i=q(i),\ i=1,...,n$. For cryptographic protocols it is not practical to work with real arithmetics, therefore a finite field is used: in particular \textcite{Shamir1979} proposes that modular instead of real arithmetic is used. A prime $p$ with $p>D$, $p>n$ is selected and used to define the set $[0, p)$. ``The coefficients $a_1, ..., a_{k-1}$ in $q(x)$ are randomly chosen from a uniform distribution over the integers in $[0, p)$, and the values $D_1, ..., D_n$ are computed modulo $p$'' \autocite[p. 613]{Shamir1979} (see \Cref{eq:polynomial modular}).
 \begin{equation}
 \label{eq:polynomial modular}
 q(x) = D + a_1 \cdot x + ... + a_{k-1} \cdot x^{k-1} \mod p \qquad D,\ a_i \in [0,p)\ , \quad p \in \gls{doubleP}
 \end{equation}
-\textcite[p. 7]{Cramer2015} declare the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
+\textcite[p. 7]{Cramer2015} define the set restricted by $p$ as $\mathbb{Z}_p = \{0, 1, ..., p-1\}$. They also use the notion \textit{secret S} for the data to be shared and \textit{shares $s_i$} for the computed pieces of the secret.
 
-\todo*{describe number off messages, usage of threshold as trade-off between security and performance -> START}
-
-\todo*{describe number off messages, usage of threshold as trade-off between security and performance -> END}
-
-The reconstruction of a secret $S$ can be done using Lagrange interpolation (compare \ref{eq:SSS lagrange interpolation}).
+The reconstruction of a secret $S$ can be done using Lagrange interpolation (see \Cref{eq:SSS lagrange interpolation}).
 \begin{equation}
 \label{eq:SSS lagrange interpolation}
 S = \sum_i s_i \prod_{i \neq j} \frac{-x_j}{x_i-x_j} \mod p
 \end{equation}
-$k$ shares $s_i$ are needed to reconstruct $S$, so only the associated values for $i$ are used in the Lagrange interpolation.
+Here, $k$ shares $s_i$ are needed to reconstruct $S$, so only the associated values for $i$ are used in the Lagrange interpolation.
 
 \subsubsection*{Example Computation} \label{Example Computation}
 
@@ -230,23 +236,23 @@ Consider the following task: a secret $S=8$ is supposed to be shared among $n=4$
 
 First a prime $p$ has to be chosen, which has to be larger than the secret ($p>S$) and the number of parties ($p>n$): $p=17$ (public information)
 
-Since $k=3$, the polynomial has a degree of $k-1=2$ (compare \ref{eq:SSS example polynomial}).
+Since $k=3$, the polynomial has a degree of $k-1=2$ (see \Cref{eq:SSS example polynomial}).
 \begin{equation}
 \label{eq:SSS example polynomial}
-f(x) = S + a_1 \cdot x + a_2 \cdot x^2 \mod p
+q(x) = S + a_1 \cdot x + a_2 \cdot x^2 \mod p
 \end{equation}
 
-The coefficients are selected randomly uniformly out of $\mathbb{Z}_p=\{0,1,...,p-1\}=\{0,1,...,16\}$: $a_1=13$ and $a_2=4$ and the shares $s_i$ are computed (compare \ref{eq:SSS example polynomial specific}).
+The coefficients are selected randomly out of $\mathbb{Z}_p=\{0,1,...,p-1\}=\{0,1,...,16\}$: $a_1=13$ and $a_2=4$ and the shares $s_i$ are computed (see \Cref{eq:SSS example polynomial specific}).
 \begin{alignat}{1}
-& f(x) = 8 + 13 \cdot x + 4 \cdot x^2 \mod 17 \label{eq:SSS example polynomial specific} \\
+& q(x) = 8 + 13 \cdot x + 4 \cdot x^2 \mod 17 \label{eq:SSS example polynomial specific} \\
 &\qquad \qquad \qquad \quad \Downarrow \nonumber \\ 
-& f(x_1)=f(1)=25\mod17=8=s_1 \nonumber \\
-& f(x_2)=f(2)=50\mod17=16=s_2 \nonumber \\
-& f(x_3)=f(3)=83\mod17=15=s_3 \nonumber \\
-& f(x_4)=f(4)=124\mod17=5=s_4 \nonumber 
+& q(x_1)=f(1)=25\mod17=8=s_1 \nonumber \\
+& q(x_2)=f(2)=50\mod17=16=s_2 \nonumber \\
+& q(x_3)=f(3)=83\mod17=15=s_3 \nonumber \\
+& q(x_4)=f(4)=124\mod17=5=s_4 \nonumber 
 \end{alignat}
 
-If for example parties $P_2$, $P_3$ and $P_4$ pool their shares, they can reconstruct the secret S using Lagrange interpolation (using also the public information: $p=17$):
+If for example parties $P_2$, $P_3$ and $P_4$ pool their shares, they can reconstruct the secret S using Lagrange interpolation (assuming the use of the public information: $p=17$):
 \begin{alignat}{2}
 & S = && \sum_i s_i \prod_{i \neq j} \frac{-x_j}{x_i - x_j } \mod 17 \qquad \qquad  with \ i,j \in \{2,3,4\} \\
 & \quad && =s_2 \cdot \frac{-x_3}{x_2-x_3} \cdot \frac{-x_4}{x_2-x_4} + s_3 \cdot \frac{-x_2}{x_3-x_2} \cdot \frac{-x_4}{x_3-x_4} + s_4 \cdot \frac{-x_2}{x_4-x_2} \cdot \frac{-x_3}{x_4-x_3} \mod 17 \nonumber \\
@@ -255,9 +261,9 @@ If for example parties $P_2$, $P_3$ and $P_4$ pool their shares, they can recons
 & \quad && = -9 \mod 17 \label{eq:SSS example negative modulo} \\
 & \quad && = 8 \nonumber 
 \end{alignat}
-\textit{Note:} in cryptography $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$ ($mn\mod n=0$), so that $m \cdot n+a>0$: e.g. $-9 \mod 17 = (\underbrace{1 \cdot 17-9}_{>0}) \mod 17$ (compare \ref{eq:SSS example negative modulo}), which resolves to: $a\mod n = n-(|a|\mod n), a<0$.
+\textit{Note:} in cryptography the expression $a \mod n$ for $a<0$ (negative dividend) is calculated by adding a multiple of  $n$ ($mn\mod n=0$), so that $m \cdot n+a>0$: e.g. $-9 \mod 17 = (\underbrace{1 \cdot 17-9}_{>0}) \mod 17$ (see \Cref{eq:SSS example negative modulo}), which resolves to: $a\mod n = n-(|a|\mod n), a<0$.
 
-When performing the Lagrange interpolation there are also cases with modulo operations on fractions (\autoref{eq:modular frac}). Here the modular multiplicative inverse (\autoref{eq:modular inverse}) has to be calculated using the extended Euclidean algorithm. For example $\frac{1}{3}\mod 17=6$ since $6\cdot 3\mod 17=1$.
+When performing the Lagrange interpolation there are also cases with modulo operations on fractions (see \Cref{eq:modular frac}). Here the modular multiplicative inverse (see \Cref{eq:modular inverse}) has to be calculated using the extended Euclidean algorithm. For example $\frac{1}{3}\mod 17=6$ since $6\cdot 3\mod 17=1$.
 \begin{alignat}{1}
 & \frac{1}{a}\mod n \label{eq:modular frac} \\
 & m\cdot a\mod n=1 \label{eq:modular inverse} \\
@@ -266,26 +272,25 @@ When performing the Lagrange interpolation there are also cases with modulo oper
 
 \subsection{Secure Addition Protocol} \label{Secure Addition Protocol}
 
-For an environment with honest parties there are simple \gls{SMPC} protocols to compute the sum over shares. \textcite{Clifton2002} describe a ring based method, where the initializing party adds a random number $R$ to the secret input $s_1$ before passing it to the next node. Each node then adds its secret until the first party receives the result. By removing $R$ the party can than reconstruct the sum over all secret inputs (see figure \ref{figure:smpc sum ring}).
+For an environment with honest parties there are simple \gls{SMPC} protocols to compute the sum over shares. \textcite{Clifton2002} describe a ring based method, where the initializing party adds a random number $R$ to the secret input $s_1$ before passing it to the next node. Each node then adds its secret until the first party receives the result. By removing $R$ the party can than reconstruct the sum over all secret inputs (see \Cref{figure:smpc sum ring}).
 
 \begin{figure}[!htb] % h for placement here
 	\caption{Simple secure sum protocol for ring} \label{figure:smpc sum ring}
 	\includegraphics[scale=1.0]{figures/smpc-sum-simple-ring.png}
 \end{figure}
 
-This method is efficient ($2n$ messages for computation and announcing the sum in a $n$-node ring) but if parties collude, party $P_i$ only needs the output of $P_{i+1}$ as received by party $P_{i+2}$ to reconstruct the secret input of $P_{i+1}$. \textcite{Clifton2002} propose using shares in combination with permutation of the ring order, so neighbors change in each iteration and the number of parties in need to pool their data increases. This approach was extended in the "k-Secure Sum Protocol" \autocite{Sheikh2009}. Especially with a focus on security ($k\rightarrow n$) the permutation of the ring approaches share-exchanges between each node. To reduce the complexity through the ring permutation and motivated by the restrictions of the network (see \autoref{practicability of an implementation}), for which the protocol is intended, this thesis  uses a Shamir based protocol for a fully connected mesh network. 
+This method is efficient ($2n$ messages for computation and announcing the sum in a $n$-node ring) but if parties collude, party $P_i$ only needs the output of $P_{i+1}$ as received by party $P_{i+2}$ to reconstruct the secret input of $P_{i+1}$. \textcite{Clifton2002} propose using shares in combination with permutation of the ring order, such that neighbors change in each iteration and the number of parties in need to pool their data increases. This approach was extended in the "k-Secure Sum Protocol" \autocite{Sheikh2009}. Especially with a focus on security ($k\rightarrow n$) the permutation of the ring approaches share-exchanges between each node. To reduce the complexity through the ring permutation and motivated by the restrictions of the network (see \Cref{practicability of an implementation}), for which the protocol is intended, this thesis  uses a Shamir-based protocol for a fully connected mesh network. 
 
-In \ref{Secret Sharing} it was demonstrated how a secret can be reconstructed from the shares using Lagrange interpolation. It is also possible to reconstruct the sum of secrets by using the sums of shares for a Lagrange interpolation.
+In \Cref{Secret Sharing} Lagrange interpolation is introduced for the reconstruction of a secret from shares. It is also possible to reconstruct the sum of secrets by using the sums of shares for a Lagrange interpolation.
 
 Proof:
-
 $n$ shares for $m$ secrets $s_l$:
 \begin{alignat}{1}
-&s_{l,i} = f_l(x_i) = s_l + \sum_{i=1}^{k-1} \alpha_{l,i} x_i^i \mod p \\
+&s_{l,i} = q_l(x_i) = s_l + \sum_{i=1}^{k-1} \alpha_{l,i} x_i^i \mod p \\
 & \Leftrightarrow \begin{cases}
-s_{1,i} = f_1(x_i) = & s_1 + \alpha_{1,1} x_i + \alpha_{1,2} x_i^2 + ... + \alpha_{1,k-1}x_i^{k-1} \mod p \\
+s_{1,i} = q_1(x_i) = & s_1 + \alpha_{1,1} x_i + \alpha_{1,2} x_i^2 + ... + \alpha_{1,k-1}x_i^{k-1} \mod p \\
 &\vdots \\
-s_{m,i} = f_n(x_i) = & s_n + \beta_{n,1} x_i + \beta_{n,2} x_i^2 + ... + \beta_{n,k-1}x_i^{k-1} \mod p
+s_{m,i} = q_n(x_i) = & s_n + \beta_{n,1} x_i + \beta_{n,2} x_i^2 + ... + \beta_{n,k-1}x_i^{k-1} \mod p
 \end{cases} \nonumber \\
 & \text{with} \ \{l \in \gls{doubleN} \ | \ 1 \leq l \leq m \},
 \ \{i \in \gls{doubleN} \ | \ 1 \leq i \leq n \},
@@ -307,7 +312,7 @@ Sum $s$ over secrets $s_l$:
 &s= \underbrace{ \sum_{i=1}^n \underbrace{\sum_{l=1}^{m} s_{l,i}}_{\text{sum over shares}} \prod_{i\neq j} \frac{-x_j}{x_i-x_j} \mod p }_{\text{Lagrange-interpolation for sum over shares}}
 \end{alignat}	
 
-\subsubsection*{Example Computation}
+\subsubsection{Example Computation}
 Public information: $n=4$, $p=67$, $k=4$\par
 
 \noindent Secrets: $s_1=13$, $s_2=27$, $s_3=17$, $s_4=1$\par
@@ -334,40 +339,41 @@ s&= &&\sum_{i=1}^{4}\sum_{l=1}^{4}s_{l,i}\prod_{i \neq j} \frac{-x_j}{x_i-x_j}\m
 & &&+124\frac{-1}{3-1}\frac{-2}{3-2}\frac{-4}{3-4}+63\frac{-1}{4-1}\frac{-2}{4-2}\frac{-3}{4-3}\mod 67 \nonumber \\
 &=&& 527 \mod 67 = 58 = \sum_{i=1}^4 s_i \label{eq:example result lagrange}
 \end{alignat}
-As expected, the result of the Lagrange-interpolation for the sum over shares is equal to the sum over the initial secrets (compare \ref{eq:example result lagrange}).
+The result of the Lagrange-interpolation for the sum over shares is equal to the sum over the initial secrets (see \Cref{eq:example result lagrange}), so the Lagrange interpolation is an additive function ($f(a+b)=f(a)+f(b)$).
 
-\subsubsection*{Protocol Description}
+\subsubsection{Protocol Description}
 Assumptions:
 %\vspace{-\topsep}
 \begin{itemize}
 	%\itemsep-0.5em
-	\item number of parties $n>2$
-	\item secure communication channel
-	\item no malicious adversaries
-	\item upper bound of sum $s \leq b$ can be estimated, so a prime $p > b$ can be chosen 
+	\item Number of parties $n>2$
+	\item Secure communication channel
+	\item No malicious adversaries
+	\item Upper bound of sum $s \leq b$ can be estimated, so a prime $p > b$ can be chosen 
 \end{itemize}
-The secure addition protocol, as used in this thesis, consists of six phases:
+The secure addition protocol, as used in this thesis, consists of six steps:
 \begin{enumerate}
 	%\itemsep-0.5em
 	\item The coordinator announces the number of parties for the computation and the indexation of each party.
-	\item Each party $j$ sends shares $s_{j,i}$ of the secret input $s_j$ to the other parties.
-	\item Each party $i$ computes the sum over the received shares $s_{j,i}$.
-	\item Each party sends the computed sum to the coordinator.
-	\item The coordinator reconstructs the sum over the inputs using Lagrange-interpolation.
+	\item Each party $j$ computes and sends shares $s_{j,i}$ of the secret input $s_j$ to the other parties (see \Cref{figure:Secure Multi-Party Computation principle - b}).
+	\item Each party $i$ computes the sum over the received shares $s_{j,i}$ (see \Cref{figure:Secure Multi-Party Computation principle - c}).
+	\item Each party sends the computed sum to the coordinator (see \Cref{figure:Secure Multi-Party Computation principle - d}).
+	\item The coordinator reconstructs the sum over the inputs using Lagrange-interpolation (see \Cref{figure:Secure Multi-Party Computation principle - e}).
 	\item The coordinator broadcasts the reconstructed sum.
 \end{enumerate}
 
-In total $(n+3)\cdot (n-1)=n^2+2n-3$ messages are exchanged, so the traffic increases with the number of parties squared. Selecting a lower threshold for the secret reconstruction $\frac{n}{2} \leq k<n$ lowers the total messages by $\Delta_{\text{messages}}=n^2-n(k-1)$.
+In total, $(n+3)\cdot (n-1)=n^2+2n-3$ messages are exchanged, so thus traffic increases with the number of parties squared. 
+%Selecting a lower threshold for the secret reconstruction $\frac{n}{2} \leq k<n$ lowers the total messages by $\Delta_{\text{messages}}=n^2-n(k-1)$.
 
-For a secure channel this protocol is information-theoretically secure: independent from computation power an adversary with $m_\text{leaked}<k$ shares will gain no information regarding the inputs.
+For a secure channel, this protocol is information-theoretically secure: independent from computation power an adversary with $m_\text{leaked}<k$ shares will gain no information regarding the inputs.
 
 \todo*{secure addition with verification \autocite{Cramer2015}; number of messages}
 
 \subsection{Secure Comparison Protocol}	\label{Secure Comparison Protocol}
 The secure comparison protocol compares the secret inputs and provides the minimum or maximum in a set without revealing the inputs or the parties holding the minimum or the maximum.
 
-The protocol is based on the privacy preserving protocol for maximum computation as described in \textcite{Hasan2013}. The general idea is to use bit-decomposition and utilize the secure addition protocol bit-wise. In iterations the secure-sum for the bits ($0 \lor 1$) of the secrets multiplied with a random value are computed, starting from the \gls{MSB}, limited by a predefined upper bound, to the \gls{LSB}. The announced sum gives each party the information that at least one party has this bit set, if the sum is unequal zero. If a party has this bit not set itself it has a lower value and commits only zeros in the following iterations. Storing the result of each iteration, the parties can reconstruct the maximum.
-For finding the minimum the protocol from \textcite{Hasan2013} needs an extension as described in \ref{Protocol Extension for Minimum Determination}: inputs are negated (using the binary operation NOT), making the minimum in the set the largest value. Afterwards the maximum is determined as described above. Finally the found maximum is negated again to reconstruct the minimum in the set.
+The protocol is based on the privacy preserving protocol for maximum computation as described in \textcite{Hasan2013}. The general idea is to use bit-decomposition and utilize the secure addition protocol bit-wise. In iterations the secure-sum for the bits $b_i$ ($b_i \in \{0,1\}$) of the secrets multiplied with a random value are computed, starting from the \gls{MSB}, limited by a predefined upper bound, to the \gls{LSB}. The announced sum gives each party the information that at least one party has this bit set, if the sum is unequal zero. If a party has this bit not set itself it has a lower value and commits only zeros in the following iterations. Storing the result of each iteration, the parties can reconstruct the maximum.
+For finding the minimum the protocol from \textcite{Hasan2013} needs an extension as described in \Cref{Protocol Extension for Minimum Determination}: inputs are negated (using the binary operation NOT), making the minimum in the set the largest value. Afterwards the maximum is determined as described above. Finally the found maximum is negated again to reconstruct the minimum in the set.
 
 \subsubsection{Example Computation} \label{Secure Comparison Example}
 
@@ -444,7 +450,7 @@ In total, each party has the bits $0|1|1|0|1|1$ stored and can reconstruct the c
 
 \subsubsection{Protocol Extension for Minimum Determination} \label{Protocol Extension for Minimum Determination}
 
-Using the negation of the binary representation, the order of the corresponding values in decimal numeral system is inverted (compare table \ref{table:secure minimum negation}). The computation is then the same as for the maximum search. The reconstructed maximum is finally negated to result in $\min(s_i)$.
+Using the negation of the binary representation, the order of the corresponding values in decimal numeral system is inverted (compare \Cref{table:secure minimum negation}). The computation is then the same as for the maximum search. The reconstructed maximum is finally negated to result in $\min(s_i)$.
 
 \begin{table}[!htb]
 	\centering
@@ -458,7 +464,7 @@ Using the negation of the binary representation, the order of the corresponding 
 	\end{tabular}
 \end{table}
 
-In the second round booth $P_2$ and $P_3$ disqualify themselves as maximum. After six rounds each party holds: $1|1|0|0|1|0$ as the maximum (see red markings in table \ref{table:secure minimum negation}). Negated this gives the minimum as $0|0|1|1|0|1_2=13_{10}$ 
+In the second round booth $P_2$ and $P_3$ disqualify themselves as maximum. After six rounds each party holds: $1|1|0|0|1|0$ as the maximum (see red markings in \Cref{table:secure minimum negation}). Negated this gives the minimum as $0|0|1|1|0|1_2=13_{10}$ 
 
 \FloatBarrier
 
@@ -467,10 +473,10 @@ Assumptions:
 % \vspace{-\topsep}
 \begin{itemize}
 	% \itemsep-0.5em
-	\item number of parties $n>2$
-	\item secure communication channel
-	\item no malicious adversaries
-	\item upper bound of sum $s \leq b$ can be estimated, so a prime $p > b$ can be chosen 
+	\item Number of parties $n>2$
+	\item Secure communication channel
+	\item No malicious adversaries
+	\item Upper bound of sum $s \leq b$ can be estimated, so a prime $p > b$ can be chosen 
 \end{itemize}
 The secure comparison protocol, as used in this thesis, consists of the phases for secure addition within iterations for the bitwise length of a predefined upper bound for the inputs: 
 \begingroup
@@ -497,25 +503,51 @@ Note: the assumption $n>2$ for the secure addition and secure comparison protoco
 
 \subsection{Existing Frameworks} \label{Existing Frameworks}
 
-In this section a short overview over existing \gls{SMPC} solutions is given. While \gls{SMPC} is an intensely researched field, practical work is less common.
+While \gls{SMPC} is an intensely researched field, practical work is less common.
 
-The following solutions were considered
+The solutions listed in \Cref{table:Considered SMPC frameworks} considered in this thesis
 
-\begin{itemize}
-	\item MpcLib (see \textcite{Online:MpcLib})
-	\item SEPIA (see \textcite{Online:Sepia})
-	\item SPDZ (see \textcite{Online:SPDZ})
-	\item Sharemind (see \textcite{Online:Sharemind})
-	\item Enigma (see \textcite{Online:Enigma})
-\end{itemize}
+\begin{table}[]
+	\centering
+	\caption{Considered SMPC frameworks}
+	\label{table:Considered SMPC frameworks}
+	\begin{tabular}{|l|l|}
+		\hline
+		Name      & Authors                       \\ \hline
+		MpcLib    & \textcite{Online:MpcLib}    \\ \hline
+		SEPIA     & \textcite{Online:Sepia}     \\ \hline
+		SPDZ      & \textcite{Online:SPDZ}      \\ \hline
+		Sharemind & \textcite{Online:Sharemind} \\ \hline
+		Enigma    & \textcite{Online:Enigma}    \\ \hline
+	\end{tabular}
+\end{table}
 
-Some key-features of the solutions are illustrated in figure \ref{figure:existing frameworks}. All projects emerged from university research. With the exception of Sharemind and Enigma, the frameworks seem to target primarily other researchers, reflecting in the lack of documentation and thereby reduced usability. The open-source library MpcLib is C\# based, SPDZ uses C++ and Python and SEPIA is a Java library.  Sharemind and Enigma are also booth based on university research (Enigma at MIT and Sharemind at University of Tartu) but evolved into market-ready business solutions. While Sharemind uses dedicated application-server, Enigma uses a distributed system of nodes based on Blockchain technology for \gls{SMPC}, booth with a focus on scalable secure data analysis.
+All projects emerged from university research. Some key-features of the solutions are illustrated in \Cref{Features of existing SMPC frameworks}. With the exception of Sharemind and Enigma, the frameworks seem to target primarily other researchers, reflecting in the lack of documentation and thereby reduced usability. The open-source library MpcLib is C\# based, SPDZ uses C++ and Python and SEPIA is a Java library.  Sharemind and Enigma also both emerged from university research (Enigma at MIT and Sharemind at University of Tartu) but evolved eventually into market-ready business solutions. While Sharemind uses a dedicated application-server, Enigma uses a distributed system of nodes based on Blockchain technology for \gls{SMPC}, booth with a focus on scalable secure data analysis.
 All solution are based on the Internet protocol suite and require at least locally run server or Internet access.
 
-\begin{figure}[!htb] % h for placement here
-	\caption{Existing \gls{SMPC} software grouped by properties} \label{figure:existing frameworks}
-	\includegraphics[scale=1.0]{figures/frameworks.png}
-\end{figure}
+{\renewcommand{\arraystretch}{1.8}% for the vertical padding
+\begin{table}[]
+	\centering
+	\caption{Features of existing SMPC frameworks}
+	\label{Features of existing SMPC frameworks}
+	\begin{tabular}{c|c|c|c|c|c|}
+		\cline{2-6}
+		& MpcLib       & SEPIA & SPDZ & Sharemind & Enigma \\ \hline
+		\multicolumn{1}{|l|}{Active Project}                                                                       & \textcolor{green}{\Large \textbf{\checkmark}}          & \textcolor{red}{ \XSolidBrush}      & \textcolor{green}{\Large \textbf{\checkmark}}     & \textcolor{green}{\Large \textbf{\checkmark}}          & \textcolor{green}{\Large \textbf{\checkmark}}       \\ \hline
+		\multicolumn{1}{|l|}{Open Source}                                                                          & \textcolor{green}{\Large \textbf{\checkmark}}          & \textcolor{green}{\Large \textbf{\checkmark}}      & \textcolor{green}{\Large \textbf{\checkmark}}     & \textcolor{red}{ \XSolidBrush}          & \textcolor{red}{ \XSolidBrush}       \\ \hline
+		\multicolumn{1}{|l|}{TCP/IP based}                                                                         & undocumented & \textcolor{green}{\Large \textbf{\checkmark}}      & \textcolor{green}{\Large \textbf{\checkmark}}     & \textcolor{green}{\Large \textbf{\checkmark}}          & \textcolor{green}{\Large \textbf{\checkmark}}       \\ \hline
+		\multicolumn{1}{|l|}{\begin{tabular}[c]{@{}l@{}}Cloud/Application Server/\\ Dedicated Server\end{tabular}} & undocumented & \textcolor{red}{ \XSolidBrush}      & \textcolor{green}{\Large \textbf{\checkmark}}     & \textcolor{green}{\Large \textbf{\checkmark}}          & \textcolor{green}{\Large \textbf{\checkmark}}       \\ \hline
+		\multicolumn{1}{|l|}{Distributed System}                                                                   & undocumented & \textcolor{red}{ \XSolidBrush}      & \textcolor{red}{ \XSolidBrush}     & \textcolor{red}{ \XSolidBrush}          & \textcolor{green}{\Large \textbf{\checkmark}}       \\ \hline
+		\multicolumn{1}{|l|}{API/SDK}                                                                              & \textcolor{red}{ \XSolidBrush}             & \textcolor{green}{\Large \textbf{\checkmark}}      & \textcolor{red}{ \XSolidBrush}     & \textcolor{green}{\Large \textbf{\checkmark}}          & \textcolor{green}{\Large \textbf{\checkmark}}       \\ \hline
+		\multicolumn{1}{|l|}{C/embedded}                                                                           & \textcolor{red}{ \XSolidBrush}             & \textcolor{red}{ \XSolidBrush}      & \textcolor{red}{ \XSolidBrush}     & \textcolor{red}{ \XSolidBrush}          & \textcolor{red}{ \XSolidBrush}        \\ \hline
+	\end{tabular}
+\end{table}
+}
+
+%\begin{figure}[!htb] % h for placement here
+%	\caption{Existing \gls{SMPC} software grouped by properties} \label{figure:existing frameworks}
+%	\includegraphics[scale=1.0]{figures/frameworks.png}
+%\end{figure}
 
 While all frameworks exceed the requirements regarding the \gls{SMPC} functionality, they don't provide a solution for local ad-hoc networks without permanently available servers. Also the support for low-level devices is either undocumented or not given through programming language dependencies.
 The development of a framework with a focus on cross-platform usage, usability for developers without cryptographic research background and applicability for local ad-hoc networks for the described gamification use-cases is therefore justified.
@@ -523,7 +555,7 @@ The development of a framework with a focus on cross-platform usage, usability f
 \FloatBarrier
 
 \section{Mobile Ad Hoc Networks} \label{Mobile Ad Hoc Networks}
-The framework developed as part of this thesis focuses on providing \gls{SMPC} for \glspl{MANET} or \gls{MANET}-like networks. In this section the network topologies related to \glspl{MANET} are briefly described (see \ref{Network Topologies}) and the practicability of an implementation based on current technology standards are examined (see \ref{practicability of an implementation}).
+The framework developed as part of this thesis focuses on providing \gls{SMPC} for \glspl{MANET} or \gls{MANET}-like networks. In this section the network topologies related to \glspl{MANET} are briefly described (see \Cref{Network Topologies}) and the practicability of an implementation based on current technology standards are examined (see \Cref{practicability of an implementation}).
 
 \subsection{Network Topologies} \label{Network Topologies}
 
@@ -536,35 +568,37 @@ The advantage of \glspl{MANET} is the open network boundary: nodes can freely jo
 %\vspace{-\topsep}
 \begin{itemize}  
 	%\itemsep-0.5em
-	\item continuously self-configuring
-	\item self-forming
-	\item self-healing
-	\item infrastructure-less
-	\item peer-to-peer
-	\item  mobility of nodes (main difference to mesh network)
+	\item Continuously self-configuring: nodes maintain routing table
+	\item Self-forming: node can join the network without interaction
+	\item Self-healing: leaving nodes cause restructuring of routes
+	\item Infrastructure-less: nodes communicate directly without dedicated access points
+	\item Peer-to-peer: distributed application architecture
+	\item Mobility of nodes: in contrast to mesh networks, the nodes have spatial freedom
 \end{itemize}
 
-The message passing in a \gls{MANET} can either be done by routing or flooding. Since the nodes can move freely, the neighbors will change often, so maintaining routing tables is expensive. The passing of messages without the availability of authentication protocols like \gls{HTTPS} makes the communication also vulnerable against man-in-the-middle attacks. Of course flooding means broadcasting and is not cheap either in regard to message quantity and network load.
+The message passing in a \gls{MANET} can either be done by routing or flooding. Since the nodes can move freely, the neighbors will change often, so maintaining routing tables is expensive. The passing of messages without the availability of authentication protocols like \gls{HTTPS} makes the communication also vulnerable against man-in-the-middle attacks. Flooding means broadcasting and is not cheap in regard to message quantity.
 
 The mentioned key-features of \glspl{MANET} make it a good network choice for a gamification setting based on mobile devices (smartphones, wearables, etc.), because it promises unobtrusive usage for participants without administrative maintenance effort. In the next section the availability and the practicability of an implementation for Android devices is discussed, because of Androids dominant position as the globally leading smartphone \gls{OS} with a market share of above 80\% (see \textcite{Online:Gartner2016}). 
 
 \subsection{Practicability of an implementation on Android Devices} \label{practicability of an implementation}
 
-\glspl{MANET} are especially of interest for military applications and disaster management but they are also gaining research focus for civil usage for example in context of \gls{IoT} devices. Demonstrations of an implementation can be found for example in Open Gardens MeshKit \gls{SDK} \autocite{Online:MeshKit}, which offers \gls{MANET} abilities for Android and iOS devices and thereby forming a \gls{SPAN}. MeshKit is also the foundation for Open Gardens FireChat \autocite{Online:FireChat}, which is for example known in context of pro-democracy demonstrations. Since Android does not provide an \gls{API} for \gls{MANET} functionality on Android devices (\gls{API} 24 at the time of writing) and the MeshKit \gls{SDK} is not open source and only available through Open Gardens partner program, a simplified (but extendable) implementation of \gls{MANET}-like behavior is developed in the application layer (compare \ref{Coordinator Election}).
-Both for Wi-Fi and Bluetooth based connections, there can be limitations in regard to maximum concurrent connections. Vendor specific restrictions (hardware, driver) are hard to compensate reactive at runtime, so this issue has to be addressed proactive in \ref{Architecture} \nameref{Architecture}.
+\glspl{MANET} are especially of interest for military applications and disaster management but they are also gaining research focus for civil usage for example in context of \gls{IoT} devices. Demonstrations of an implementation can be found for example in Open Gardens MeshKit \gls{SDK} \autocite{Online:MeshKit}, which offers \gls{MANET} abilities for Android and iOS devices and thereby forming a \gls{SPAN}. MeshKit is also the foundation for Open Gardens FireChat \autocite{Online:FireChat}, which is for example known in context of pro-democracy demonstrations in countries with censorship \autocite{Online:Hern2014}. Since Android does not provide an \gls{API} for \gls{MANET} functionality on Android devices (\gls{API} 24 at the time of writing) and the MeshKit \gls{SDK} is not open source and only available through Open Gardens partner program, a simplified (but extendable) implementation of \gls{MANET}-like behavior is developed in the application layer (compare \ref{Coordinator Election}).
+Both for Wi-Fi and Bluetooth based connections, there can be limitations in regard to maximum concurrent connections. Vendor specific restrictions (hardware, driver) are hard to compensate at runtime, so this issue has to be addressed proactive in \ref{Architecture} \nameref{Architecture}.
 
 \subsubsection{Bluetooth Based \gls{MANET}}
 
-Usually Bluetooth connections with smartphones require pairing and user actions. This is not a useful process flow to build a \gls{MANET}-like network, since nodes cannot simply join.
+Bluetooth connections established with smartphones require pairing and user actions. This is not a useful process flow to build a \gls{MANET}-like network, since nodes cannot simply join.
 Using the Bluetooth protocol \gls{RFCOMM} an insecure connection can be established, without the need for pairing and user interaction. \textcite{RFCOMM2012} describe \gls{RFCOMM} as the emulation of serial ports over \gls{L2CAP}, supporting the emulation of multiple ports between two devices and ports between multiple devices (device dependent).
-Since multiple simultaneous connection have to share the available bandwidth per node, it takes $\frac{n}{2}$ times longer to share the same amount of data when using only one-to-one connections sequentially. For the targeted number of computation partners in this thesis, this is a tolerable overhead and practical system parameters will be evaluated in \autoref{Evaluation} and \autoref{Discussion}.
+Since multiple simultaneous connection have to share the available bandwidth per node, it takes $\frac{n}{2}$ times longer to share the same amount of data when using only one-to-one connections sequentially. Practical system parameters will be evaluated in \Cref{Evaluation} and \Cref{Discussion}.
 The Bluetooth Special Interest Group has announced mesh networking protocols for upcoming specifications \autocite{Online:BluetoothMesh}. This is very promising in regard of system provided \gls{MANET} features, though it will take time (from experience with Bluetooth LE likely years) until enough devices are equipped with compliant Bluetooth modules.
 
 \subsubsection{Wi-Fi Based \gls{MANET}}
 
-Situations in which we can use Wi-Fi (or \gls{GSM}) usually provide Internet access, so Wi-Fi is not the primary target technology for this thesis. Generally, the callback-based architecture of the developed framework (compare \ref{Architecture} \nameref{Architecture}) enables the usage of different wireless technologies though. Even the interconnection of \gls{MANET}-like networks is conceivable (as demonstrated with MeshKit), but it complicates the forming of the computation group (compare \ref{Coordinator Election}), because different optional channels between nodes have to be evaluated.
+Situations in which we can use Wi-Fi (or \gls{GSM}) usually provide Internet access, so the usage of the framework in these settings is reduced to the plain \gls{SMPC}s, since the communication layer provides routing and channel encryption. Generally, the callback-based architecture of the developed framework (compare \ref{Architecture} \nameref{Architecture}) enables the usage of different wireless technologies. Even the interconnection of \gls{MANET}-like networks is conceivable (as demonstrated with MeshKit), but it complicates the forming of the computation group (compare \ref{Coordinator Election}), because different optional channels between nodes have to be evaluated.
 With Android 4.0 (\gls{API} level 14) the Wi-Fi Peer-to-Peer framework was introduced, which complies with the Wi-Fi Alliance's Wi-Fi Direct certificate program. Wi-Fi Direct states that one-to-one or group (many-to-one) connections are possible. One device acts as a group owner (soft access point), so it forms a star topology. To imitate a \gls{SPAN} with Wi-Fi Direct multi-group communication has to be provided. In \textcite{Funai2015} limitations of Android in regard of multi-group networking as well as solutions are discussed.
-Other solutions (compare \textcite{Online:SPANProject}) include usage of custom kernels on rooted smartphones. Even though  demonstrations on selected devices have shown the feasibility, such system modifications neglect the target group and the intentions of this framework.
+Another solution (compare \textcite{Online:SPANProject}) includes usage of custom kernels on rooted smartphones. Even though  demonstrations on selected devices have shown the feasibility, such system modifications neglect the target group and the intentions of this framework.
+
+In conclusion, the focus of design (see \Cref{Design}) and implementation (see \Cref{Implementation}) in this thesis is a Bluetooth based, local ad-hoc network without infrastructure, while the general framework targets wireless technology independence.
 
 %\section{Pseudo-Random Numbers} %maybe move to implementation/secureing channel
 %\label{sec:Pseudo-Random Numbers}
@@ -579,7 +613,6 @@ Other solutions (compare \textcite{Online:SPANProject}) include usage of custom 
 
 \chapter{Design} \label{Design}
 
-\todo*{15-20\%; explains complete processing chain; explains what methods are used; for someone that wants to know what was done in detail}
 
 Based on the findings in chapter \fullref{Background} and extended with use-cases the requirements for the framework are specified in \fullref{Requirements}. In \fullref{Decentralized, Distributed Computing} specific requirements in context of complex processes are substantiated with algorithms for decentralized, distributed computing. Finally, a draft design is presented in \fullref{Architecture}.
 
@@ -599,19 +632,17 @@ requirements are categorized into functional and non-functional requirements:
 \end{rcases*} \text{non-functional requirements}
 \end{alignat*}
 
-The functional and non-functional requirements are specified in \ref{Functional Requirements} and \ref{Non-Functional Requirements}. 
-
 \subsection{Functional Requirements} \label{Functional Requirements}
 
 Functional requirements define the functions the framework has to offer to meet the acceptance criteria. Based on chapter \fullref{Background} we can divide the requirements into two main fields: features regarding the accurate computation of the \gls{SMPC} protocols and functions required to compensate the lack of a \gls{MANET} \gls{API} and technical limitations.
-Figure \ref{figure:requirements use-case node} presents the general functionality a party - respectively a node - expects from the system: especially the need for a secure channel and the limitation to run the \gls{SMPC} only with nearby computation partners is caused by the missing multi-hop capabilities.
+Figure \ref{figure:requirements use-case node} presents the general functionality a party - respectively a node - expects from the system: the need for a secure channel and the limitation to run the \gls{SMPC} only with nearby computation partners is caused by the missing multi-hop capabilities.
 
 \begin{figure}[!htb] % h for placement here
 	\caption[General functional requirements of a node]{\gls{UML} use-case diagram for the general functional requirements of a node} \label{figure:requirements use-case node}
 	\includegraphics[scale=0.85]{figures/use-case-node.png}
 \end{figure}
 
-Since most functions (like the time synchronization and the multi-party computation) require the interaction between nodes, these processes need to be coordinated. In a distributed system there is no central authority, so a node has to become the temporal leader or coordinator for the duration of a process. In figure \ref{figure:requirements use-case coordinator} the processes requiring coordination are described as use-cases from the view of a temporal coordinator.
+Since most functionalities such as the time synchronization and the multi-party computation) require the interaction between nodes, these processes need to be coordinated. In a distributed system there is no central authority, so a node has to become the temporal leader or coordinator for the duration of a process. In figure \ref{figure:requirements use-case coordinator} the processes requiring coordination are described as use-cases from the view of a temporal coordinator.
 
 \begin{figure}[!htb] % h for placement here
 	\caption[Use-case diagram for coordinator requirements]{\gls{UML} use-case diagram for the functional requirements for the coordinator} \label{figure:requirements use-case coordinator}
@@ -625,31 +656,31 @@ Based on the use-cases functional requirements can easily be identified and spec
 	\centering
 	\caption{Functional requirements} \label{table:functional requirements}
 	\begin{tabular}{|l|p{\textwidth*5/6-7mm}|}
-		\toprule
-		Name & \funcreq{Pairing-less Connection}\label{req:Pairing-less Connection} \\ \midrule
+		\hline
+		Name & \funcreq{Pairing-less Connection}\label{req:Pairing-less Connection} \\ \hline
 		Requirement & As a node I want to join the system without having to pair with other devices so that the system remains unobtrusive. \\
-		Assumptions & Device has Bluetooth capabilities with \gls{RFCOMM} protocol. \\ \midrule
-		Name & \funcreq{Heartbeat}\label{req:Heartbeat} \\ \midrule
+		Assumptions & Device has Bluetooth capabilities with \gls{RFCOMM} protocol. \\ \hline
+		Name & \funcreq{Heartbeat}\label{req:Heartbeat} \\ \hline
 		Requirement & As a node I need to inform my coordinator if my computation is running longer than expected so that the system does not assume that the process has failed. As a coordinator I need to inform all group nodes if a computation is running longer than expected. \\
-		Assumptions & Hosting system provides system time. \\ \midrule
-		Name & \funcreq{Non-termination Detection}\label{req:Non-termination Detection} \\ \midrule
+		Assumptions & Hosting system provides system time. \\ \hline
+		Name & \funcreq{Non-termination Detection}\label{req:Non-termination Detection} \\ \hline
 		Requirement & As a node I must be able to detect a communication problem so that I can reset my status. \\
-		Assumptions & Hosting system provides system time. \\ \midrule
-		Name & \funcreq{Coordinator Election}\label{req:Coordinator Election} \\ \midrule
-		Requirement & As a node I want to become coordinator for nearby nodes so that communication can be organized. \\ \midrule
-		Name & \funcreq{Token-Passing}\label{req:Token-Passing} \\ \midrule
-		Requirement & As coordinator I want to be able to assign a group-member to coordinate a subprocess so that direct communication between group-members can be established. \\ \midrule
-		Name & \funcreq{Secure Multi-Party Computation Module}\label{req:SMPC Module} \\ \midrule
+		Assumptions & Hosting system provides system time. \\ \hline
+		Name & \funcreq{Coordinator Election}\label{req:Coordinator Election} \\ \hline
+		Requirement & As a node I want to become coordinator for nearby nodes so that communication can be organized. \\ \hline
+		Name & \funcreq{Token-Passing}\label{req:Token-Passing} \\ \hline
+		Requirement & As coordinator I want to be able to assign a group-member to coordinate a subprocess so that direct communication between group-members can be established. \\ \hline
+		Name & \funcreq{Secure Multi-Party Computation Module}\label{req:SMPC Module} \\ \hline
 		Requirement & As a coordinator I want to form a group of fully meshed nodes and coordinate the execution of the secure addition and secure comparison protocols using a secure communication channel. \\ \todo*{visualize finding fully-meshed nearby group in mesh network}
 		Assumptions & Group size $>2$. All group-members are time-synchronized and have a score within the same time-frame limits. \\
-		Testability & Unit tests to proof correctness of implementation. Performance-tests with different number of computation partners and validation of result. \\ \midrule
-		Name & \funcreq{Clock Synchronization}\label{req:Clock Synchronization} \\ \midrule
+		Testability & Unit tests to proof correctness of implementation. Performance-tests with different number of computation partners and validation of result. \\ \hline
+		Name & \funcreq{Clock Synchronization}\label{req:Clock Synchronization} \\ \hline
 		Requirement & As coordinator I want to synchronize the clocks of nearby nodes so that computation results are not biased because of different time settings. \\
-		Testability & Unit tests to proof correctness of implementation. \\ \midrule
-		Name & \funcreq{Database Synchronization}\label{req:Database Synchronization} \\ \midrule
+		Testability & Unit tests to proof correctness of implementation. \\ \hline
+		Name & \funcreq{Database Synchronization}\label{req:Database Synchronization} \\ \hline
 		Requirement & As coordinator I want to compare my database status with nearby nodes and exchange missing entries without having to compare all entries. \\
 		Assumptions & Participating nodes are idle and not waiting for a computation.\\
-		\bottomrule
+		\hline
 	\end{tabular}
 \end{table}
 
@@ -668,37 +699,37 @@ Based on the use-cases for developers and general demands regarding the maintain
 	\centering
 	\caption{Non-functional requirements} \label{table:non-functional requirements}
 	\begin{tabular}{|l|p{\textwidth*4/5}|}
-		\toprule
-		Name & \nonfuncreq{Usability}\label{req:Usability} \\ \midrule
-		Requirement & The framework shall be configurable, so that a developer using the framework can configure the settings for the \gls{SMPC}. \\ \midrule
-		Name & \nonfuncreq{Maintainability}\label{req:Supportability} \\ \midrule
-		Requirement & The framework shall be maintainable, so that the code and documentation make it clear for a developer what callbacks have to be implemented and how the framework can be used in an Android device. \\ \midrule
-		Name & \nonfuncreq{Performance}\label{req:Performance} \\ \midrule
-		Requirement & The framework shall be secure while providing enough performance, that computations can properly terminate for nodes that move at walking speed ($\approx1\frac{m}{s}$). \\ \midrule
-		Name & \nonfuncreq{Expandability}\label{req:Expandability} \\ \midrule
-		Requirement & The frameworks coupling with the wireless technology shall be loosely, so that the system can be extended without having to touch core functionalities regarding the \gls{SMPC}.  \\ \bottomrule
+		\hline
+		Name & \nonfuncreq{Usability}\label{req:Usability} \\ \hline
+		Requirement & The framework shall be configurable, so that a developer using the framework can configure the settings for the \gls{SMPC}. \\ \hline
+		Name & \nonfuncreq{Maintainability}\label{req:Supportability} \\ \hline
+		Requirement & The framework shall be maintainable, so that the code and documentation make it clear for a developer what callbacks have to be implemented and how the framework can be used in an Android device. \\ \hline
+		Name & \nonfuncreq{Performance}\label{req:Performance} \\ \hline
+		Requirement & The framework shall be secure while providing enough performance, that computations can properly terminate for nodes that move at walking speed ($\approx1\frac{m}{s}$). \\ \hline
+		Name & \nonfuncreq{Expandability}\label{req:Expandability} \\ \hline
+		Requirement & The frameworks coupling with the wireless technology shall be loosely, so that the system can be extended without having to touch core functionalities regarding the \gls{SMPC}.  \\ \hline
 	\end{tabular}
 \end{table}
 
 \section{Decentralized, Distributed Computing} \label{Decentralized, Distributed Computing}
 
-While the protocols for secure addition and secure comparison and thereby the requirement \ref{req:SMPC Module} are already well-defined (compare \autoref{Secret Sharing}, \autoref{Secure Addition Protocol} and \autoref{Secure Comparison Protocol}), other functional requirements need further methodical substantiation. \ref{req:Coordinator Election} and \ref{req:Token-Passing} are addressed in \autoref{Coordinator Election}, \ref{req:Heartbeat} and \ref{req:Non-termination Detection} are discussed in \autoref{Non-termination Detection}, an algorithm for \ref{req:Clock Synchronization} is provided in \autoref{Clock synchronization} and finally \ref{req:Database Synchronization} is covered in \autoref{Distributed Database}.
+While the protocols for secure addition and secure comparison needed for requirement \ref{req:SMPC Module} are already well-defined (compare \Cref{Secret Sharing}, \Cref{Secure Addition Protocol} and \Cref{Secure Comparison Protocol}), other functional requirements need further methodical substantiation. \ref{req:Coordinator Election} and \ref{req:Token-Passing} are addressed in \Cref{Coordinator Election}, \ref{req:Heartbeat} and \ref{req:Non-termination Detection} are discussed in \Cref{Non-termination Detection}, an algorithm for \ref{req:Clock Synchronization} is provided in \Cref{Clock synchronization} and finally \ref{req:Database Synchronization} is covered in \Cref{Distributed Database}.
 
 \subsection{Coordinator Election and Coordinator Role} \label{Coordinator Election}
 
-As discussed in \autoref{practicability of an implementation} fully featured \glspl{MANET} are currently not provided and mapping it completely in the application layer is beyond the scope of this thesis. Overcoming the technical limitations, the system can be build with sequential communications instead of parallel. As stated in \fullref{Network Topologies} communication in context of \glspl{SMPC} is only done in a fully meshed subgroup of the network, which also simplifies the coordinator election.
+As discussed in \Cref{practicability of an implementation}, fully featured \glspl{MANET} are currently not provided and mapping it completely in the application layer is beyond the scope of this thesis. Overcoming the technical limitations, the system has to be build with sequential communications instead of parallel, because there is no certainty about the number of connections the Bluetooth module can hold. As stated in \Cref{Network Topologies}, communication in the context of \glspl{SMPC} is only done in a fully meshed subgroup of the network, which also simplifies the coordinator election, because the coordinator candidate only communicates with nodes nearby.
 
 \noindent A node will try to become the coordinator, when \nolinebreak
 %\vspace{-\topsep}
 \begin{enumerate}
 	%\itemsep-0.5em
-	\item it enters the network after longer disconnection: event driven.
-	\item a new personal score is ready for \gls{SMPC}: event driven.
-	\item all \gls{SMPC} computations for a score are done: event driven.
-	\item an event driven attempt failed and a certain amount of time passed: timer based.
+	\item It enters the network after longer disconnection: event driven.
+	\item A new personal score is ready for \gls{SMPC}: event driven.
+	\item All \gls{SMPC} computations for a score are done: event driven.
+	\item An event driven attempt failed and a certain amount of time passed: timer based.
 \end{enumerate}
 
-Extending requirement \ref{req:Coordinator Election} and to avoid situations of competing nodes trying to become coordinator and thereby booth repeatedly failing because neither can acquire enough computation partners, the timer based approach is supported by the exponential backoff algorithm. \textcite[p.67]{IEEE2010} describe the exponential backoff algorithm for collision detection and retransmission: if a coordinator appointment failed (equivalent to collision detection in original description) a factor for the waiting time till the next attempt is selected uniformly random from an increasing range, reducing the probability for competing coordinator candidates. The process is outlined in form of an \gls{UML} activity diagram in figure \ref{figure:coordinator exponential backoff}.
+Extending requirement \ref{req:Coordinator Election} and to avoid situations of competing nodes trying to become coordinator and thereby booth repeatedly failing because neither can acquire enough computation partners, the timer based approach is supported by the exponential backoff algorithm. \textcite[p.67]{IEEE2010} describe the exponential backoff algorithm for collision detection and retransmission: if a coordinator appointment failed (equivalent to collision detection in the original description) a factor for the waiting time till the next attempt is selected uniformly random from an increasing range, reducing the probability for competing coordinator candidates. The process is outlined in form of an \gls{UML} activity diagram in figure \ref{figure:coordinator exponential backoff}.
 
 \begin{figure}[htbp] % h for placement here
 	\caption{\gls{UML} activity diagram for exponential backoff algorithm} \label{figure:coordinator exponential backoff}
@@ -707,7 +738,15 @@ Extending requirement \ref{req:Coordinator Election} and to avoid situations of 
 
 \todo*{Reduction of active connections; compare number of additional rounds needed; discuss timeouts}
 
-In regard to the execution of the \gls{SMPC} protocols in \ref{req:SMPC Module}, the coordinator has to find a computation group. In a mesh network with routing and point-to-point encryption as displayed in \autoref{figure:Formation of fully meshed computation group - a}, the green marked coordinator can simply broadcast a computation request and responding nodes form the computation group. Caused by the technical limitations (see \autoref{practicability of an implementation}), the coordinator has to find a fully meshed group within its reach: this guarantees that each node can directly communicate with all computation partners and messages required for securing the channel are not passed through other nodes. First the coordinator $n_1$ discovers nearby nodes (see \autoref{figure:Formation of fully meshed computation group - b}). Then a list of these devices (identified by \gls{MAC} address) is sent to every neighboring node (see $n_2$ to $n_7$ in \autoref{figure:Formation of fully meshed computation group - c}). Each node responds with the intersection of the received device list with the own list of discovered devices (see \autoref{figure:Formation of fully meshed computation group - d}). To reduce the payload of the responses, they only contain a list of booleans, indication if the device with the same index in the received device list is seen by the node. The coordinator then computes the maximum group of fully meshed nodes and sends computation partners an associative array assigning new 8-bit ids (see \autoref{figure:Formation of fully meshed computation group - e}), which reduce the payload in following steps. Nearby nodes, that are not part of the computation group, receive an indicator to abort the computation. Each node in the computation group has a list of the group and the assigned ids and can exchange public keys with group members, forming a fully meshed, end-to-end encrypted group (see figure \ref{figure:Formation of fully meshed computation group - f}).
+In regard to the execution of the \gls{SMPC} protocols in \ref{req:SMPC Module}, the coordinator has to find a computation group. In a mesh network with routing and point-to-point encryption as displayed in \Cref{figure:Formation of fully meshed computation group - a}, the green marked coordinator can simply broadcast a computation request and responding nodes form the computation group. Caused by the technical limitations (see \Cref{practicability of an implementation}), the coordinator has to find a fully meshed group within its reach: this guarantees that each node can directly communicate with all computation partners and messages required for securing the channel are not passed through other nodes. 
+\begin{enumerate}
+	\item First the coordinator $n_1$ discovers nearby nodes (see \Cref{figure:Formation of fully meshed computation group - b}).
+	\item Then a list of these devices (identified by \gls{MAC} address) is sent to every neighboring node (see $n_2$ to $n_7$ in \Cref{figure:Formation of fully meshed computation group - c}).
+	\item Each node responds with the intersection of the received device list with the own list of discovered devices (see \Cref{figure:Formation of fully meshed computation group - d}).  To reduce the payload of the responses, they only contain a list of booleans, indication if the device with the same index in the received device list is seen by the node.
+	\item  The coordinator then computes the maximum group of fully meshed nodes and sends computation partners an associative array assigning new 8-bit ids (see \Cref{figure:Formation of fully meshed computation group - e}), which reduce the payload in following steps.
+	\item  Nearby nodes, that are not part of the computation group, receive an indicator to abort the computation. Each node in the computation group has a list of the group and the assigned ids and can exchange public keys with group members, forming a fully meshed, end-to-end encrypted group (see \Cref{figure:Formation of fully meshed computation group - f}).
+\end{enumerate}
+  
 
 \begin{figure}[!htb] % h for placement here
 
@@ -737,19 +776,24 @@ In regard to the execution of the \gls{SMPC} protocols in \ref{req:SMPC Module},
 	\hfill
 	\subfloat[Meshed network is ready for \gls{SMPC} computation]{%
 		\includegraphics[scale=1.0]{figures/coordinator-6.png}
+		\label{figure:Formation of fully meshed computation group - f}
 	}
-	\label{figure:Formation of fully meshed computation group - f}
 	\caption{Formation of fully meshed computation group} \label{figure:Formation of fully meshed computation group}
 \end{figure}
 
-Since parallel message exchange for the computation group cannot be guaranteed (see \autoref{practicability of an implementation}), the coordinator controls sequential message exchanges with token passing in accordance with \ref{req:Token-Passing}. For example when $n$ nodes want to exchange $n$ secrets divided into $n$ shares each, the coordinator first requests successively the shares for himself ($s_i,1$) from the other $n-1$ nodes, while transmitting his own shares ($s_1,j$) with the request. Then the communication token gets passed to the next node, which in turn requests the shares for himself from the other $n-2$ nodes while transmitting his own shares and so on. An exemplary share-exchange for $n=3$ with token-passing is illustrated in figure \ref{figure:coordinator token passing}.
+Since parallel message exchange for the computation group cannot be guaranteed (see \Cref{practicability of an implementation}), the coordinator controls sequential message exchanges with token passing in accordance with \ref{req:Token-Passing}. 
+\begin{enumerate}
+	\item For example, when $n$ nodes want to exchange $n$ secrets divided into $n$ shares each, the coordinator first requests successively the shares for himself ($s_i,1$) from the other $n-1$ nodes, while transmitting his own shares ($s_1,j$) with the request.
+	\item Then the communication token gets passed to the next node, which in turn requests the shares for himself from the other $n-2$ nodes while transmitting his own shares and so on.
+\end{enumerate}
+ An exemplary share-exchange for $n=3$ with token-passing is illustrated in \Cref{figure:coordinator token passing}.
 
 \begin{figure}[!htb] % h for placement here
 	\caption{\gls{UML} sequence diagram for passing of communication token t} \label{figure:coordinator token passing}
 	\includegraphics[scale=1.0]{figures/token-passing-ion.png}
 \end{figure}
 
-The combination of processes with the same communication partners, single-digit bytes of payloads and short process termination is a good option to reduces the total message-occurrence in the network: for example when a coordinator requests the states of nearby nodes, it can be combined with the clock synchronization.
+The combination of processes with the same communication partners, single-digit bytes of payloads and short process termination is a good option to reduce the total message-occurrence in the network: for example when a coordinator requests the states of nearby nodes, it can be combined with the clock synchronization.
 
 \subsection{Clock Synchronization} \label{Clock synchronization}
 
@@ -795,14 +839,14 @@ By sending the adjustments $\Delta_i$ instead of the adjusted time, the receivin
 	\caption[Distributed clock synchronzation]{Internal clock synchronzation in distributed networks} \label{figure:Distributed clock synchronzation}
 \end{figure}
 
-For further improvement of the accuracy the processing duration between receiving a request and sending the response $t_{process}$ can be measured and send to the coordinator. In this thesis the simple approximation for $t_{response}$ is used, since the additional payload extends the transmission duration. The \gls{RTT} has to be below an upper bound though, otherwise there is to much uncertainty regarding the influence of $t_{request}$, $t_{process}$ and $t_{response}$.
-Also bounds for the deviation of the time can be defined to reduce the influence of outliers.
+For further improvement of the accuracy the processing duration between receiving a request and sending the response $t_{process}$ can be measured and sent to the coordinator. In this thesis the simple approximation for $t_{response}$ is used, since the additional payload extends the transmission duration. The \gls{RTT} has to be below an upper bound though, otherwise there is to much uncertainty regarding the influence of $t_{request}$, $t_{process}$ and $t_{response}$.
+Furthermore bounds for the deviation of the time can be defined to reduce the influence of outliers.
 
 The framework does not change the actual clock setting on the hosting system, but stores the computed time difference $\Delta_t$ and applies the value to all time-related actions. To make sure that a node is time-synchronized before scores and computations are acquired, it is reasonable to trigger a synchronization when the node joins the network. 
 
 \subsection{Non-termination Detection} \label{Non-termination Detection}
 
-Especially since the coordinator gives temporarily away the message token and goes into a waiting state, there has to be a protocol to detect non-termination for processes. Meeting \ref{req:Non-termination Detection} each request to another node and each local computation initializes the start of timers. The local timer triggers the transmission of a heartbeat message (compare \ref{req:Heartbeat}) to the coordinator, signaling that the process is still intact, but not yet finished. If the coordinator receives a heartbeat message, it informs the other nodes in the computation group (causing them to reset their local timers), and resets its local timeout-timer. If the coordinator reaches a limit for the timer without receiving a heartbeat message, non-termination is assumed and all group members are informed, that the computation failed. The heartbeat protocol for the coordinator waiting for response is outlined in figure \ref{figure:heartbeat coordinator}, while the protocol for a node in possession of the message token is displayed in figure \ref{figure:heartbeat node}.  
+Since the coordinator gives temporarily away the message token and goes into a waiting state, there has to be a protocol to detect non-termination for processes. Meeting \ref{req:Non-termination Detection} each request to another node and each local computation initializes the start of timers. The local timer triggers the transmission of a heartbeat message (as required by \ref{req:Heartbeat}) to the coordinator, signaling that the process is still intact, but not yet finished. If the coordinator receives a heartbeat message, it informs the other nodes in the computation group (causing them to reset their local timers), and resets its local timeout-timer. If the coordinator reaches a limit for the timer without receiving a heartbeat message, non-termination is assumed and all group members are informed, that the computation failed. The heartbeat protocol for the coordinator waiting for response is outlined in figure \ref{figure:heartbeat coordinator}, while the protocol for a node in possession of the message token is displayed in figure \ref{figure:heartbeat node}.  
 
 \begin{figure}[!htb] % h for placement here
 	\centering
@@ -820,7 +864,7 @@ Especially since the coordinator gives temporarily away the message token and go
 
 \subsection{Distributed Databases} \label{Distributed Database}
 
-A distributed system without central servers, that guarantee availability throughout the network, has to provide a distributed database model. This means, that nodes need to compare their database states with each other and synchronize differences. Since the nodes can enter and leave the network freely, preservation of the data in the system as well as consistency has to be considered.
+A distributed system without a central server that guarantees availability throughout the network, has to provide a distributed database model. This means that each node holds a snapshot of the database and nodes need to compare their database states with each other and synchronize differences. Since the nodes can enter and leave the network freely, preservation of the data in the system as well as consistency have to be considered.
 
 The framework deals only with entry-sets of the database and lets the hosting system handle the actual storage. Since each node hosts its own database, transactions for concurrent access is not an issue.
 
@@ -835,7 +879,7 @@ The framework deals only with entry-sets of the database and lets the hosting sy
 	\item value
 \end{itemize}
 
-The combination of hash and Unix timestamp generates a key for the entry that is most likely collision free. The size of the computation group is needed to compute the arithmetic average from multiple entry-sum-values in a specified time-window (compare \autoref{eq:average of average}).
+The combination of hash and Unix timestamp generates a key for the entry that is most likely collision free. The size of the computation group is needed to compute the arithmetic average from multiple entry-sum-values in a specified time-window (compare \Cref{eq:average of average}).
 \begin{align}
 \begin{rcases*}
 \begin{rcases*}
@@ -858,32 +902,32 @@ Figure \ref{figure:Database synchronization scheme} displays the basic process f
 
 \subsection{Securing the Communication Channel} \label{Securing the Communication Channel}
 
-As requested in requirement \ref{req:SMPC Module} and noted in \ref{Secure Addition Protocol} the \gls{SMPC} protocols need secure communication channels. Listen in on wireless communication means receiving the radio signals, so for common wireless technologies this is easily accomplished. Since the physical layer is more or less public, the communication needs encryption. 
-For this framework two kinds of encryption are used: first asymmetric cryptography is used to exchange a session-key, which is then used to secure messages with symmetric encryption, as displayed in figure \ref{figure:RSA/AES scheme}. This principle is well known from \gls{TLS} encryption used in \gls{HTTPS}. For the asymmetric encryption the public-key cryptosystem \acs{RSA} as described by \textcite[pp. 49-76]{Delfs2015} is used. For the symmetric encryption the \gls{AES} as described by \textcite[pp. 19-25]{Delfs2015} is used.
+As requested in requirement \ref{req:SMPC Module} and noted in \ref{Secure Addition Protocol} the \gls{SMPC} protocols need secure communication channels. To intercept wireless communication means receiving the radio signals, so for common wireless technologies this is easily accomplished. Since the physical layer is public, the communication needs encryption. 
+For this framework two encryptions are used: first asymmetric cryptography is used to exchange a session-key, which is then used to secure messages with symmetric encryption, as displayed in figure \ref{figure:RSA/AES scheme}. This principle is well known from \gls{TLS} encryption used in \gls{HTTPS}. For the asymmetric encryption the public-key cryptosystem \acs{RSA} as described by \textcite[pp. 49-76]{Delfs2015} is used. For the symmetric encryption the \gls{AES} as described by \textcite[pp. 19-25]{Delfs2015} is used.
 \gls{AES} encrypts and decrypts faster than \gls{RSA}, because \gls{RSA} requires long keys (2048 bit and longer recommended) for proper security. But \gls{AES} needs sender and receiver to know the shared/symmetric key, and the exchange of this key over an insecure channel only with \gls{AES} is not possible.
 
 \begin{figure}[!htbp] % h for placement here
 	\caption{Securing communication with \gls{RSA} and \gls{AES}} \label{figure:RSA/AES scheme}
-	\includegraphics[scale=1.0]{figures/encryption-ion.png}
+	\includegraphics[scale=0.8]{figures/encryption-ion.png}
 \end{figure}
 
 The basis for the cryptosystem by \gls{RSA} is the prime-factorization, which requires super-polynomial time. \gls{RSA} is asymmetric, since there is one key for encryption and one key for decryption. In this setting, the public key is used for encryption, so only the receiver with the private key can decrypt the secret.
-For the key generation two large prime numbers are selected: $p,q \in \gls{doubleP} \ \text{with} \ p\neq q$. The product $n=p\cdot q$ is computed. Euler's Phi function $\phi (n)=(p-1)(q-1)$ is computed and a coprime integer $e$ is selected $1<e<\phi(n)$. A common value for $e$ is $65537$. The public key is formed by $n$ and $e$.
+For the key generation two large prime numbers are selected: $p,q \in \gls{doubleP} \ \text{with} \ p\neq q$. The product $n=p\cdot q$ is computed. Euler's Phi function $\phi (n)=(p-1)(q-1)$ is computed and a coprime integer $e$ is selected $1<e<\phi(n)$. A common value for $e$ is $65537$. The public key is formed using $n$ and $e$.
 The private key is formed from $n$ and $d$, where d meets $e\cdot d\equiv 1\mod \phi(n)$.
 
 For the symmetric encryption, booth partners use the same key. \gls{AES} is an iterated block cipher with a block length of 128 bits and key length of 128, 192 or 256 bits. The iterations (called rounds) follow the Rijndael algorithm. A detailed description of the algorithm can be found in \textcite[pp. 20-25]{Delfs2015}.
 
 \section{Architecture} \label{Architecture}
 
-Based on \ref{Coordinator Election} it is sensible, that the central element in this framework is a node component. Figure \ref{figure:UML component diagram} displays the \gls{UML} component diagram for the framework design and illustrates the basic conjunctions between the components, as well as key-functionalities. The node component can also act as the coordinator and in either state communications and computations let it pass through different states of activity. This framework therefore uses the state pattern: the current state determines the behavior and abilities of the node.
-In regard to the hosting system the node component utilizes an \gls{API} component, which uses callbacks to bind the communication layer and the system clock to the framework in accordance with \ref{req:Supportability}. To handle the message encryption a cryptography module is needed, providing the functionality described in \ref{Securing the Communication Channel}. As described in \ref{Non-termination Detection} a handler for timeout detection and heartbeat message triggering is provided. Parameters for communication, cryptography and \gls{SMPC} need to be accessible in a central component to meet \ref{req:Usability}.
+Based on \Cref{Coordinator Election} it is sensible, that the central element in this framework is a node component. \Cref{figure:UML component diagram} displays the components for the framework design and illustrates the basic conjunctions between the components, as well as key-functionalities. The node component can also act as the coordinator and in either state communications and computations let it pass through different states of activity. This framework therefore uses the state pattern: the current state determines the behavior and abilities of the node.
+In regard to the hosting system the node component utilizes an \gls{API} component, which uses callbacks to bind the communication layer and the system clock to the framework in accordance with \ref{req:Supportability}. To handle the message encryption a cryptography module is needed, providing the functionality described in \Cref{Securing the Communication Channel}. As described in \Cref{Non-termination Detection} a handler for timeout detection and heartbeat message triggering is provided. Parameters for communication, cryptography and \gls{SMPC} need to be accessible in a central component to meet \ref{req:Usability}.
 
 \begin{figure}[!htbp] % h for placement here
-	\caption{\gls{UML} component diagram} \label{figure:UML component diagram}
-	\includegraphics[scale=1.0]{figures/uml-component.png}
+	\caption{Framework components} \label{figure:UML component diagram}
+	\includegraphics[scale=0.8]{figures/uml-component.png}
 \end{figure}
 
-Since it is likely, that the technical limitations described in \autoref{practicability of an implementation} will be overcome in future releases, the framework's core functionality is independent from the efforts to provide the self-forming network abilities (avoidance of code smell known as change preventer or shotgun surgery). So in case of availability of full \gls{MANET} capabilities (secure multi-hop routing and parallel communications) only the node component has to be adopted.
+Since it is likely, that the technical limitations described in \Cref{practicability of an implementation} will be overcome in future releases, the framework's core functionality is independent from the efforts to provide the self-forming network abilities (avoidance of code smell known as change preventer or shotgun surgery). So in case of availability of full \gls{MANET} capabilities (secure multi-hop routing and parallel communications) only the node component has to be adopted.
 
 %\todo*{state machine; state pattern; client server architecture; \gls{UML} state diagrams for 1. joining network (get time; set clock delta), 2. finding computation partners, 3. running computation, 4. compare database}
 
@@ -892,7 +936,7 @@ Since it is likely, that the technical limitations described in \autoref{practic
 
 \todo*{15-20\%; details on the implementation; for someone who wants to continue the work}
 
-While the algorithms and protocols described in \autoref{Background} and \autoref{Design} are language-independent, it is sensible to use the programming language C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}. 
+While the algorithms and protocols described in \Cref{Background} and \Cref{Design} are language-independent, it is sensible to use the programming language C for the development, since it is widely supported on most \glspl{OS} including embedded \glspl{OS}. 
 To evaluate the practicability of the proposed framework design for real-life usage, the core system is implemented.
 To simplify the utilization and further development of the framework, first the development environments and tools used for the implementation of the core system are described.
 
@@ -902,7 +946,7 @@ Since the project will be hosted as an open-source project alongside a generated
 
 The core implementation was developed on Arch Linux using the \gls{GCC} version 6.2.1. JetBrains CLion 2016.3.1 was selected as \gls{IDE}, because it is cross-platform, offers code completion and analysis and supports Doxygen.
 
-Doxygen is a tool for generating documentation based on annotated sources (\autoref{Doxygen function annotation}), similar to Javadoc. Maintaining the documentation in the source files simplifies the process of keeping the documentation up to date after code changes and the documentation generation can be included in the build pipeline. This helps to avoid version conflicts between \gls{API} and source code, since developers can generate the \gls{API} on their local system from the sources, guaranteeing that the documentation at hand is the correct one for the used release of the source code. Doxygen offers the documentation as \gls{HTML} (\autoref{Doxygen function documentation}) and LaTeX, making it easy to provide platform independent documentation.
+Doxygen is a tool for generating documentation based on annotated sources (\Cref{Doxygen function annotation}), similar to Javadoc. Maintaining the documentation in the source files simplifies the process of keeping the documentation up to date after code changes and the documentation generation can be included in the build pipeline. This helps to avoid version conflicts between \gls{API} and source code, since developers can generate the \gls{API} on their local system from the sources, guaranteeing that the documentation at hand is the correct one for the used release of the source code. Doxygen offers the documentation as \gls{HTML} (\Cref{Doxygen function documentation}) and LaTeX, making it easy to provide platform independent documentation.
 
 \begin{lstlisting}[language=C, caption={Doxygen function annotation}, label={Doxygen function annotation}]
 /*!
@@ -919,11 +963,11 @@ unsigned int mod (long long x, int p);
 	\includegraphics[scale=1.4]{figures/doxygen.png}
 \end{figure}
 
-For managing changes to documents, the distributed version control git is used and the project is hosted on GitHub. Besides providing access to the project and easy maintainability the intention is to let other developers suggest improvements using pull requests.
+For managing changes to documents, the distributed version control system Git is used and the project is hosted on GitHub. Besides providing access to the project and easy maintainability the intention is to let other developers suggest improvements using pull requests.
 
 To validate the correctness of implemented functions, the unit test library Unity\footnote{\url{https://github.com/ThrowTheSwitch/Unity}} is used as a submodule. Using the parameter \lstinline|--recursive| the GitHub repository for Unity is embedded in the Security Games repository. 
 
-For unit tests with Unity, test files are added to the project including validations of predefined test cases with known output (\autoref{Unity test file}). When build for testing (\lstinline|make test|), the defined tests are executed and the results are displayed (\autoref{Unity test result}).
+For unit tests with Unity, test files are added to the project including validations of predefined test cases with known output (\Cref{Unity test file}). When build for testing (\lstinline|make test|), the defined tests are executed and the results are displayed (\Cref{Unity test result}).
 
 \begin{lstlisting}[language=C, caption=Unity test file, label={Unity test file}, float,floatplacement=H]
 #include "../src/SMPC_math.h"
@@ -954,23 +998,23 @@ OK
 
 \section{Module Structure} \label{Module Structure}
 
-As described in \autoref{Architecture} the central module for the framework is the Node module. The header file \lstinline|node.h| provides the interface to the host system. Settings and parameters for communication and computation are defined in \lstinline|configurations.h|. For the usage of the framework only those two header files are relevant: the settings in \lstinline|configurations.h| need to be adjusted to the use-case and  \lstinline|node.h| needs to be included in the own source file, to access functions and register function pointers for needed callbacks.
-The core implementation contains the following files:
+As described in \Cref{Architecture} the central module for the framework is the Node module. The header file \lstinline|node.h| provides the interface to the host system. Settings and parameters for communication and computation are defined in \lstinline|configurations.h|. For the usage of the framework only those two header files are relevant: the settings in \lstinline|configurations.h| need to be adjusted to the use-case and  \lstinline|node.h| needs to be included in the own source file, to access functions and register function pointers for needed callbacks.
+The core implementation consists of the following files:
 
 \begin{itemize}
 	\item \lstinline|node.h|: provides function prototypes for setting function pointers for callbacks from the framework to host functions as well as function prototypes for passing massages to the framework.
 	\item \lstinline|node.c| contains the implementation for the functions defined in \lstinline|node.h| and is the central managing unit. The processed messages define states for the node and it acts accordingly (state machine).
 	\item \lstinline|configurations.h| is the central place for settings regarding network and computation parameters. Booth \lstinline|node.c| and \lstinline|smpc.c| access the definitions in \lstinline|configurations.h| and no other files need adjustment for the usage of the system.
 	\item \lstinline|smpc.h| provides function prototypes to \lstinline|node.c| for the generation of the share matrix, the computation of the shares for the different \gls{SMPC} types and the Lagrange interpolation for recombination of shares.
-	\item \lstinline|smpc.c| provides the implementation of the functions defined in \lstinline|smpc.h| as well as needed helper functions like the cryptographic modulo operation for negative values and fractions.
+	\item \lstinline|smpc.c| provides the implementation of the functions defined in \lstinline|smpc.h| as well as needed helper functions such as the cryptographic modulo operation for negative values and fractions.
 	\item wolfCrypt\footnote{\url{https://www.wolfssl.com/wolfSSL/Products-wolfcrypt.html}} cryptography engine provides asymmetric \gls{RSA} as well as symmetric \gls{AES} encryption (\lstinline|rsa.h, aes.h, random.h|) for securing the communication.
 \end{itemize}
 
 \subsection{Node Module} \label{Node Module}
 
-The node module is the core of the framework and the only module interacting with the host system (see \autoref{Interfacing the Library}). Since nodes handle the formation of the computation group, they need to be aware of the host's identity, namely the \gls{MAC}, therefore the host passes the \gls{MAC} to the node when initializing it.
+The node module is the core of the framework and the only module interacting with the host system (see \Cref{Interfacing the Library}). Since nodes handle the formation of the computation group, they need to be aware of the host's identity, namely the \gls{MAC}, therefore the host passes the \gls{MAC} to the node when initializing it.
 
-For the computation group a share matrix is required, that describes which nodes share secrets when the threshold for needed shares ($k$) is lower than the computation group size. The share matrix is a symmetric matrix with same row-sum and column-sum for all rows and columns. For example \autoref{Share matrix for secret sharing} displays the share matrix for $n=5$ and $k=3$ (so at least three shares are required for the Lagrange interpolation and two adversaries can be tolerated), where node $n_3$ will send his shares $s_{3,1}$ to $n_1$, $s_{3,3}$ to itself and $s_{3,5}$ to $s_5$ while receiving $s_{1,3}$ $s_{3,3}$ and $s_{5,3}$.
+For the computation group a share matrix is required, that describes which nodes share secrets when the threshold for needed shares ($k$) is lower than the computation group size. The share matrix is a symmetric matrix with same row-sum and column-sum for all rows and columns. For example \Cref{Share matrix for secret sharing} displays the share matrix for $n=5$ and $k=3$ (so at least three shares are required for the Lagrange interpolation and two adversaries can be tolerated), where node $n_3$ will send his shares $s_{3,1}$ to $n_1$, $s_{3,3}$ to itself and $s_{3,5}$ to $s_5$ while receiving $s_{1,3}$ $s_{3,3}$ and $s_{5,3}$.
 \begin{table}[]
 	\centering
 	\caption[Share matrix for secret sharing]{Share matrix for secret sharing with threshold}
@@ -985,9 +1029,9 @@ For the computation group a share matrix is required, that describes which nodes
 	\end{tabular}
 \end{table}
 
-To compute the share matrix, the number of nodes in the computation group needs to be known. The framework offers the setting for varying values for the minimum and the maximum computation group size. Small group sizes make it more likely that a computation is completed, in contrast larger group sizes improve the security. In general it is advised to settle for a value and define minimum and maximum group size with it. This enables the node to compute also all shares needed for the \gls{SMPC} computations without the interaction with other nodes and the online phase can be minimized (see \autoref{figure:Off-line preparation for online computation}).
+To compute the share matrix, the number of nodes in the computation group needs to be known. The framework offers the setting for varying values for the minimum and the maximum computation group size. Small group sizes make it more likely that a computation is completed, in contrast larger group sizes improve the security. In general it is advised to settle for a value and define minimum and maximum group size with it. This enables the node to compute also all shares needed for the \gls{SMPC} computations without the interaction with other nodes and the online phase can be minimized (see \Cref{figure:Off-line preparation for online computation}).
 
-Once the host system passes a score to the node, the behavior of the node is controlled by different states. \autoref{Node module state machine} displays a simplified state diagram for coordinators and regular nodes once a score is passed.
+Once the host system passes a score to the node, the behavior of the node is controlled by different states. \Cref{Node module state machine} displays a simplified state diagram for coordinators and regular nodes once a score is passed.
 
 \begin{figure}[!htbp] % h for placement here
 	\caption{Off-line preparation for online computation} \label{figure:Off-line preparation for online computation}
@@ -1015,7 +1059,7 @@ To identify the purpose of a received message, an enumeration for message types 
 typedef enum { BROADCAST, ACK, STATE_REQUEST, STATE_RESPONSE, DISCOVERY_START_REQUEST, ... COMPUTATION_RESULT_RESPONSE } type_message;
 \end{lstlisting}
 
-Even though a regular broadcasting is not provided by the network (compare \autoref{practicability of an implementation}), the node module provides a pseudo-broadcast: a broadcast request requires a direct acknowledgment as a response. This was implemented to trigger longer processes, like discovery in all nodes in a more parallel way, instead of waiting for each node. 
+Even though regular broadcasting is not provided by the network (compare \Cref{practicability of an implementation}), the node module provides pseudo-broadcast: a broadcast request requires a direct acknowledgment as a response. This was implemented to trigger longer processes, like discovery in all nodes in a more parallel way, instead of waiting for each node. 
 For a broadcast the communication flow is:
 
 \begin{enumerate}
@@ -1033,7 +1077,7 @@ For a broadcast the communication flow is:
 
 The receiving node checks for each incoming message if the message begins with the broadcast enumerator, and responds with the \lstinline|ACK|, before reading and handling the additionally contained enumerator for the task request.
 
-All messages are byte arrays (respectively char arrays), with varying length, depending on the payload (see \autoref{Message body}).
+All messages are byte arrays (respectively char arrays), with varying length, depending on the payload (see \Cref{Message body}).
 
 \begin{table}[]
 	\centering
@@ -1058,9 +1102,9 @@ The cryptography engine wolfCrypt is open-source (GPLv2) and was selected becaus
 	\item Lightweight library, usable on embedded systems (e.g. \gls{TI-RTOS})
 \end{itemize}
 
-Like the Unity framework, wolfCrypt is referenced int the repository as a submodule. Using the parameter \lstinline|--recursive| the GitHub repository for Unity is embedded in the Security Games repository, ensuring relative paths in header includes and in the makefile are preserved. Submodules also reference a specific commit, so build errors through different source code versions can be reduced.
+Like the Unity framework, wolfCrypt is referenced in the repository as a submodule. Using the parameter \lstinline|--recursive| the GitHub repository for Unity is embedded in the Security Games repository, ensuring relative paths in header includes and in the makefile are preserved. Submodules also reference a specific commit, so build errors through different source code versions can be reduced.
 
-To meet up-to-date security demands (see \autoref{Securing the Communication Channel}), \gls{RSA} keys of length 3072 bits are generated and \gls{AES} keys with 192 bit are used (see \autoref{Configuration}) as defaults, though changes can be made in \lstinline|configurations.h|.
+To meet up-to-date security demands (see \Cref{Securing the Communication Channel}), \gls{RSA} keys of length 3072 bits are generated and \gls{AES} keys with 192 bit are used (see \Cref{Configuration}) as defaults, though changes can be made in \lstinline|configurations.h|.
 
 For the generation of the \gls{RSA} private key \lstinline|WOLFSSL_API int wc_MakeRsaKey(RsaKey* key, int size, long e, WC_RNG* rng);| is used, which is only available when \lstinline|WOLFSSL_KEY_GEN| is defined, therefore \lstinline|rsa.o| is compiled with the \lstinline|-DWOLFSSL_KEY_GEN| option.
 
@@ -1068,7 +1112,7 @@ Specific required modules from the library are embedded in the framework but not
 
 \subsection{Secure Multi-Party Computation Module} \label{SMPC Module}
 
-The \gls{SMPC} module provides functions to create shares for the secure sum, minimum and maximum computation. As described in \autoref{Secure Comparison Protocol} the shares for following rounds change, when a node disqualifies itself as the maximum. For the off-line preparation the \gls{SMPC} module therefore generates for each computation round additional shares for the disqualification case.
+The \gls{SMPC} module provides functions to create shares for the secure sum, minimum and maximum computation. As described in \Cref{Secure Comparison Protocol} the shares for following rounds change, when a node disqualifies itself as the maximum. For the off-line preparation the \gls{SMPC} module therefore generates for each computation round additional shares for the disqualification case.
 For large computation groups and large upper limits for the maximum score storage has to be considered, especially when running the framework on embedded system. 
 \begin{alignat}{3}
 \intertext{For example, the upper bound for the maximum score is 10000 and the computation group has a size of 20 and scores are 4 byte integers:}
@@ -1080,14 +1124,14 @@ For large computation groups and large upper limits for the maximum score storag
 &\text{Secure min disqualified:} \ && \text{14 rounds:} \quad && 14\cdot 20 \cdot 4\text{ byte}=1120\text{ byte} \nonumber
 \intertext{In total: $4560$ byte need to be stored for the given example values.} \nonumber
 \end{alignat}
-The \gls{SMPC} module also offers the restoration of the secret using Lagrange interpolation (see \autoref{Public function prototypes in smpc.h}). The interpretation of the result remains in the control of the node module. If the Lagrange interpolation for a round in the secure max protocol returns a value unequal to zero the node has to set the related bit for the maximum result and so on.
+The \gls{SMPC} module also offers the restoration of the secret using Lagrange interpolation (see \Cref{Public function prototypes in smpc.h}). The interpretation of the result remains in the control of the node module. If the Lagrange interpolation for a round in the secure max protocol returns a value unequal to zero the node has to set the related bit for the maximum result and so on.
 
 \begin{lstlisting}[language=C, caption={Public function prototypes in smpc.h}, label={Public function prototypes in smpc.h}, float, floatplacement=H]
 void smpc_generate_shares(int shares[], int n, int k, int secret, smpc_share_type type);
 int smpc_lagrange_interpolation(int involved_parties[], int shares[], int k);
 \end{lstlisting}
 
-All computations need to be in the finite ring defined by the upper bound prime. For lager computation groups the intermediate values in the Lagrange interpolation can leave the range, so potential risk operations have to be casted in a larger type and afterwards returned into the ring using modular operations. The \gls{SMPC} module therefore offers the cryptographic modulo for negative values and a modulo for fractions based on the Euclidean algorithm. Also for power operations with the risk of reaching undefined type ranges a power function with modulo application on intermediate values is provided (see \autoref{Modular operations in smpc.c})
+All computations need to be in the finite ring defined by the upper bound prime. For lager computation groups the intermediate values in the Lagrange interpolation can leave the range, so potential risk operations have to be casted in a larger type and afterwards returned into the ring using modular operations. The \gls{SMPC} module therefore offers the cryptographic modulo for negative values and a modulo for fractions based on the Euclidean algorithm. Also for power operations with the risk of reaching undefined type ranges a power function with modulo application on intermediate values is provided (see \Cref{Modular operations in smpc.c})
 
 \begin{lstlisting}[language=C, caption={Modular operations in smpc.c}, label={Modular operations in smpc.c}, float, floatplacement=H]
 int mod_power(int base, int power, int mod);
@@ -1097,12 +1141,12 @@ int mod_fraction(long long x, int p);
 
 \section{Interfacing the Library} \label{Interfacing the Library}
 
-As mentioned in \autoref{Node Module} for the usage of the library \lstinline|node.h| provides the prototypes for function callbacks, that need to be provided from the host system, to give the library access to the communication layer. In the current implementation the system is intended for the usage with Bluetooth and devices are identified by \gls{MAC}, but with moderate effort the system is portable to an IP address based system: only the arrays containing the discovery results and related messages in the node module need adjustments, otherwise the computations are independent from the communication layer.
-Based on tests on various Android device with different \gls{API} levels only the \gls{RFCOMM}Bluetooth protocol offers the ability to connect devices without (with minimum) user-interaction.
+As mentioned in \Cref{Node Module} for the usage of the library \lstinline|node.h| provides the prototypes for function callbacks, that need to be provided from the host system, to give the library access to the communication layer. In the current implementation the system is intended for the usage with Bluetooth and devices are identified by \gls{MAC}, but with moderate effort the system is portable to an IP address based system: only the arrays containing the discovery results and related messages in the node module need adjustments, otherwise the computations are independent from the communication layer.
+Based on tests on various Android device with different \gls{API} levels only the \gls{RFCOMM} Bluetooth protocol offers the ability to connect devices without (with minimum) user-interaction.
 
 \subsection{Configuration} \label{Configuration}
 
-Before the system is used, the settings in \lstinline|configuration.h| should be adjusted to the demands of the own system. The default values are displayed in \autoref{Definitions in configurations.h}.
+Before the system is used, the settings in \lstinline|configuration.h| should be adjusted to the demands of the own system. The default values are displayed in \Cref{Definitions in configurations.h}.
 
 \begin{lstlisting}[language=C, caption={Definitions in configurations.h}, label={Definitions in configurations.h}, float, floatplacement=H]
 #define CONFIGURATIONS_MINIMUM_COMPUTATION_GROUP 20
@@ -1114,7 +1158,7 @@ Before the system is used, the settings in \lstinline|configuration.h| should be
 #define CONFIGURATIONS_BOUNDING_PRIME 2147483647
 \end{lstlisting}
 
-As previously described the value for minimum and maximum computation group size are set to the same value, making the group size static and enabling the computation of the shares in the off-line phase (see \autoref{figure:Off-line preparation for online computation}). 
+As previously described the value for minimum and maximum computation group size are set to the same value, making the group size static and enabling the computation of the shares in the off-line phase (see \Cref{figure:Off-line preparation for online computation}). 
 
 Smaller computation groups offer better performance and reduce the risk of network separation, but for security reasons no adversaries should be tolerated. Providing a narrow estimation for the possible scores thorough the maximum score value is important for the secure maximum and minimum protocols, because it determines the number of needed rounds.
 
@@ -1122,7 +1166,7 @@ The selected key sizes for \gls{RSA} and \gls{AES} meet currently considered sec
 
 \subsection{Usage in C}	\label{Usage in C}
 
-After including \lstinline|node.h| the host has access to the functions to initialize the node, pass a score or pass a message (see \autoref{Function prototypes int node.h}). 
+After including \lstinline|node.h| the host has access to the functions to initialize the node, pass a score or pass a message (see \Cref{Function prototypes int node.h}). 
 
 \begin{lstlisting}[language=C, caption={Function prototypes int node.h}, label={Function prototypes int node.h}, float, floatplacement=H]
 void node_init(char *mac);
@@ -1133,7 +1177,7 @@ void node_set_send_function(void(*func)(char *target, char *message));
 void node_set_await_function(int (*func)(char * source, char[]));
 \end{lstlisting}
 
-Using the provided setters, the host system needs to provide the function pointers for the functions to send from the node, run discovery of Bluetooth devices and await the response from a specified node (see \autoref{Prototypes for host callbacks}). After setting the callbacks the node can be initialized before passing the first score (see \autoref{Node setup and system start}).
+Using the provided setters, the host system needs to provide the function pointers for the functions to send from the node, run discovery of Bluetooth devices and await the response from a specified node (see \Cref{Prototypes for host callbacks}). After setting the callbacks the node can be initialized before passing the first score (see \Cref{Node setup and system start}).
 
 \begin{lstlisting}[language=C, caption={Prototypes for host callbacks}, label={Prototypes for host callbacks}, float, floatplacement=H]
 void host_function_send_message(char *target, char *message);
@@ -1176,7 +1220,7 @@ Java_[package]_MainActivity_nodePassMessages(JNIEnv *env, jobject this, jstring 
 	\includegraphics[scale=1.0]{figures/jni_wrapper.png}
 \end{figure}
 
-To provide a callback function, \gls{JNI} class lookup can be used. To call a Java method defined as \lstinline|public void sendMessage(String target, String message){ ... }| class and method references can be stored (see \autoref{Using a Java method as callback for native method}) and the reference to a wrapping function is passed to the C library.
+To provide a callback function, \gls{JNI} class lookup can be used. To call a Java method defined as \lstinline|public void sendMessage(String target, String message){ ... }| class and method references can be stored (see \Cref{Using a Java method as callback for native method}) and the reference to a wrapping function is passed to the C library.
 
 \begin{lstlisting}[language=C, caption={Using a Java method as callback for native method}, label={Using a Java method as callback for native method}, float, floatplacement=H]
     jclass mainClass = (*env)->FindClass(env, "[package]/MainActivity");
@@ -1187,7 +1231,7 @@ jobject javaObjectRef = (*env)->NewObject(env, mainClass, id);
 
 \subsubsection{Android Bluetooth Observations} \label{Android Bluetooth Observations}
 
-In regard to the implementation of the \gls{RFCOMM} communication, different versions of Android showed different behavior: when trying to set the visibility, older test devices running Android 4.0 up to Android 4.3 issued the initial user confirmation to become indefinitely discoverable (see \autoref{Android discoverable intent}), but stopped without notification after the duration set in the Bluetooth settings, deviation from the android documentation. In contrast Android 5 devices became discoverable indefinitely (until Bluetooth was disabled and re-enabled). 
+In regard to the implementation of the \gls{RFCOMM} communication, different versions of Android showed different behavior: when trying to set the visibility, older test devices running Android 4.0 up to Android 4.3 issued the initial user confirmation to become indefinitely discoverable (see \Cref{Android discoverable intent}), but stopped without notification after the duration set in the Bluetooth settings, deviation from the android documentation. In contrast Android 5 devices became discoverable indefinitely (until Bluetooth was disabled and re-enabled). 
 
 \begin{lstlisting}[language=Java, caption={Android discoverable intent}, label={Android discoverable intent}, float, floatplacement=H]
 Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -1203,7 +1247,7 @@ Also one device (Kindle Fire HDX based on Android 4.2.2) showed unexpected behav
 \chapter{Evaluation} \label{Evaluation}
 \todo*{5-15\%; outcome; how was it tested; for supervisor}
 
-While the correctness of the implemented methods is verified using unit tests (see \autoref{Development Tools}), the influence of configurable options (see \fullref{Configuration}), like the group size has to be evaluated. Also the impact of devices with significant lower computation power is of interest when targeting wearables and \gls{IoT} grade devices.
+While the correctness of the implemented methods is verified using unit tests (see \Cref{Development Tools}), the influence of configurable options (see \fullref{Configuration}), like the group size has to be evaluated. Also the impact of devices with significant lower computation power is of interest when targeting wearables and \gls{IoT} grade devices.
 For the usage of the framework embedded in an Android application running battery powered devices like the personal smartphone, the power consumption is also an important topic.
 
 %\section{Testing Tools}	\label{Testing Tools}
@@ -1212,14 +1256,21 @@ For the usage of the framework embedded in an Android application running batter
 
 \section{Power Consumption for Bluetooth States} \label{Power Consumption for Bluetooth States}
 
+All test were realized on a Sony Experia Z1 Compact:
+\begin{itemize}
+	\item Android 5.1.1
+	\item Software Version 14.6.A.1.236
+	\item disabled power saving modes
+\end{itemize} 
+
 To evaluate the power consumption of Android devices in different Bluetooth states an application was developed enabling Bluetooth states for a specific amount a time. Then a report can be imported from the devices which contains estimated power usage\footnote{\url{https://developer.android.com/studio/profile/battery-historian.html}}.
 
 \begin{enumerate}
-	\item Using \gls{ADB} with a connected device, the battery stats are reseted to reduce the produced analysis file to the duration of interest: \lstinline|adb shell dumpsys batterystats --reset|
+	\item Using \gls{ADB} with a connected device, the battery stats are reset to reduce the produced analysis file to the duration of interest: \lstinline|adb shell dumpsys batterystats --reset|
 	\item The device is disconnected from the development system, so battery stats are recorded
 	\item The application is executed for a fixed time duration
 	\item The device is reconnected to the development system and using \gls{ADB} the report is pulled from the device: \lstinline|adb bugreport > bugreport.txt|
-	\item The report contains a section labeled estimated power use (see \autoref{Android battery stats report})
+	\item The report contains a section labeled estimated power use (see \Cref{Android battery stats report})
 \end{enumerate}
   
 \begin{lstlisting}[language=C, caption={Android battery stats report}, label={Android battery stats report}]
@@ -1229,12 +1280,7 @@ Screen: 146
 Bluetooth: 12,0
 \end{lstlisting}
   
-All test were realized on a Sony Experia Z1 Compact:
-\begin{itemize}
-	\item Android 5.1.1
-	\item Software Version 14.6.A.1.236
-	\item disabled power saving modes
-\end{itemize}   
+  
 
 Each test case has a runtime of one hour, to reduce the significance of measuring inaccuracy. At the beginning and after completion of the tests Bluetooth is disabled. Discoverable state is periodically verified during the test with another Android device in range. Tests:
 
@@ -1247,7 +1293,7 @@ Each test case has a runtime of one hour, to reduce the significance of measurin
 	\item Wi-Fi enabled, connected and receiving video-stream
 \end{enumerate}
 
-The results of the power consumption tests are displayed in \autoref{figure:Batterystats}.
+The results of the power consumption tests are displayed in \Cref{figure:Batterystats}.
 
 \begin{figure}[!htbp] % h for placement here
 	\caption{Batterystats for different Bluetooth states (logarithmic scale) } \label{figure:Batterystats}
@@ -1262,7 +1308,7 @@ The processes communicate using named pipes, with the \gls{MAC} as name, so the 
 
 To take the discovery duration into account, the tester application forces a sleep for 3 seconds, when discovery is called by the node module. Also a sleep duration based on the lower end for Bluetooth transmission rates (732,2 kbit/s) is applied for outgoing messages depending on the message length.
 
-The time critical part is the online phase of the computations (see \autoref{figure:Off-line preparation for online computation}), therefore the coordinator measures the time (using the \lstinline|<time.h>| library) from sending the state request to all nodes nearby until the computation is concluded with the acknowledgment from all nodes in response to the computation result announcement.
+The time critical part is the online phase of the computations (see \Cref{figure:Off-line preparation for online computation}), therefore the coordinator measures the time (using the \lstinline|<time.h>| library) from sending the state request to all nodes nearby until the computation is concluded with the acknowledgment from all nodes in response to the computation result announcement.
 
 Test settings for secure sum protocol:
 \begin{enumerate}
@@ -1274,7 +1320,7 @@ Test settings for secure sum protocol:
 	\item Secure sum with 100 nodes
 \end{enumerate}
 
-Test execution: each test was repeated three times and the displayed durations in \autoref{figure:Computation time over number of nodes for secure sum} and \autoref{figure:Computation time over number of nodes for secure maximum} are the arithmetic average to reduce the significance of disturbances through other processes.
+Test execution: each test was repeated three times and the displayed durations in \Cref{figure:Computation time over number of nodes for secure sum} and \Cref{figure:Computation time over number of nodes for secure maximum} are the arithmetic average to reduce the significance of disturbances through other processes.
 
 \begin{figure}[!htbp] % h for placement here
 	\caption{Computation time over number of nodes for secure sum} \label{figure:Computation time over number of nodes for secure sum}
@@ -1303,7 +1349,7 @@ To evaluate the influence of computational power, the virtualization software Vi
 
 As an alternative approach cpulimit\footnote{\url{https://github.com/opsengine/cpulimit}} was used to limit the cpu usage of the tester processes. Again the online time was not affected besides for very small limit-values (1 to 5\%). The measurements embedded in the code revealed however, that the usage of \lstinline|SIGSTOP| and \lstinline|SIGCONT| signals distort the measurements and the results are not reproducible.
 
-Finally the power management of the hosting system provided reproducible results. The changes in the related computations (encryption, decryption, summation, Lagrange interpolation) are very small, therefore the fixed value for discovery was removed, to highlight the differences (see \autoref{figure:Computation time over CPU Power for 20 nodes}).
+Finally the power management of the hosting system provided reproducible results. The changes in the related computations (encryption, decryption, summation, Lagrange interpolation) are very small, therefore the fixed value for discovery was removed, to highlight the differences (see \Cref{figure:Computation time over CPU Power for 20 nodes}).
 
 For all tests the computation group size was defined as 20. The power management was than used to limit the CPU to levels of 20\%, 40\%, 60\%, 80\% and 100\%.
 \begin{figure}[!htbp] % h for placement here
@@ -1315,38 +1361,38 @@ For all tests the computation group size was defined as 20. The power management
 
 \chapter{Discussion} \label{Discussion}
 
-The evaluation of the core implementation in \autoref{Evaluation} demonstrates that the framework reaches a performance grade that makes it applicable for smaller computation group sizes. Besides the computation performance, the unobtrusiveness for the end-user is also important for the successful integration of the system for example in a work environment. The demands toward the system were outlined in \autoref{Requirements} and the requirement coverage is review.
-Finally solutions and improvement potential for design flaws, which were uncovered through the simulations and analysis of subroutines, are proposed for next  he evaluation also revealed first design flaws and improvement potential and solutions are proposed for the next development iterations.
+The evaluation of the core implementation in \Cref{Evaluation} demonstrates that the framework reaches a performance grade that makes it applicable for smaller computation group sizes. Besides the computation performance, the unobtrusiveness for the end-user is also important for the successful integration of the system for example in a work environment. The demands toward the system were outlined in \Cref{Requirements} and the requirement coverage is reviewed.
+Finally solutions and improvement potential for design flaws, which were uncovered through the simulations and analysis of subroutines, are proposed for the next development iterations.
 
 \section{Requirement Satisfaction in Real-Life Settings} \label{Requirement Satisfaction in Real-Life Settings}
 
 The usage of the framework in \glspl{MANET} with the intention to use personal smartphones as hosts, require strict compliance with the requirements regarding unobtrusiveness (\ref{req:Pairing-less Connection}), privacy protection (\ref{req:SMPC Module}) and performance (\ref{req:Performance}). In the following sections conditions for compliance are discussed in context of real-life environments.
 
 \subsection{User Acceptance}
-The results of the power consumption tests for Android (see \fullref{figure:Batterystats}) show, that having Bluetooth enabled, being discoverable and holding a \gls{RFCOMM} connection have no significance for the daily usage of a smartphone: being discoverable and connected for 24 hours consumes around the same amount of power as having the display activated for a few minutes (also analyzed through the battery stats, compare \autoref{Android battery stats report}). 
+The results of the power consumption tests for Android (see \fullref{figure:Batterystats}) show, that having Bluetooth enabled, being discoverable and holding a \gls{RFCOMM} connection have no significance for the daily usage of a smartphone: being discoverable and connected for 24 hours consumes around the same amount of power as having the display activated for a few minutes (also analyzed through the battery stats, compare \Cref{Android battery stats report}). 
 The discovery phase is expensive in regard of power consumption, but device dependent this phase is usually only active for around one to five seconds. Even for multiple retries to form a computation group, the total power consumption per hour for discovery will range significantly below 1 mA, for example if for all three \gls{SMPC} protocols 10 retries to form a computation group were needed and the device runs discovery for 5 seconds, then the power consumption for the discovery phase is $0,5$ mA in an hour. 
 
 In regard of the power consumption the framework is therefore fit for usage and worries regarding drainage of the battery can be easily invalidated.
 
-Further the Android tests (see \autoref{Android Bluetooth Observations}) have shown, that at least for Android devices running Android 5.0 and up, the user interaction required for joining the system is limited to the permission of becoming discoverable. Until Bluetooth is disabled, no further interactions are required and no system settings have to be manually altered. Therefore requirement \ref{req:Pairing-less Connection} is also met.
+Further the Android tests (see \Cref{Android Bluetooth Observations}) have shown, that at least for Android devices running Android 5.0 and up, the user interaction required for joining the system is limited to the permission of becoming discoverable. Until Bluetooth is disabled, no further interactions are required and no system settings have to be manually altered. Therefore requirement \ref{req:Pairing-less Connection} is also met.
 
 For developers \ref{req:Supportability} is met through the doxygen documentation, the clean interface provided by \lstinline|node.h| and the implementations in the tester application and the Android example. For \ref{req:Usability} all settings are adjusted in \lstinline|configurations.h|, simplifying the framework adaption and integration. 
-As described in \autoref{Interfacing the Library}, \ref{req:Expandability} is not fully met yet. The \gls{MAC} address bound identification of devices will be further abstracted to decouple the framework from a specific wireless technology.
+As described in \Cref{Interfacing the Library}, \ref{req:Expandability} is not fully met yet. The \gls{MAC} address bound identification of devices will be further abstracted to decouple the framework from a specific wireless technology.
 
 \subsection{Required Time for Computation}
 
 Since the system is intended for a \gls{MANET}, the computation time has to stay within limits, so that the computation can complete before the fully meshed computation group network is separated.
 
-In the secure sum protocol for lower node numbers, the discovery is the major time consumer and up to 20 nodes, the computational costs are comparatively negligible. For larger computation groups, the time needed to compute the secure sum reaches durations that make a network separation for moving nodes likely. Bluetooth range varies significantly among Bluetooth modules and power settings, but a range of 10 meters is a good rule of thumb. Considering a typical walking speed of 1,4 meters per second \autocite{Mohler2007}, the distance after 7 seconds (compare \autoref{figure:walking range in computation time}) makes it likely that the connection to other nodes is lost because of the distance or shielding walls, especially if the other nodes are moving as well.
+In the secure sum protocol for lower node numbers, the discovery is the major time consumer and up to 20 nodes, the computational costs are comparatively negligible. For larger computation groups, the time needed to compute the secure sum reaches durations that make a network separation for moving nodes likely. Bluetooth range varies significantly among Bluetooth modules and power settings, but a range of 10 meters is a good rule of thumb. Considering a typical walking speed of 1,4 meters per second \autocite{Mohler2007}, the distance after 7 seconds (compare \Cref{figure:walking range in computation time}) makes it likely that the connection to other nodes is lost because of the distance or shielding walls, especially if the other nodes are moving as well.
 
 \begin{figure}[!htbp] % h for placement here
 	\caption{Walking range in computation time} \label{figure:walking range in computation time}
 	\includegraphics[scale=1.0]{figures/walking_range.png}
 \end{figure}
 
-The core implementation provided in \autoref{Implementation} meets requirements \ref{req:Coordinator Election}, \ref{req:Token-Passing} and \ref{req:SMPC Module}, though based on the current performance simulations of the system (see \autoref{figure:Computation time over number of nodes for secure sum} and \autoref{figure:Computation time over number of nodes for secure maximum}) \ref{req:Performance} is only met for small computation groups ($n<20$). Since the simulations in \autoref{Evaluation} do not take into account durations needed for establishing the \gls{RFCOMM} connections, the simulations need to be adjusted based on further measurements on different Android devices. The development goal for the tester application is to make it a tool for analyzing the performance of the framework in the intended system configuration.
+The core implementation provided in \Cref{Implementation} meets requirements \ref{req:Coordinator Election}, \ref{req:Token-Passing} and \ref{req:SMPC Module}, though based on the current performance simulations of the system (see \Cref{figure:Computation time over number of nodes for secure sum} and \Cref{figure:Computation time over number of nodes for secure maximum}) \ref{req:Performance} is only met for small computation groups ($n<20$). Since the simulations in \Cref{Evaluation} do not take into account durations needed for establishing the \gls{RFCOMM} connections, the simulations need to be adjusted based on further measurements on different Android devices. The development goal for the tester application is to make it a tool for analyzing the performance of the framework in the intended system configuration.
 
-The tests regarding computational power have shown, that the reduction of the online phase through scale up of the nodes is limited: the message driven nature of the system and the high amount of massages (raising with the number of nodes squared) passed between the nodes in a sequential manner are not transmitted faster when upscaling. This demonstrates that the framework can tolerate nodes with comparatively low computational power, but the influence of the messages also request optimization of the message system (see \autoref{Design Flaws Detected Through Evaluation}).
+The tests regarding computational power have shown, that the reduction of the online phase through scale up of the nodes is limited: the message driven nature of the system and the high amount of massages (raising with the number of nodes squared) passed between the nodes in a sequential manner are not transmitted faster when upscaling. This demonstrates that the framework can tolerate nodes with comparatively low computational power, but the influence of the messages also request optimization of the message system (see \Cref{Design Flaws Detected Through Evaluation}).
 
 \section{Design Flaws Discussion} \label{Design Flaws Detected Through Evaluation}
 
@@ -1360,7 +1406,7 @@ Message format improvements:
 
 Similar to software parallelization, where load is distributed among threads, in some cases the sequential message passing can be distributed among nodes:
 \begin{itemize}
-	\item Instead of sending each node in the computation group sequentially a broadcast message (compare \autoref{figure:Broadcast optimization - a}), the coordinator can distribute broadcasts with large payloads among nodes, which in turn transmit the message to a subgroup of nodes. The coordinator then sends \lstinline|ACK|-requests to each node to verify all nodes are ready (see \autoref{figure:Broadcast optimization - b}).
+	\item Instead of sending each node in the computation group sequentially a broadcast message (compare \Cref{figure:Broadcast optimization - a}), the coordinator can distribute broadcasts with large payloads among nodes, which in turn transmit the message to a subgroup of nodes. The coordinator then sends \lstinline|ACK|-requests to each node to verify all nodes are ready (see \Cref{figure:Broadcast optimization - b}).
 \end{itemize}
 
 \begin{figure}[!htb] % h for placement here
@@ -1379,7 +1425,7 @@ Similar to software parallelization, where load is distributed among threads, in
  
 Protocol improvements:
 \begin{itemize}
-	\item The sum protocol currently limits the computation group, because an 32 bit integer is computed and returned. For larger scores, this can cause a integer overflow if the computation group is lager than the maximum value of the data type divided by the maximum score. Because of the expected group sizes based on \autoref{Evaluation}, using a 64 bit integer will fix the overflow risk.
+	\item The sum protocol currently limits the computation group, because an 32 bit integer is computed and returned. For larger scores, this can cause a integer overflow if the computation group is lager than the maximum value of the data type divided by the maximum score. Because of the expected group sizes based on \Cref{Evaluation}, using a 64 bit integer will fix the overflow risk.
 	\item A fixed size computation group reduces the online-phase and is therefore the preferred setting, but this will leave single nodes without the option to commit their scores. The computation priority should increase for these node. When a threshold is reached, the computation can tolerate a number of nodes (similar to the threshold for adversaries) using computation results as inputs. This has to be evaluated for correctness and privacy.
 \end{itemize}
 
@@ -1396,33 +1442,33 @@ Using these values as a metric for system performance, the maintainer can then c
 \FloatBarrier
 
 \chapter{Conclusion} \label{Conclusion}
+This thesis proposed the design of an \gls{SMPC} framework running distributed computations
+in a \gls{MANET} to compute privacy preserving statistics to introduce gamification into local ad-hoc networks with high privacy demands.
 
-\todo*{5-10\%; outcome for an introduction-reader}
+Since Android currently does not provide \gls{MANET} functionality, a self-forming network was developed using \gls{RFCOMM}. In a fully meshed and cryptographic secured subnetwork secure protocols for sum, minimum and maximum based on Shamir's secret sharing scheme are computed.
 
-This thesis proposed the development of a \gls{SMPC} framework for \glspl{MANET}, providing privacy preserving computations of average, minimum and maximum to introduce gamification into local ad-hoc networks with high privacy demands.
-Since Android currently does not provide \gls{MANET} functionality, a self-forming network was developed using \gls{RFCOMM}. For the computation a fully meshed subnetwork is formed (see \autoref{figure:Formation of fully meshed computation group}). This way, each member in the computation group can directly communicate with all other members, which is needed for securing the communication using cryptography.
-Based on Shamir's secret sharing scheme a protocol for secure addition was developed. For the minimum and maximum computation, the secure sum protocol was extended to a multi-round, bitwise comparison protocol. Besides basic knowledge of mathematics only modulo arithmetic has to be known for manually reconstructing the computations and detailed examples are provided in \autoref{Secure Multi-Party Computation}. The protocols were implemented using the C programming language to be able to use the framework on a multitude of devices.
+User acceptance of the final system was a key target in the development of the framework:
 
-For the user acceptance of the system the power consumption for a Bluetooth based network was analyzed. Even demanding operations like discovery will only have a minimal effect on the overall battery drainage since these phases are only run for short time periods.
-
-The behavior of the framework for different sizes of the computation group was simulated to identify influential factors:
 \begin{itemize}
-	\item For small computation groups the discovery phase is causing most of the computation time.
-	\item For larger groups the amount of messages becomes the relevant influence factor, since the amount of messages increases with number of parties in the group squared. 
-	\item The secure maximum protocol shows critical computation durations at around 20 nodes, but in a real-life situation network separation and thereby unintended computation termination is likely to occur at lower group sizes.
-	\item In general the trade-off is: larger computation groups strengthens the privacy, while smaller groups have better performance; but even a setting of a group size of 5 nodes provides good privacy and performance.
-\end{itemize}  
-
-Overall the framework-simulations performed well enough to be applicable for a gamification integration in a high-privacy environment.
-
-Outlook:
-\begin{itemize}
-	\item in a first incrementation of the framework the improvements proposed in \autoref{Design Flaws Detected Through Evaluation} will be implemented and the performance again evaluated.
-	\item Measurements of durations for establishing connections using \gls{RFCOMM} and achievable transmission rates will be performed on different Android devices, to improve the tester application with the intention to provide developers with decent approximations of the framework performance, so settings can be tested before deploying the system. 
-	\item Further the framework's coupling with Bluetooth will be loosened up, so it can be utilized more flexible in different environments.
+	\item The \gls{SMPC} protocols and the implemented encryption of the communication channel meet high privacy and security demands.
+	\item Besides the protocol descriptions, detailed example computations are provided, so users with a basic knowledge of mathematics can review and verify the functionality of the protocols to gain the users trust in the system.
+	\item The evaluations of the Bluetooth related power consumption clarify, that worries regarding battery drainage through the usage of the framework are unfounded.
 \end{itemize}
 
-Especially the announced implementation of mesh networking in upcoming Bluetooth versions will further improve the applicability of \gls{SMPC} for gamification approaches in ad-hoc networks.
+The evaluation of the performance of the protocols dependent on different group size suggest likely completion of the computations for group sizes in the range of 10 nodes. The results of different computation groups can be merged, without reducing the correctness of the overall computation, therefore smaller group sizes present no downsides to the system users.
+
+Overall the framework-simulations performed well enough to be unhesitatingly applicable for a gamification integration in a high-privacy environment. System users can verify that their secret score is never revealed to an other party as long as their own device keeps the final share needed for the restoration of the secret safe.
+
+\section{Outlook}
+
+\begin{enumerate}
+	\item in a first incrementation of the framework the improvements proposed in \Cref{Design Flaws Detected Through Evaluation} will be implemented and the performance again evaluated.
+	\item Measurements of durations for establishing connections using \gls{RFCOMM} and achievable transmission rates will be performed on different Android devices, to improve the tester application with the intention to provide developers with decent approximations of the framework performance, so settings can be tested before deploying the system. 
+	\item Further the framework's coupling with Bluetooth will be loosened up, so it can be utilized more flexible in different environments.
+\end{enumerate}
+
+The core system does not yet provide the features for the distributed database, which will be implemented before embedding the framework in the Hygiene Games project. Embedding the framework in the Hygiene Games and will showcase \textit{secure gamification} as the successful conjunction of the gamification principles (namely the ability of social comparison) with \gls{SMPC}. Simultaneously the framework will be launched on GitHub as an open source project.
+The \gls{MANET} like features implemented in the framework have the potential to become a stand-alone project to separate the network development from the \gls{SMPC} features. The announced implementation of mesh networking in upcoming Bluetooth versions will further improve the applicability of \gls{SMPC} for gamification approaches in ad-hoc networks, though based on the experience with Bluetooth LE, it will probably take years until the distribution of the new standard validates discarding the current technology which is wide spread an therefore supports a multitude of devices and \glspl{OS}.
 
 \clearpage
 \renewcommand{\bibname}{References} % rename Bibliograpy to References

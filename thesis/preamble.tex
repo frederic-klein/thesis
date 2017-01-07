@@ -21,7 +21,8 @@
 \usepackage[makeroom]{cancel} % crossed out numbers
 \usepackage{booktabs} % thick rules for tables
 \usepackage{listings} % source code
-
+\usepackage{bbding}
+\usepackage{cleveref}
 \lstdefinestyle{customc}{
 	belowcaptionskip=1\baselineskip,
 	breaklines=true,
@@ -39,7 +40,7 @@
 
 % reenable for final version
 %\setcounter{tocdepth}{1} % include only section in toc
-%\setcounter{secnumdepth}{3} % number also subsections
+\setcounter{secnumdepth}{3} % number also subsections
 
 % \bibliography{references}
 \addbibresource{references.bib}
@@ -60,7 +61,9 @@
 
 \newcommand{\pad}[1]{\ifnum\value{#1}<10 0\fi\arabic{#1}}
 
-
+% borders
+\usepackage{makecell}
+% borders
 
 % define funcreq command
 % creates an auto-incremented (FR00), bold output of the functional requirement argument, that can be labeled and prints the output when referenced
@@ -100,7 +103,6 @@
 \newacronym{NDK}{NDK}{Native Development Kit}
 \newacronym{JNI}{JNI}{Java Native Interface}
 \newacronym{PRNG}{PRNG}{pseudo-random number generator}
-\newacronym{2PC}{2PC}{secure two-party computation}
 \newacronym{DDoS}{DDoS}{Distributed Denial of Service}
 \newacronym{MSB}{MSB}{most significant bit}
 \newacronym{LSB}{LSB}{least significant bit}
